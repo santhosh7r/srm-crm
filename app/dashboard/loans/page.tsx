@@ -107,7 +107,7 @@ export default function LoansPage() {
                     </p>
 
                     {/* Amounts row */}
-                    <div className="grid grid-cols-4 gap-3 text-sm mb-3">
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 text-sm mb-3">
                       <div>
                         <p className="text-xs text-slate-500">Disposed</p>
                         <p className="font-semibold text-slate-900">₹{(loan.disposeAmount ?? 0).toFixed(2)}</p>
