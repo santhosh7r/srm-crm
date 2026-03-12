@@ -67,6 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/clients', label: 'Clients' },
     { href: '/dashboard/plans', label: 'Plans' },
     { href: '/dashboard/loans', label: 'Loans' },
+    { href: '/dashboard/history', label: 'History' },
   ];
 
   const isActive = (href: string) =>
@@ -77,8 +78,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── Navbar ── */}
       <nav
         className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-            ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200/60'
-            : 'bg-white border-b border-slate-100'
+          ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200/60'
+          : 'bg-white border-b border-slate-100'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -103,8 +104,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     key={item.href}
                     href={item.href}
                     className={`relative px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${active
-                        ? 'text-slate-900 bg-slate-100'
-                        : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'text-slate-900 bg-slate-100'
+                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
                       }`}
                   >
                     {item.label}
