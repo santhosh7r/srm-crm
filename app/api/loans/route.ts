@@ -1,6 +1,7 @@
 import { connectDB } from '@/lib/db';
 import Loan from '@/models/Loan';
 import Plan from '@/models/Plan';
+import Payment from '@/models/Payment';
 import { getCurrentUser } from '@/lib/jwt';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -71,6 +72,20 @@ export async function POST(req: NextRequest) {
     });
 
     await loan.save();
+
+    // Request: in monthly the initial interest need to come as first payment record
+    if (plan.planType === 'monthly' && interest > 0) {
+      const initialPayment = new Payment({
+        userId,
+        loanId: loan._id,
+        amount: interest,
+        type: 'interest',
+        date: start,
+        notes: 'Initial monthly interest (recorded at allocation)',
+      });
+      await initialPayment.save();
+    }
+
     return NextResponse.json({ success: true, data: loan }, { status: 201 });
   } catch (error: any) {
     console.error('Create loan error:', error);

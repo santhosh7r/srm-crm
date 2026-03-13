@@ -67,6 +67,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/clients', label: 'Clients' },
     { href: '/dashboard/plans', label: 'Plans' },
     { href: '/dashboard/loans', label: 'Loans' },
+    { href: '/dashboard/dues', label: 'Dues' },
     { href: '/dashboard/history', label: 'History' },
   ];
 

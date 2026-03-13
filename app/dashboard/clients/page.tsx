@@ -25,6 +25,7 @@ export default function ClientsPage() {
   const [clients, setClients] = useState<Client[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     fetchClients();
@@ -61,6 +62,12 @@ export default function ClientsPage() {
     }
   };
 
+  const filteredClients = clients.filter(c =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    c.phone.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (c.email && c.email.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -75,6 +82,16 @@ export default function ClientsPage() {
             Add Client
           </Button>
         </Link>
+      </div>
+
+      <div className="mb-6">
+        <input
+          type="text"
+          placeholder="Search clients by name, phone, or email..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="w-full md:w-1/3 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+        />
       </div>
 
       {loading ? (
@@ -92,7 +109,7 @@ export default function ClientsPage() {
         </Card>
       ) : (
         <div className="grid grid-cols-1 gap-4">
-          {clients.map((client) => (
+          {filteredClients.map((client) => (
             <Card
               key={client._id}
               className="p-4 hover:shadow-md transition-shadow"
