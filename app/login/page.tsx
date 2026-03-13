@@ -49,7 +49,7 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
-          <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest">SRM Associates</p>
+          <p className="text-sm font-semibold text-slate-500 uppercase tracking-widest">SRM ASSOCIATES</p>
           <CardTitle className="text-2xl">{isLogin ? 'Login' : 'Register'}</CardTitle>
           <CardDescription>
             {isLogin ? 'Enter your email and password to login' : 'Create an account to continue'}

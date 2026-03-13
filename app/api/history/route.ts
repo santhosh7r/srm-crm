@@ -83,6 +83,7 @@ export async function GET(req: NextRequest) {
                 status: l.status,
                 startDate: l.startDate,
                 endDate: l.endDate ?? null,
+                createdAt: l.createdAt,
             };
         });
 

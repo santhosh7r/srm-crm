@@ -25,6 +25,7 @@ interface HistoryRow {
     status: 'active' | 'completed' | 'overdue';
     startDate: string;
     endDate: string | null;
+    createdAt: string;
 }
 
 interface Plan {
@@ -54,6 +55,7 @@ export default function HistoryPage() {
     const [status, setStatus] = useState('');
     const [searchTerm, setSearchTerm] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
+    const [statusPrimary, setStatusPrimary] = useState(true);
     const itemsPerPage = 20;
 
     const fetchData = useCallback(async () => {
@@ -86,13 +88,34 @@ export default function HistoryPage() {
         setTimeout(fetchData, 0);
     };
 
-    // ── Filtering Logic (Local) ──
-    const filteredRows = rows.filter(r => {
-        const matchesSearch = !searchTerm ||
-            r.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            r.clientPhone.includes(searchTerm);
-        return matchesSearch;
-    });
+    // ── Filtering & Sorting Logic (Local) ──
+    const sortedFilteredRows = rows
+        .filter(r => {
+            const matchesSearch = !searchTerm ||
+                r.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                r.clientPhone.includes(searchTerm);
+            return matchesSearch;
+        })
+        .sort((a, b) => {
+            const timeA = new Date(a.startDate).getTime();
+            const timeB = new Date(b.startDate).getTime();
+            const createdA = new Date(a.createdAt).getTime();
+            const createdB = new Date(b.createdAt).getTime();
+
+            // 1. Status Priority (if enabled)
+            if (statusPrimary) {
+                const priority: Record<string, number> = { active: 1, overdue: 2, completed: 3 };
+                const pA = priority[a.status] || 99;
+                const pB = priority[b.status] || 99;
+                if (pA !== pB) return pA - pB;
+            }
+
+            // 2. Default: Newest First
+            if (timeA !== timeB) return timeB - timeA;
+            return createdB - createdA;
+        });
+
+    const filteredRows = sortedFilteredRows; // For backward compatibility with existing code refs
 
     const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
     const paginatedRows = filteredRows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
@@ -328,15 +351,33 @@ export default function HistoryPage() {
                             </select>
                         </div>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-slate-100">
                         <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white px-5">
                             Apply Filters
                         </Button>
                         <Button type="button" variant="outline" onClick={clearFilters} className="border-slate-200">
                             Clear
                         </Button>
-                        <span className="ml-auto text-xs text-slate-400 self-center">
-                            {filteredRows.length} record{filteredRows.length !== 1 ? 's' : ''} {searchTerm && `matched "${searchTerm}"`}
+
+                        <div className="flex items-center gap-3 ml-auto">
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sorting</span>
+                            <Button
+                                type="button"
+                                onClick={() => setStatusPrimary(!statusPrimary)}
+                                className={`h-9 px-4 rounded-xl text-xs font-bold transition-all gap-2 ${statusPrimary
+                                        ? 'bg-slate-900 text-white shadow-md'
+                                        : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
+                                    }`}
+                            >
+                                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
+                                Sort by Status: {statusPrimary ? 'ON' : 'OFF'}
+                            </Button>
+                        </div>
+
+                        <span className="hidden md:inline-block text-xs text-slate-300 mx-2">|</span>
+
+                        <span className="text-xs text-slate-400 self-center px-1">
+                            {filteredRows.length} record{filteredRows.length !== 1 ? 's' : ''}
                         </span>
                     </div>
                 </form>

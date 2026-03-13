@@ -92,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 <span className="text-white text-xs font-bold">SR</span>
               </div>
               <span className="font-bold text-slate-900 text-sm hidden sm:inline tracking-tight">
-                SRM Associates
+                SRM ASSOCIATES
               </span>
             </Link>
 
