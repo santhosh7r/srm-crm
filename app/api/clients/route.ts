@@ -42,6 +42,15 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const validatedData = ClientSchema.parse(body);
 
+    // Check if phone already exists for this user
+    const existingClient = await Client.findOne({ userId, phone: validatedData.phone });
+    if (existingClient) {
+      return NextResponse.json(
+        { error: 'A client with this phone number already exists' },
+        { status: 400 }
+      );
+    }
+
     const client = new Client({
       userId,
       ...validatedData,

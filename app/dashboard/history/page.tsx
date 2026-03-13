@@ -47,14 +47,18 @@ export default function HistoryPage() {
     const [plans, setPlans] = useState<Plan[]>([]);
     const [loading, setLoading] = useState(true);
 
-    // Filters
+    // Filters & Pagination
     const [from, setFrom] = useState('');
     const [to, setTo] = useState('');
     const [planId, setPlanId] = useState('');
     const [status, setStatus] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 20;
 
     const fetchData = useCallback(async () => {
         setLoading(true);
+        setCurrentPage(1); // Reset to first page on filter change
         const params = new URLSearchParams();
         if (from) params.set('from', from);
         if (to) params.set('to', to);
@@ -82,12 +86,23 @@ export default function HistoryPage() {
         setTimeout(fetchData, 0);
     };
 
+    // ── Filtering Logic (Local) ──
+    const filteredRows = rows.filter(r => {
+        const matchesSearch = !searchTerm ||
+            r.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            r.clientPhone.includes(searchTerm);
+        return matchesSearch;
+    });
+
+    const totalPages = Math.ceil(filteredRows.length / itemsPerPage);
+    const paginatedRows = filteredRows.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);
+
     // ── Excel Export ──
     const downloadExcel = () => {
         const wsData = [
-            ['Client Name', 'Phone', 'Plan', 'Duration', 'Dispose Amount', 'Initial Interest',
+            ['Client Name', 'Phone', 'Plan', 'Duration', 'Dispose Amount', 'Init. Interest',
                 'Total Amount', 'Collected Interest', 'Total Given', 'Balance', 'Status', 'Start Date', 'End Date'],
-            ...rows.map(r => [
+            ...filteredRows.map(r => [
                 r.clientName, r.clientPhone, `${r.planName} (${r.planType === 'weekly' ? 'Weekly' : 'Monthly'})`,
                 r.duration ? `${r.duration} weeks` : 'N/A',
                 r.disposeAmount, r.initialInterest, r.totalAmount,
@@ -102,8 +117,8 @@ export default function HistoryPage() {
         XLSX.writeFile(wb, `SRM_History_${new Date().toISOString().slice(0, 10)}.xlsx`);
     };
 
-    // Summary totals
-    const totals = rows.reduce((acc, r) => ({
+    // Summary totals based on FILTERED data
+    const totals = filteredRows.reduce((acc, r) => ({
         dispose: acc.dispose + r.disposeAmount,
         interest: acc.interest + r.initialInterest,
         total: acc.total + r.totalAmount,
@@ -138,10 +153,10 @@ export default function HistoryPage() {
         autoTable(doc, {
             startY: 57,
             head: [[
-                'Client', 'Plan', 'Dispose Amount', 'Interest Amount',
+                'Client', 'Plan', 'Dispose Amount', 'Init. Interest',
                 'Total Amount', 'Collected Interest', 'Collected Given', 'Balance', 'Status', 'Start Date', 'End Date'
             ]],
-            body: rows.map(r => [
+            body: filteredRows.map(r => [
                 r.clientName,
                 `${r.planName}\n(${r.planType === 'weekly' ? 'Weekly' : 'Monthly'})`,
                 fmtPDF(r.disposeAmount),
@@ -262,7 +277,21 @@ export default function HistoryPage() {
             {/* ── Filters ── */}
             <Card className="p-4 mb-5">
                 <form onSubmit={applyFilters}>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
+                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
+                        <div className="md:col-span-2">
+                            <label className="block text-xs font-medium text-slate-600 mb-1">Search Client</label>
+                            <div className="relative">
+                                <Input
+                                    placeholder="Search by name or phone..."
+                                    value={searchTerm}
+                                    onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                                    className="pl-9"
+                                />
+                                <svg className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                                </svg>
+                            </div>
+                        </div>
                         <div>
                             <label className="block text-xs font-medium text-slate-600 mb-1">From Date</label>
                             <Input type="date" value={from} onChange={e => setFrom(e.target.value)} />
@@ -307,7 +336,7 @@ export default function HistoryPage() {
                             Clear
                         </Button>
                         <span className="ml-auto text-xs text-slate-400 self-center">
-                            {rows.length} record{rows.length !== 1 ? 's' : ''}
+                            {filteredRows.length} record{filteredRows.length !== 1 ? 's' : ''} {searchTerm && `matched "${searchTerm}"`}
                         </span>
                     </div>
                 </form>
@@ -358,7 +387,7 @@ export default function HistoryPage() {
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-slate-100">
-                                {rows.map((r, i) => (
+                                {paginatedRows.map((r, i) => (
                                     <tr key={r._id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}>
                                         <td className="px-4 py-3 font-medium text-slate-900 whitespace-nowrap">{r.clientName}</td>
                                         <td className="px-4 py-3 whitespace-nowrap">
@@ -388,7 +417,7 @@ export default function HistoryPage() {
 
                     {/* Mobile cards */}
                     <div className="md:hidden divide-y divide-slate-100">
-                        {rows.map(r => (
+                        {paginatedRows.map(r => (
                             <div key={r._id} className="p-4 space-y-2">
                                 <div className="flex items-start justify-between">
                                     <div>
@@ -430,6 +459,57 @@ export default function HistoryPage() {
                         ))}
                     </div>
                 </Card>
+            )}
+
+            {/* Pagination Controls */}
+            {!loading && filteredRows.length > itemsPerPage && (
+                <div className="flex items-center justify-between mt-6 px-1">
+                    <p className="text-sm text-slate-500">
+                        Showing <span className="font-semibold text-slate-900">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-semibold text-slate-900">{Math.min(currentPage * itemsPerPage, filteredRows.length)}</span> of <span className="font-semibold text-slate-900">{filteredRows.length}</span> results
+                    </p>
+                    <div className="flex gap-2">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                            className="bg-white"
+                        >
+                            Previous
+                        </Button>
+                        <div className="flex items-center gap-1">
+                            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                                // Simple sliding window for pagination if many pages
+                                let pageNum = i + 1;
+                                if (totalPages > 5 && currentPage > 3) {
+                                    pageNum = currentPage - 3 + i + 1;
+                                    if (pageNum > totalPages) pageNum = totalPages - (4 - i);
+                                }
+
+                                return (
+                                    <Button
+                                        key={pageNum}
+                                        variant={currentPage === pageNum ? 'default' : 'outline'}
+                                        size="sm"
+                                        className={`h-8 w-8 p-0 ${currentPage === pageNum ? 'bg-slate-900 text-white' : 'bg-white text-slate-600'}`}
+                                        onClick={() => setCurrentPage(pageNum)}
+                                    >
+                                        {pageNum}
+                                    </Button>
+                                );
+                            })}
+                        </div>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                            className="bg-white"
+                        >
+                            Next
+                        </Button>
+                    </div>
+                </div>
             )}
         </div>
     );

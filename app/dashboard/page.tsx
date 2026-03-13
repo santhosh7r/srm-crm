@@ -175,14 +175,18 @@ export default function DashboardPage() {
               const pendingPrincipal = expectedTotalPrincipalPaid - (loan.totalPaid || 0);
 
               // Check for 1-time interest
-              const interestPayments = paymentsData.filter((p: any) => p.loanId === loan._id && p.type === 'interest');
+              const interestPayments = paymentsData.filter((p: any) => {
+                const pid = p.loanId?._id || p.loanId;
+                return String(pid) === String(loan._id) && p.type === 'interest';
+              });
               const totalInterestPaid = interestPayments.reduce((sum: number, p: any) => sum + p.amount, 0);
               const pendingInterest = loan.interestAmount > 0 ? Math.max(0, loan.interestAmount - totalInterestPaid) : 0;
 
               const totalPendingDue = Math.max(0, pendingPrincipal) + pendingInterest;
 
-              if (totalPendingDue > 0) {
-                weeklyPending.push({ ...loan, dueAmount: totalPendingDue });
+              if (Math.round(totalPendingDue) > 0) {
+                const dueDate = new Date(new Date(loan.startDate).getTime() + (weeksPassed * msInWeek));
+                weeklyPending.push({ ...loan, dueAmount: totalPendingDue, dueDate });
               }
             }
           } else if (plan.planType === 'monthly') {
@@ -199,18 +203,21 @@ export default function DashboardPage() {
             const expectedRecurringInterest = activeMonths * loan.interestAmount;
 
             // Only count interest payments that are NOT the initial Day-0 payment
-            const recurringInterestPayments = paymentsData.filter((p: any) =>
-              p.loanId === loan._id &&
-              p.type === 'interest' &&
-              !(p.notes || '').toLowerCase().includes('initial')
-            );
+            const recurringInterestPayments = paymentsData.filter((p: any) => {
+              const pid = p.loanId?._id || p.loanId;
+              return String(pid) === String(loan._id) &&
+                p.type === 'interest' &&
+                !(p.notes || '').toLowerCase().includes('initial');
+            });
             const totalRecurringPaid = recurringInterestPayments.reduce((sum: number, p: any) => sum + p.amount, 0);
 
             const pendingInterest = expectedRecurringInterest - totalRecurringPaid;
 
-            // Only show in pending list if 1 full month has passed (next month same date)
-            if (pendingInterest > 0 && activeMonths >= 1) {
-              monthlyPending.push({ ...loan, dueAmount: pendingInterest });
+            // Only show in pending list if debt is at least 1 unit after rounding
+            if (Math.round(pendingInterest) > 0 && activeMonths >= 1) {
+              const dueDate = new Date(start);
+              dueDate.setMonth(start.getMonth() + activeMonths);
+              monthlyPending.push({ ...loan, dueAmount: pendingInterest, dueDate });
             }
           }
         });
@@ -367,10 +374,13 @@ export default function DashboardPage() {
           {stats.weeklyPending.length === 0 ? <p className="text-sm text-slate-500">No pending weekly dues at this time.</p> : (
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
               {stats.weeklyPending.slice(0, 10).map((p, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 transition-colors hover:border-indigo-200 hover:bg-indigo-50/30">
-                  <div>
-                    <p className="font-semibold text-slate-800 text-sm">{p.clientId?.name}</p>
-                    <p className="text-xs text-slate-500 inline-flex items-center gap-1 mt-0.5">Estimated Due: <span className="text-red-600 font-bold ml-1">₹{Math.round(p.dueAmount)}</span></p>
+                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-3 rounded-lg border border-slate-100 transition-all hover:border-indigo-200">
+                  <div className="flex-1">
+                    <p className="font-bold text-slate-800 text-sm">{p.clientId?.name}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-xs text-slate-500 font-medium">₹{Math.round(p.dueAmount)}</p>
+                      <p className="text-[10px] text-slate-400 italic">Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Link href={`/dashboard/clients/${p.clientId?._id}`} className="flex-1 sm:flex-none">
@@ -399,10 +409,13 @@ export default function DashboardPage() {
           {stats.monthlyPending.length === 0 ? <p className="text-sm text-slate-500">No pending monthly dues at this time.</p> : (
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
               {stats.monthlyPending.slice(0, 10).map((p, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-slate-50 p-3 rounded-lg border border-slate-100 transition-colors hover:border-emerald-200 hover:bg-emerald-50/30">
-                  <div>
-                    <p className="font-semibold text-slate-800 text-sm">{p.clientId?.name}</p>
-                    <p className="text-xs text-slate-500 inline-flex items-center gap-1 mt-0.5">Interest Cycle Due: <span className="text-red-600 font-bold ml-1">₹{Math.round(p.dueAmount)}</span></p>
+                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-3 rounded-lg border border-slate-100 transition-all hover:border-emerald-200">
+                  <div className="flex-1">
+                    <p className="font-bold text-slate-800 text-sm">{p.clientId?.name}</p>
+                    <div className="flex items-center gap-3">
+                      <p className="text-xs text-slate-500 font-medium text-emerald-700">₹{Math.round(p.dueAmount)}</p>
+                      <p className="text-[10px] text-slate-400 italic">Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Link href={`/dashboard/clients/${p.clientId?._id}`} className="flex-1 sm:flex-none">

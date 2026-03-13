@@ -36,6 +36,7 @@ export default function NewLoanPage() {
   const [selectedPlan, setSelectedPlan] = useState<Plan | null>(null);
   const [loading, setLoading] = useState(false);
   const [clientId, setClientId] = useState('');
+  const [clientSearch, setClientSearch] = useState('');
   const [planId, setPlanId] = useState('');
   const [disposeAmount, setDisposeAmount] = useState('');
   const [interestAmount, setInterestAmount] = useState('');
@@ -70,6 +71,11 @@ export default function NewLoanPage() {
     setPlanId(val);
     setSelectedPlan(plans.find(p => p._id === val) || null);
   };
+
+  const filteredClients = clients.filter(c =>
+    c.name.toLowerCase().includes(clientSearch.toLowerCase()) ||
+    c.phone.includes(clientSearch)
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,19 +120,43 @@ export default function NewLoanPage() {
 
               {/* Client */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Client *</label>
-                <Select value={clientId} onValueChange={setClientId} disabled={loading}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select a client" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {clients.map(c => (
-                      <SelectItem key={c._id} value={c._id}>
-                        {c.name}{c.phone ? ` — ${c.phone}` : ''}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-sm font-medium text-slate-700">Client *</label>
+                  <Link href="/dashboard/clients/new" className="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                    New Client?
+                  </Link>
+                </div>
+                <div className="space-y-2">
+                  <div className="relative">
+                    <Input
+                      placeholder="Search for client..."
+                      value={clientSearch}
+                      onChange={(e) => setClientSearch(e.target.value)}
+                      className="pl-9 h-10 border-slate-200 focus:ring-indigo-500"
+                    />
+                    <svg className="absolute left-3 top-3 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                  </div>
+                  <Select value={clientId} onValueChange={setClientId} disabled={loading}>
+                    <SelectTrigger className="h-11 border-slate-200">
+                      <SelectValue placeholder={clientSearch ? `Select from ${filteredClients.length} results` : "Or select from list"} />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {filteredClients.length === 0 ? (
+                        <div className="p-4 text-center text-sm text-slate-400 font-medium italic">No clients found matching "{clientSearch}"</div>
+                      ) : (
+                        filteredClients.map(c => (
+                          <SelectItem key={c._id} value={c._id} className="cursor-pointer py-2.5">
+                            <div className="flex flex-col">
+                              <span className="font-bold text-slate-900">{c.name}</span>
+                              <span className="text-xs text-slate-400">{c.phone}</span>
+                            </div>
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               {/* Plan */}

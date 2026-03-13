@@ -113,7 +113,12 @@ export default function LoanDetailPage() {
   const givenPayments = payments.filter(p => !p.type || p.type === 'given');
   const interestPayments = payments.filter(p => p.type === 'interest');
   const totalGiven = givenPayments.reduce((s, p) => s + p.amount, 0);
-  const totalInterest = interestPayments.reduce((s, p) => s + p.amount, 0);
+  const initialInterestPayments = interestPayments.filter(p => (p.notes || '').toLowerCase().includes('initial'));
+  const collectedInterestPayments = interestPayments.filter(p => !(p.notes || '').toLowerCase().includes('initial'));
+  const totalInitial = initialInterestPayments.reduce((s, p) => s + p.amount, 0);
+  const totalCollected = collectedInterestPayments.reduce((s, p) => s + p.amount, 0);
+  const totalInterest = totalInitial + totalCollected;
+
   const progress = Math.min(100, loan.totalAmount > 0 ? (loan.totalPaid / loan.totalAmount) * 100 : 0);
 
   const durationDisplay = plan?.planType === 'weekly' && plan?.duration
@@ -159,7 +164,7 @@ export default function LoanDetailPage() {
         {[
           { label: 'Disbursed', value: fmt(loan.disposeAmount), color: 'text-slate-900' },
           { label: 'Total Given', value: fmt(totalGiven), color: 'text-green-700' },
-          { label: 'Interest', value: fmt(totalInterest), color: 'text-blue-700' },
+          { label: 'Interest Paid', value: fmt(totalInterest), color: 'text-blue-700' },
           { label: 'Balance', value: fmt(loan.balance), color: loan.balance === 0 ? 'text-green-600' : 'text-red-600' },
         ].map(s => (
           <Card key={s.label} className="p-3.5">
@@ -208,8 +213,8 @@ export default function LoanDetailPage() {
               ['Type', plan?.planType === 'weekly' ? 'Weekly' : 'Monthly'],
               ['Duration', durationDisplay],
               ['Dispose', fmt(loan.disposeAmount)],
-              ['Interest', fmt(loan.interestAmount)],
-              ['Total', fmt(loan.totalAmount)],
+              ['Monthly Interest', fmt(loan.interestAmount)],
+              ['Total Amount', fmt(loan.totalAmount)],
               ['Start', new Date(loan.startDate).toLocaleDateString('en-IN')],
               ['End', loan.endDate ? new Date(loan.endDate).toLocaleDateString('en-IN') : 'No end date'],
               ['Status', loan.status],
@@ -329,18 +334,22 @@ export default function LoanDetailPage() {
 
         {/* Summary footer */}
         {payments.length > 0 && (
-          <div className="border-t border-slate-100 mt-4 pt-3 grid grid-cols-3 gap-3 text-center text-xs">
+          <div className="border-t border-slate-100 mt-4 pt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs px-2">
             <div>
-              <p className="text-slate-400">Total Given</p>
-              <p className="font-bold text-slate-900">{fmt(totalGiven)}</p>
+              <p className="text-slate-400 uppercase font-semibold mb-1">Total Given</p>
+              <p className="font-bold text-slate-900 text-sm">{fmt(totalGiven)}</p>
             </div>
             <div>
-              <p className="text-slate-400">Interest</p>
-              <p className="font-bold text-blue-700">{fmt(totalInterest)}</p>
+              <p className="text-slate-400 uppercase font-semibold mb-1 text-amber-600">Initial Int.</p>
+              <p className="font-bold text-amber-700 text-sm">{fmt(totalInitial)}</p>
             </div>
             <div>
-              <p className="text-slate-400">Balance</p>
-              <p className={`font-bold ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>{fmt(loan.balance)}</p>
+              <p className="text-slate-400 uppercase font-semibold mb-1 text-blue-600">Coll. Interest</p>
+              <p className="font-bold text-blue-800 text-sm">{fmt(totalCollected)}</p>
+            </div>
+            <div>
+              <p className="text-slate-400 uppercase font-semibold mb-1">Balance</p>
+              <p className={`font-bold text-sm ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>{fmt(loan.balance)}</p>
             </div>
           </div>
         )}

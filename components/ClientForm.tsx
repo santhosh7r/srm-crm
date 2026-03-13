@@ -35,12 +35,37 @@ export default function ClientForm({
     name: initialData?.name || '',
     email: initialData?.email || '',
     phone: initialData?.phone || '',
+    pincode: initialData?.pincode || '',
     address: initialData?.address || '',
     city: initialData?.city || '',
-    country: initialData?.country || '',
+    state: initialData?.state || '',
+    country: initialData?.country || 'India',
     status: initialData?.status || 'active',
   });
+  const [isPincodeLoading, setIsPincodeLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const handlePincodeChange = async (val: string) => {
+    setFormData({ ...formData, pincode: val });
+    if (val.length === 6) {
+      setIsPincodeLoading(true);
+      try {
+        const res = await fetch(`https://api.postalpincode.in/pincode/${val}`);
+        const data = await res.json();
+        if (data[0].Status === "Success") {
+          const postOffice = data[0].PostOffice[0];
+          setFormData(prev => ({
+            ...prev,
+            city: postOffice.District,
+            state: postOffice.State,
+            country: postOffice.Country || 'India',
+            address: prev.address || postOffice.Name
+          }));
+        }
+      } catch (e) { console.error("Pincode error", e); }
+      finally { setIsPincodeLoading(false); }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -73,22 +98,6 @@ export default function ClientForm({
 
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
-              Email *
-            </label>
-            <Input
-              type="email"
-              value={formData.email}
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
-              required
-              disabled={isLoading}
-              placeholder="email@example.com"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
               Phone *
             </label>
             <Input
@@ -100,6 +109,22 @@ export default function ClientForm({
               required
               disabled={isLoading}
               placeholder="+1234567890"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Email
+              <span className="text-xs font-normal text-slate-400 ml-1">(Optional)</span>
+            </label>
+            <Input
+              type="email"
+              value={formData.email}
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+              disabled={isLoading}
+              placeholder="email@example.com"
             />
           </div>
 
@@ -137,11 +162,31 @@ export default function ClientForm({
             }
             required
             disabled={isLoading}
-            placeholder="Street address"
+            placeholder="Street address / Area"
           />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              Pincode *
+            </label>
+            <div className="relative">
+              <Input
+                type="text"
+                value={formData.pincode}
+                onChange={(e) => handlePincodeChange(e.target.value)}
+                required
+                maxLength={6}
+                disabled={isLoading}
+                placeholder="6-digit Pincode"
+              />
+              {isPincodeLoading && (
+                <div className="absolute right-3 top-2.5 h-4 w-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+              )}
+            </div>
+          </div>
+
           <div>
             <label className="block text-sm font-medium text-slate-700 mb-1">
               City *
@@ -155,6 +200,24 @@ export default function ClientForm({
               required
               disabled={isLoading}
               placeholder="City"
+            />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              State *
+            </label>
+            <Input
+              type="text"
+              value={formData.state}
+              onChange={(e) =>
+                setFormData({ ...formData, state: e.target.value })
+              }
+              required
+              disabled={isLoading}
+              placeholder="State"
             />
           </div>
 

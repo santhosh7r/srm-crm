@@ -17,8 +17,10 @@ export const ClientSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Invalid email').optional().or(z.literal('')),
   phone: z.string().min(7, 'Invalid phone number'),
+  pincode: z.string().optional(),
   address: z.string().optional().default(''),
   city: z.string().optional().default(''),
+  state: z.string().optional().default(''),
   country: z.string().optional().default(''),
   status: z.enum(['active', 'inactive']).default('active'),
 });

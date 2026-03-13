@@ -5,8 +5,10 @@ export interface IClient extends Document {
   name: string;
   email: string;
   phone: string;
+  pincode: string;
   address: string;
   city: string;
+  state: string;
   country: string;
   status: 'active' | 'inactive';
   createdAt: Date;
@@ -26,12 +28,16 @@ const clientSchema = new Schema<IClient>(
     },
     email: {
       type: String,
-      required: [true, 'Please provide an email'],
+      required: false,
       match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email'],
     },
     phone: {
       type: String,
       required: [true, 'Please provide a phone number'],
+    },
+    pincode: {
+      type: String,
+      required: false,
     },
     address: {
       type: String,
@@ -40,6 +46,10 @@ const clientSchema = new Schema<IClient>(
     city: {
       type: String,
       required: true,
+    },
+    state: {
+      type: String,
+      required: false,
     },
     country: {
       type: String,

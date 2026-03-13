@@ -40,12 +40,21 @@ export async function GET(req: NextRequest) {
         const payments = await Payment.find(paymentQuery).lean();
 
         // Group payments by loanId
-        const paymentMap: Record<string, { given: number; interest: number }> = {};
+        const paymentMap: Record<string, { given: number; initialInterest: number; collectedInterest: number }> = {};
         for (const p of payments as any[]) {
             const lid = p.loanId.toString();
-            if (!paymentMap[lid]) paymentMap[lid] = { given: 0, interest: 0 };
-            if (p.type === 'interest') paymentMap[lid].interest += p.amount;
-            else paymentMap[lid].given += p.amount;
+            if (!paymentMap[lid]) paymentMap[lid] = { given: 0, initialInterest: 0, collectedInterest: 0 };
+
+            if (p.type === 'interest') {
+                const isInitial = (p.notes || '').toLowerCase().includes('initial');
+                if (isInitial) {
+                    paymentMap[lid].initialInterest += p.amount;
+                } else {
+                    paymentMap[lid].collectedInterest += p.amount;
+                }
+            } else {
+                paymentMap[lid].given += p.amount;
+            }
         }
 
         // Filter by planType / planId after populate
@@ -55,7 +64,7 @@ export async function GET(req: NextRequest) {
 
         const result = filtered.map(l => {
             const lid = l._id.toString();
-            const pm = paymentMap[lid] || { given: 0, interest: 0 };
+            const pm = paymentMap[lid] || { given: 0, initialInterest: 0, collectedInterest: 0 };
             return {
                 _id: lid,
                 clientName: l.clientId?.name ?? '—',
@@ -64,11 +73,12 @@ export async function GET(req: NextRequest) {
                 planType: l.planId?.planType ?? '—',
                 duration: l.planId?.duration ?? null,
                 disposeAmount: l.disposeAmount ?? 0,
-                initialInterest: l.interestAmount ?? 0,
+                initialInterest: pm.initialInterest, // Now returns PAID initial interest
+                expectedInterest: l.interestAmount ?? 0, // Keep this just in case, though not used yet
                 totalAmount: l.totalAmount ?? 0,
                 balance: l.balance ?? 0,
                 totalPaid: l.totalPaid ?? 0,
-                collectedInterest: pm.interest,
+                collectedInterest: pm.collectedInterest,
                 collectedGiven: pm.given,
                 status: l.status,
                 startDate: l.startDate,
