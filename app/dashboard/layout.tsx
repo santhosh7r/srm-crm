@@ -69,6 +69,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard/loans', label: 'Loans' },
     { href: '/dashboard/dues', label: 'Dues' },
     { href: '/dashboard/history', label: 'History' },
+    { href: '/dashboard/profile', label: 'Profile' },
   ];
 
   const isActive = (href: string) =>
@@ -89,10 +90,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             {/* Logo */}
             <Link href="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
               <div className="h-8 w-8 bg-slate-900 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200">
-                <span className="text-white text-xs font-bold">SR</span>
+                <span className="text-white text-xs font-bold">RI</span>
               </div>
               <span className="font-bold text-slate-900 text-sm hidden sm:inline tracking-tight">
-                SRM ASSOCIATES
+                RIYA FINANCE LTD
               </span>
             </Link>
 
@@ -120,12 +121,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Right — desktop */}
             <div className="hidden sm:flex items-center gap-2">
-              <div className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-slate-200 bg-slate-50">
-                <div className="h-6 w-6 bg-slate-900 rounded-full flex items-center justify-center text-xs text-white font-semibold">
+              <Link 
+                href="/dashboard/profile"
+                className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all group"
+              >
+                <div className="h-6 w-6 bg-slate-900 rounded-full flex items-center justify-center text-[10px] text-white font-bold group-hover:scale-110 transition-transform">
                   {useName.charAt(0).toUpperCase()}
                 </div>
                 <span className="text-sm font-medium text-slate-700">{useName}</span>
-              </div>
+              </Link>
               <button
                 onClick={handleLogout}
                 className="text-xs font-medium text-slate-500 hover:text-red-600 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-all duration-200"
