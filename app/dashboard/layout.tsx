@@ -3,6 +3,7 @@
 import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { ThemeToggle } from '@/components/ThemeToggle';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -48,10 +49,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-slate-900 animate-pulse" />
-          <p className="text-sm text-slate-500 font-medium">Loading...</p>
+          <div className="h-10 w-10 rounded-xl bg-primary animate-pulse" />
+          <p className="text-sm text-muted-foreground font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -76,12 +77,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     href === '/dashboard' ? pathname === '/dashboard' : pathname.startsWith(href);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* ── Navbar ── */}
       <nav
         className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
-          ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-slate-200/60'
-          : 'bg-white border-b border-slate-100'
+          ? 'bg-card/90 backdrop-blur-md shadow-sm border-b border-border/60'
+          : 'bg-card border-b border-border'
           }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -89,10 +90,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Logo */}
             <Link href="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="h-8 w-8 bg-slate-900 rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200">
-                <span className="text-white text-xs font-bold">RI</span>
+              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200">
+                <span className="text-primary-foreground text-xs font-bold">RI</span>
               </div>
-              <span className="font-bold text-slate-900 text-sm hidden sm:inline tracking-tight">
+              <span className="font-bold text-foreground text-sm hidden sm:inline tracking-tight">
                 RIYA FINANCE LTD
               </span>
             </Link>
@@ -106,13 +107,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     key={item.href}
                     href={item.href}
                     className={`relative px-3.5 py-2 text-sm font-medium rounded-lg transition-all duration-200 ${active
-                      ? 'text-slate-900 bg-slate-100'
-                      : 'text-slate-500 hover:text-slate-900 hover:bg-slate-50'
+                      ? 'text-primary-foreground bg-primary'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       }`}
                   >
                     {item.label}
                     {active && (
-                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-slate-900 rounded-full" />
+                      <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1 h-1 bg-primary rounded-full" />
                     )}
                   </Link>
                 );
@@ -121,35 +122,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Right — desktop */}
             <div className="hidden sm:flex items-center gap-2">
+              <ThemeToggle />
               <Link 
                 href="/dashboard/profile"
-                className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-slate-200 bg-slate-50 hover:bg-slate-100 hover:border-slate-300 transition-all group"
+                className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-full border border-border bg-card hover:bg-muted hover:border-border/80 transition-all group"
               >
-                <div className="h-6 w-6 bg-slate-900 rounded-full flex items-center justify-center text-[10px] text-white font-bold group-hover:scale-110 transition-transform">
+                <div className="h-6 w-6 bg-primary rounded-full flex items-center justify-center text-[10px] text-primary-foreground font-bold group-hover:scale-110 transition-transform">
                   {useName.charAt(0).toUpperCase()}
                 </div>
-                <span className="text-sm font-medium text-slate-700">{useName}</span>
+                <span className="text-sm font-medium text-foreground">{useName}</span>
               </Link>
               <button
                 onClick={handleLogout}
-                className="text-xs font-medium text-slate-500 hover:text-red-600 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-all duration-200"
+                className="text-xs font-medium text-muted-foreground hover:text-destructive px-2 py-1.5 rounded-lg hover:bg-destructive/10 transition-all duration-200"
               >
                 Logout
               </button>
             </div>
 
             {/* Hamburger — mobile */}
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="sm:hidden relative h-9 w-9 flex items-center justify-center rounded-xl bg-slate-100 hover:bg-slate-200 transition-colors duration-200"
-              aria-label="Toggle menu"
-            >
-              <div className="flex flex-col gap-1.5 w-4">
-                <span className={`block h-0.5 bg-slate-800 rounded-full transition-all duration-300 origin-center ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                <span className={`block h-0.5 bg-slate-800 rounded-full transition-all duration-200 ${mobileOpen ? 'opacity-0 scale-x-0' : ''}`} />
-                <span className={`block h-0.5 bg-slate-800 rounded-full transition-all duration-300 origin-center ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-              </div>
-            </button>
+            <div className="sm:hidden flex items-center gap-2">
+              <ThemeToggle />
+              <button
+                onClick={() => setMobileOpen(!mobileOpen)}
+                className="relative h-9 w-9 flex items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors duration-200"
+                aria-label="Toggle menu"
+              >
+                <div className="flex flex-col gap-1.5 w-4">
+                  <span className={`block h-0.5 bg-foreground rounded-full transition-all duration-300 origin-center ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
+                  <span className={`block h-0.5 bg-foreground rounded-full transition-all duration-200 ${mobileOpen ? 'opacity-0 scale-x-0' : ''}`} />
+                  <span className={`block h-0.5 bg-foreground rounded-full transition-all duration-300 origin-center ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+                </div>
+              </button>
+            </div>
           </div>
         </div>
       </nav>
@@ -167,7 +172,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Slide-in panel */}
         <div
-          className={`absolute top-14 left-0 right-0 bottom-0 bg-white flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-y-0' : '-translate-y-4'
+          className={`absolute top-14 left-0 right-0 bottom-0 bg-card flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-y-0' : '-translate-y-4'
             }`}
         >
           {/* Nav links — takes up main space */}
@@ -181,8 +186,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   style={{ transitionDelay: mobileOpen ? `${60 + i * 50}ms` : '0ms' }}
                   className={`flex items-center justify-between px-5 py-4 rounded-2xl text-xl font-semibold transition-all duration-300 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
                     } ${active
-                      ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/20'
-                      : 'text-slate-700 bg-slate-50 hover:bg-slate-100'
+                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
+                      : 'text-foreground bg-muted hover:bg-muted/80'
                     }`}
                 >
                   {item.label}
@@ -197,15 +202,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
 
           {/* Bottom user section */}
-          <div className="px-8 pb-10 pt-4 border-t border-slate-100">
+          <div className="px-8 pb-10 pt-4 border-t border-border">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-slate-900 rounded-full flex items-center justify-center text-base text-white font-bold shadow">
+                <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center text-base text-primary-foreground font-bold shadow">
                   {useName.charAt(0).toUpperCase()}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-slate-900">{useName}</p>
-                  <p className="text-xs text-slate-400">Signed in</p>
+                  <p className="text-sm font-semibold text-foreground">{useName}</p>
+                  <p className="text-xs text-muted-foreground">Signed in</p>
                 </div>
               </div>
               <button
@@ -223,9 +228,21 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
         {children}
       </main>
+
+      {/* ── Footer ── */}
+      <footer className="border-t border-border mt-auto w-full bg-card/30">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-2">
+          <p className="text-xs text-muted-foreground font-medium text-center md:text-left">
+            © {new Date().getFullYear()} RIYA FINANCE LTD. All rights reserved.
+          </p>
+          <p className="text-xs text-muted-foreground/80 font-medium text-center md:text-right">
+            Software by <a href="https://webzystudios.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">webzystudios.com</a>
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

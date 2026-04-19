@@ -96,16 +96,16 @@ export default function LoanDetailPage() {
   if (loading) return (
     <div className="flex items-center justify-center py-20">
       <div className="text-center">
-        <div className="h-8 w-8 bg-slate-200 rounded-full animate-pulse mx-auto mb-3" />
-        <p className="text-sm text-slate-500">Loading loan...</p>
+        <div className="h-8 w-8 bg-muted rounded-full animate-pulse mx-auto mb-3" />
+        <p className="text-sm text-muted-foreground">Loading loan...</p>
       </div>
     </div>
   );
 
   if (!loan) return (
     <Card className="p-8 text-center">
-      <p className="text-slate-600 mb-4">Loan not found</p>
-      <Link href="/dashboard/loans"><Button className="bg-slate-900 text-white">Back to Loans</Button></Link>
+      <p className="text-secondary-foreground mb-4">Loan not found</p>
+      <Link href="/dashboard/loans"><Button className="bg-primary text-primary-foreground">Back to Loans</Button></Link>
     </Card>
   );
 
@@ -127,7 +127,7 @@ export default function LoanDetailPage() {
 
   const statusStyle = {
     active: 'bg-green-100 text-green-700',
-    completed: 'bg-slate-100 text-slate-600',
+    completed: 'bg-muted text-secondary-foreground',
     overdue: 'bg-red-100 text-red-700',
   }[loan.status];
 
@@ -145,13 +145,13 @@ export default function LoanDetailPage() {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <Link href={fromClient && clientId ? `/dashboard/clients/${clientId}` : '/dashboard/loans'}>
-            <button className="shrink-0 h-8 w-8 flex items-center justify-center rounded-lg border border-slate-200 bg-white hover:bg-slate-50 transition-colors text-slate-600">
+            <button className="shrink-0 h-8 w-8 flex items-center justify-center rounded-lg border border-border bg-card hover:bg-background transition-colors text-secondary-foreground">
               ←
             </button>
           </Link>
           <div className="min-w-0">
-            <h1 className="text-xl font-bold text-slate-900 truncate">{loan.clientId.name}</h1>
-            <p className="text-sm text-slate-500 truncate">Plan: {plan?.name}</p>
+            <h1 className="text-xl font-bold text-foreground truncate">{loan.clientId.name}</h1>
+            <p className="text-sm text-muted-foreground truncate">Plan: {plan?.name}</p>
           </div>
         </div>
         <span className={`shrink-0 px-2.5 py-1 rounded-full text-xs font-semibold ${statusStyle}`}>
@@ -162,13 +162,13 @@ export default function LoanDetailPage() {
       {/* ── 4 stat cards — 2×2 on mobile, 4 on md+ ── */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
-          { label: 'Disbursed', value: fmt(loan.disposeAmount), color: 'text-slate-900' },
+          { label: 'Disbursed', value: fmt(loan.disposeAmount), color: 'text-foreground' },
           { label: 'Total Given', value: fmt(totalGiven), color: 'text-green-700' },
           { label: 'Interest Paid', value: fmt(totalInterest), color: 'text-blue-700' },
           { label: 'Balance', value: fmt(loan.balance), color: loan.balance === 0 ? 'text-green-600' : 'text-red-600' },
         ].map(s => (
           <Card key={s.label} className="p-3.5">
-            <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">{s.label}</p>
+            <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{s.label}</p>
             <p className={`text-lg font-bold ${s.color}`}>{s.value}</p>
           </Card>
         ))}
@@ -177,10 +177,10 @@ export default function LoanDetailPage() {
       {/* ── Progress ── */}
       <Card className="p-4">
         <div className="flex justify-between text-sm mb-2">
-          <span className="text-slate-600">Repayment Progress</span>
-          <span className="font-semibold text-slate-900">{progress.toFixed(1)}%</span>
+          <span className="text-secondary-foreground">Repayment Progress</span>
+          <span className="font-semibold text-foreground">{progress.toFixed(1)}%</span>
         </div>
-        <div className="w-full bg-slate-100 rounded-full h-2.5">
+        <div className="w-full bg-muted rounded-full h-2.5">
           <div
             className={`h-2.5 rounded-full transition-all duration-500 ${loan.balance === 0 ? 'bg-green-500' : 'bg-slate-800'}`}
             style={{ width: `${progress}%` }}
@@ -192,21 +192,21 @@ export default function LoanDetailPage() {
       </Card>
 
       {/* ── Collapsible Loan Info (mobile-friendly) ── */}
-      <div className="border border-slate-200 rounded-xl bg-white overflow-hidden">
+      <div className="border border-border rounded-xl bg-card overflow-hidden">
         <button
           onClick={() => setInfoOpen(!infoOpen)}
-          className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50 transition-colors"
+          className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-foreground hover:bg-background transition-colors"
         >
           Loan Info
           <svg
-            className={`h-4 w-4 text-slate-400 transition-transform duration-200 ${infoOpen ? 'rotate-180' : ''}`}
+            className={`h-4 w-4 text-muted-foreground transition-transform duration-200 ${infoOpen ? 'rotate-180' : ''}`}
             fill="none" stroke="currentColor" viewBox="0 0 24 24"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
           </svg>
         </button>
         {infoOpen && (
-          <div className="border-t border-slate-100 px-4 py-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+          <div className="border-t border-border/50 px-4 py-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
             {[
               ['Plan', plan?.name],
               ['Client', loan.clientId.name],
@@ -220,8 +220,8 @@ export default function LoanDetailPage() {
               ['Status', loan.status],
             ].map(([label, value]) => (
               <div key={String(label)}>
-                <p className="text-xs text-slate-400 uppercase tracking-wide">{label}</p>
-                <p className="font-medium text-slate-900 mt-0.5">{String(value)}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">{label}</p>
+                <p className="font-medium text-foreground mt-0.5">{String(value)}</p>
               </div>
             ))}
           </div>
@@ -231,15 +231,15 @@ export default function LoanDetailPage() {
       {/* ── Add Payment ── */}
       {loan.status !== 'completed' && (
         <Card className="p-4">
-          <h2 className="text-base font-semibold text-slate-900 mb-4">Add Payment</h2>
+          <h2 className="text-base font-semibold text-foreground mb-4">Add Payment</h2>
 
           {/* Payment type select */}
           <div className="mb-4">
-            <label className="block text-xs font-medium text-slate-600 mb-1.5">Payment Type</label>
+            <label className="block text-xs font-medium text-secondary-foreground mb-1.5">Payment Type</label>
             <select
               value={paymentType}
               onChange={e => { setPaymentType(e.target.value as 'given' | 'interest'); setAmount(''); setError(''); }}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2.5 text-sm text-slate-900 bg-white focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+              className="w-full border border-border rounded-lg px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
             >
               <option value="given">Given Amount — reduces balance</option>
               <option value="interest">Interest Payment — no balance change</option>
@@ -249,7 +249,7 @@ export default function LoanDetailPage() {
           <form onSubmit={handlePayment} className="space-y-3">
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1.5">Amount (₹) *</label>
+                <label className="block text-xs font-medium text-secondary-foreground mb-1.5">Amount (₹) *</label>
                 <Input
                   type="number" step="0.01" min="0.01"
                   value={amount}
@@ -259,7 +259,7 @@ export default function LoanDetailPage() {
                 />
               </div>
               <div>
-                <label className="block text-xs font-medium text-slate-600 mb-1.5">Date *</label>
+                <label className="block text-xs font-medium text-secondary-foreground mb-1.5">Date *</label>
                 <Input
                   type="date" value={date}
                   onChange={e => setDate(e.target.value)}
@@ -268,7 +268,7 @@ export default function LoanDetailPage() {
               </div>
             </div>
             <div>
-              <label className="block text-xs font-medium text-slate-600 mb-1.5">Notes</label>
+              <label className="block text-xs font-medium text-secondary-foreground mb-1.5">Notes</label>
               <Input
                 type="text" value={notes}
                 onChange={e => setNotes(e.target.value)}
@@ -281,7 +281,7 @@ export default function LoanDetailPage() {
             )}
             <Button
               type="submit" disabled={isSubmitting}
-              className={`w-full font-semibold text-white ${paymentType === 'given' ? 'bg-slate-900 hover:bg-slate-800' : 'bg-blue-600 hover:bg-blue-700'}`}
+              className={`w-full font-semibold text-primary-foreground ${paymentType === 'given' ? 'bg-primary hover:bg-primary/90' : 'bg-primary hover:bg-primary/90'}`}
             >
               {isSubmitting ? 'Saving...' : paymentType === 'given' ? 'Add Given Payment' : 'Add Interest Payment'}
             </Button>
@@ -292,14 +292,14 @@ export default function LoanDetailPage() {
       {/* ── Payment History ── */}
       <Card className="p-4">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-slate-900">History</h2>
+          <h2 className="text-base font-semibold text-foreground">History</h2>
           {/* Tabs */}
-          <div className="flex rounded-lg border border-slate-200 overflow-hidden text-xs">
+          <div className="flex rounded-lg border border-border overflow-hidden text-xs">
             {([['all', `All (${payments.length})`], ['given', `Given (${givenPayments.length})`], ['interest', `Interest (${interestPayments.length})`]] as const).map(([tab, label]) => (
               <button
                 key={tab}
                 onClick={() => setHistoryTab(tab)}
-                className={`px-3 py-1.5 font-medium transition-colors ${historyTab === tab ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50'}`}
+                className={`px-3 py-1.5 font-medium transition-colors ${historyTab === tab ? 'bg-primary text-primary-foreground' : 'bg-card text-secondary-foreground hover:bg-background'}`}
               >
                 {label}
               </button>
@@ -308,22 +308,22 @@ export default function LoanDetailPage() {
         </div>
 
         {filteredPayments.length === 0 ? (
-          <p className="text-sm text-slate-400 text-center py-6">No payments yet.</p>
+          <p className="text-sm text-muted-foreground text-center py-6">No payments yet.</p>
         ) : (
           <div className="space-y-2 max-h-72 overflow-y-auto pr-0.5">
             {filteredPayments.map(p => (
               <div
                 key={p._id}
-                className={`flex items-center justify-between p-3 rounded-lg border text-sm ${p.type === 'interest' ? 'bg-blue-50 border-blue-100' : 'bg-slate-50 border-slate-100'
+                className={`flex items-center justify-between p-3 rounded-lg border text-sm ${p.type === 'interest' ? 'bg-blue-50 border-blue-100' : 'bg-background border-border/50'
                   }`}
               >
                 <div>
-                  <p className="font-semibold text-slate-900">{fmt(p.amount)}</p>
-                  {p.notes && <p className="text-xs text-slate-400 mt-0.5">{p.notes}</p>}
+                  <p className="font-semibold text-foreground">{fmt(p.amount)}</p>
+                  {p.notes && <p className="text-xs text-muted-foreground mt-0.5">{p.notes}</p>}
                 </div>
                 <div className="text-right shrink-0 ml-3">
-                  <p className="text-xs text-slate-400">{new Date(p.date).toLocaleDateString('en-IN')}</p>
-                  <span className={`text-xs font-medium ${p.type === 'interest' ? 'text-blue-600' : 'text-slate-500'}`}>
+                  <p className="text-xs text-muted-foreground">{new Date(p.date).toLocaleDateString('en-IN')}</p>
+                  <span className={`text-xs font-medium ${p.type === 'interest' ? 'text-primary' : 'text-muted-foreground'}`}>
                     {p.type === 'interest' ? 'Interest' : 'Given'}
                   </span>
                 </div>
@@ -334,21 +334,21 @@ export default function LoanDetailPage() {
 
         {/* Summary footer */}
         {payments.length > 0 && (
-          <div className="border-t border-slate-100 mt-4 pt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs px-2">
+          <div className="border-t border-border/50 mt-4 pt-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center text-xs px-2">
             <div>
-              <p className="text-slate-400 uppercase font-semibold mb-1">Total Given</p>
-              <p className="font-bold text-slate-900 text-sm">{fmt(totalGiven)}</p>
+              <p className="text-muted-foreground uppercase font-semibold mb-1">Total Given</p>
+              <p className="font-bold text-foreground text-sm">{fmt(totalGiven)}</p>
             </div>
             <div>
-              <p className="text-slate-400 uppercase font-semibold mb-1 text-amber-600">Initial Int.</p>
+              <p className="text-muted-foreground uppercase font-semibold mb-1 text-primary">Initial Int.</p>
               <p className="font-bold text-amber-700 text-sm">{fmt(totalInitial)}</p>
             </div>
             <div>
-              <p className="text-slate-400 uppercase font-semibold mb-1 text-blue-600">Coll. Interest</p>
+              <p className="text-muted-foreground uppercase font-semibold mb-1 text-primary">Coll. Interest</p>
               <p className="font-bold text-blue-800 text-sm">{fmt(totalCollected)}</p>
             </div>
             <div>
-              <p className="text-slate-400 uppercase font-semibold mb-1">Balance</p>
+              <p className="text-muted-foreground uppercase font-semibold mb-1">Balance</p>
               <p className={`font-bold text-sm ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>{fmt(loan.balance)}</p>
             </div>
           </div>

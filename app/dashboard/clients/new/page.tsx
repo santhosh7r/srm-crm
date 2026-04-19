@@ -34,13 +34,13 @@ export default function NewClientPage() {
     <div>
       <div className="mb-8 flex items-center gap-4">
         <Link href="/dashboard/clients">
-          <Button variant="outline" className="border-slate-200">
+          <Button variant="outline" className="border-border">
             ← Back
           </Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">New Client</h1>
-          <p className="text-slate-600 mt-1">Add a new client to your system</p>
+          <h1 className="text-3xl font-bold text-foreground">New Client</h1>
+          <p className="text-secondary-foreground mt-1">Add a new client to your system</p>
         </div>
       </div>
 

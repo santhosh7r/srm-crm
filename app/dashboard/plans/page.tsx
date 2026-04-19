@@ -117,15 +117,15 @@ export default function PlansPage() {
     onChange: (v: string) => void;
     options: { value: string; label: string }[];
   }) => (
-    <div className="flex rounded-lg border border-slate-200 overflow-hidden w-fit">
+    <div className="flex rounded-lg border border-border overflow-hidden w-fit">
       {options.map(o => (
         <button
           key={o.value}
           type="button"
           onClick={() => onChange(o.value)}
           className={`px-4 py-2 text-sm font-medium transition-colors ${value === o.value
-              ? 'bg-slate-900 text-white'
-              : 'bg-white text-slate-600 hover:bg-slate-50'
+              ? 'bg-primary text-primary-foreground'
+              : 'bg-card text-secondary-foreground hover:bg-background'
             }`}
         >
           {o.label}
@@ -138,10 +138,10 @@ export default function PlansPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Loan Plans</h1>
-          <p className="text-slate-600 mt-1">Define loan rules — amounts are set per client when assigning</p>
+          <h1 className="text-3xl font-bold text-foreground">Loan Plans</h1>
+          <p className="text-secondary-foreground mt-1">Define loan rules — amounts are set per client when assigning</p>
         </div>
-        <Button onClick={() => { reset(); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800 text-white">
+        <Button onClick={() => { reset(); setShowForm(true); }} className="bg-primary hover:bg-primary/90 text-primary-foreground">
           + New Plan
         </Button>
       </div>
@@ -149,13 +149,13 @@ export default function PlansPage() {
       {/* Form */}
       {showForm && (
         <Card className="p-6 mb-6">
-          <h2 className="text-xl font-semibold text-slate-900 mb-5">
+          <h2 className="text-xl font-semibold text-foreground mb-5">
             {editingId ? 'Edit Plan' : 'Create Plan'}
           </h2>
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Name */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Plan Name *</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Plan Name *</label>
               <Input
                 value={form.name}
                 onChange={e => setForm({ ...form, name: e.target.value })}
@@ -166,7 +166,7 @@ export default function PlansPage() {
 
             {/* Plan Type */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Plan Type *</label>
+              <label className="block text-sm font-medium text-foreground mb-2">Plan Type *</label>
               <Toggle
                 value={form.planType}
                 onChange={v => setForm({ ...form, planType: v as 'weekly' | 'monthly', duration: '' })}
@@ -180,7 +180,7 @@ export default function PlansPage() {
             {/* Duration — only for weekly */}
             {form.planType === 'weekly' && (
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Duration (weeks) *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Duration (weeks) *</label>
                 <Input
                   type="number"
                   min="1"
@@ -191,14 +191,14 @@ export default function PlansPage() {
                   className="w-36"
                 />
                 {form.duration && (
-                  <p className="text-xs text-slate-400 mt-1">{form.duration} week(s)</p>
+                  <p className="text-xs text-muted-foreground mt-1">{form.duration} week(s)</p>
                 )}
               </div>
             )}
 
             {/* Interest Type */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-2">Interest Type *</label>
+              <label className="block text-sm font-medium text-foreground mb-2">Interest Type *</label>
               <Toggle
                 value={form.interestType}
                 onChange={v => setForm({ ...form, interestType: v as 'fixed' | 'percentage' })}
@@ -207,7 +207,7 @@ export default function PlansPage() {
                   { value: 'percentage', label: '% Percentage' },
                 ]}
               />
-              <p className="text-xs text-slate-400 mt-1">
+              <p className="text-xs text-muted-foreground mt-1">
                 {form.interestType === 'fixed'
                   ? 'Interest is a fixed rupee amount — set per loan'
                   : 'Interest is a % of dispose amount — set per loan'}
@@ -216,7 +216,7 @@ export default function PlansPage() {
 
             {/* Description */}
             <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">Description *</label>
+              <label className="block text-sm font-medium text-foreground mb-1">Description *</label>
               <Input
                 value={form.description}
                 onChange={e => setForm({ ...form, description: e.target.value })}
@@ -228,10 +228,10 @@ export default function PlansPage() {
             {error && <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm">{error}</div>}
 
             <div className="flex gap-3">
-              <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white">
+              <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
                 {editingId ? 'Update Plan' : 'Create Plan'}
               </Button>
-              <Button type="button" variant="outline" onClick={reset} className="border-slate-200">
+              <Button type="button" variant="outline" onClick={reset} className="border-border">
                 Cancel
               </Button>
             </div>
@@ -241,11 +241,11 @@ export default function PlansPage() {
 
       {/* Plans list */}
       {loading ? (
-        <Card className="p-8 text-center"><p className="text-slate-500">Loading plans...</p></Card>
+        <Card className="p-8 text-center"><p className="text-muted-foreground">Loading plans...</p></Card>
       ) : plans.length === 0 ? (
         <Card className="p-8 text-center">
-          <p className="text-slate-500 mb-4">No plans yet.</p>
-          <Button onClick={() => { reset(); setShowForm(true); }} className="bg-slate-900 hover:bg-slate-800 text-white">
+          <p className="text-muted-foreground mb-4">No plans yet.</p>
+          <Button onClick={() => { reset(); setShowForm(true); }} className="bg-primary hover:bg-primary/90 text-primary-foreground">
             Create First Plan
           </Button>
         </Card>
@@ -255,34 +255,34 @@ export default function PlansPage() {
             <Card key={plan._id} className="p-5 hover:shadow-md transition-shadow">
               <div className="flex justify-between items-start mb-3">
                 <div>
-                  <h3 className="font-semibold text-slate-900">{plan.name}</h3>
-                  <p className="text-sm text-slate-500 mt-0.5">{plan.description}</p>
+                  <h3 className="font-semibold text-foreground">{plan.name}</h3>
+                  <p className="text-sm text-muted-foreground mt-0.5">{plan.description}</p>
                 </div>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${plan.planType === 'weekly'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-slate-100 text-slate-600'
+                    ? 'bg-muted text-blue-700'
+                    : 'bg-muted text-secondary-foreground'
                   }`}>
                   {plan.planType === 'weekly' ? '📆 Weekly' : '📅 Monthly'}
                 </span>
               </div>
 
-              <div className="space-y-1.5 text-sm text-slate-600 mb-4">
+              <div className="space-y-1.5 text-sm text-secondary-foreground mb-4">
                 <div className="flex justify-between">
                   <span>Interest Type</span>
-                  <span className="font-medium text-slate-900">
+                  <span className="font-medium text-foreground">
                     {plan.interestType === 'fixed' ? '₹ Fixed Amount' : '% Percentage'}
                   </span>
                 </div>
                 {plan.planType === 'weekly' && plan.duration && (
                   <div className="flex justify-between">
                     <span>Duration</span>
-                    <span className="font-medium text-slate-900">{plan.duration} week(s)</span>
+                    <span className="font-medium text-foreground">{plan.duration} week(s)</span>
                   </div>
                 )}
               </div>
 
               <div className="flex gap-2">
-                <Button onClick={() => handleEdit(plan)} variant="outline" size="sm" className="flex-1 border-slate-200">
+                <Button onClick={() => handleEdit(plan)} variant="outline" size="sm" className="flex-1 border-border">
                   Edit
                 </Button>
                 <Button

@@ -57,27 +57,27 @@ export default function LoansPage() {
     active: 'bg-blue-50 text-blue-700 border border-blue-200',
     completed: 'bg-green-50 text-green-700 border border-green-200',
     overdue: 'bg-red-50 text-red-700 border border-red-200',
-  }[status] || 'bg-slate-50 text-slate-700');
+  }[status] || 'bg-background text-foreground');
 
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Loans</h1>
-          <p className="text-slate-600 mt-1">Manage all client loans and track payments</p>
+          <h1 className="text-3xl font-bold text-foreground">Loans</h1>
+          <p className="text-secondary-foreground mt-1">Manage all client loans and track payments</p>
         </div>
         <Link href="/dashboard/loans/new">
-          <Button className="bg-slate-900 hover:bg-slate-800 text-white">+ Assign Loan</Button>
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">+ Assign Loan</Button>
         </Link>
       </div>
 
       {loading ? (
-        <Card className="p-8 text-center"><p className="text-slate-500">Loading loans...</p></Card>
+        <Card className="p-8 text-center"><p className="text-muted-foreground">Loading loans...</p></Card>
       ) : loans.length === 0 ? (
         <Card className="p-8 text-center">
-          <p className="text-slate-500 mb-4">No loans yet.</p>
+          <p className="text-muted-foreground mb-4">No loans yet.</p>
           <Link href="/dashboard/loans/new">
-            <Button className="bg-slate-900 hover:bg-slate-800 text-white">Assign First Loan</Button>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Assign First Loan</Button>
           </Link>
         </Card>
       ) : (
@@ -91,7 +91,7 @@ export default function LoansPage() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-1">
                       <Link href={`/dashboard/loans/${loan._id}`}>
-                        <h3 className="font-semibold text-slate-900 hover:underline cursor-pointer">
+                        <h3 className="font-semibold text-foreground hover:underline cursor-pointer">
                           {loan.clientId?.name ?? '—'}
                         </h3>
                       </Link>
@@ -99,7 +99,7 @@ export default function LoansPage() {
                         {loan.status}
                       </span>
                     </div>
-                    <p className="text-sm text-slate-500 mb-3">
+                    <p className="text-sm text-muted-foreground mb-3">
                       {loan.planId?.name ?? '—'} ·{' '}
                       {loan.planId?.planType === 'weekly'
                         ? `📆 Weekly${loan.planId.duration ? ` (${loan.planId.duration}w)` : ''}`
@@ -109,19 +109,19 @@ export default function LoansPage() {
                     {/* Amounts row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 text-sm mb-3">
                       <div>
-                        <p className="text-xs text-slate-500">Disposed</p>
-                        <p className="font-semibold text-slate-900">₹{(loan.disposeAmount ?? 0).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">Disposed</p>
+                        <p className="font-semibold text-foreground">₹{(loan.disposeAmount ?? 0).toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-500">Interest</p>
-                        <p className="font-semibold text-slate-900">₹{(loan.interestAmount ?? 0).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">Interest</p>
+                        <p className="font-semibold text-foreground">₹{(loan.interestAmount ?? 0).toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-500">Paid</p>
+                        <p className="text-xs text-muted-foreground">Paid</p>
                         <p className="font-semibold text-green-700">₹{(loan.totalPaid ?? 0).toFixed(2)}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-slate-500">Balance</p>
+                        <p className="text-xs text-muted-foreground">Balance</p>
                         <p className={`font-semibold ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>
                           ₹{(loan.balance ?? 0).toFixed(2)}
                         </p>
@@ -129,19 +129,19 @@ export default function LoansPage() {
                     </div>
 
                     {/* Progress bar */}
-                    <div className="w-full bg-slate-100 rounded-full h-1.5 max-w-sm">
+                    <div className="w-full bg-muted rounded-full h-1.5 max-w-sm">
                       <div
                         className="bg-green-500 h-1.5 rounded-full transition-all"
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <p className="text-xs text-slate-400 mt-0.5">{progress.toFixed(0)}% repaid of ₹{(loan.totalAmount ?? 0).toFixed(2)}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">{progress.toFixed(0)}% repaid of ₹{(loan.totalAmount ?? 0).toFixed(2)}</p>
                   </div>
 
                   {/* Right: actions */}
                   <div className="flex flex-col gap-2 items-end shrink-0">
                     <Link href={`/dashboard/loans/${loan._id}`}>
-                      <Button variant="outline" size="sm" className="border-slate-200 w-20">View</Button>
+                      <Button variant="outline" size="sm" className="border-border w-20">View</Button>
                     </Link>
                     <Button
                       variant="outline"

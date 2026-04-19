@@ -83,7 +83,7 @@ export default function ProfilePage() {
   if (isLoading) {
     return (
       <div className="h-[60vh] flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-slate-400" />
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
       </div>
     );
   }
@@ -93,74 +93,74 @@ export default function ProfilePage() {
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900">Profile Settings</h1>
-          <p className="text-slate-500 text-sm mt-0.5">Manage your account information and security</p>
+          <h1 className="text-2xl font-bold text-foreground">Profile Settings</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Manage your account information and security</p>
         </div>
       </div>
 
       <form onSubmit={handleUpdate} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-white">
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-card">
             <CardHeader className="border-b border-slate-50 pb-4">
-              <div className="flex items-center gap-2 text-slate-900">
-                <User size={18} className="text-slate-400" />
+              <div className="flex items-center gap-2 text-foreground">
+                <User size={18} className="text-muted-foreground" />
                 <CardTitle className="text-lg">Account Info</CardTitle>
               </div>
               <CardDescription>Basic profile details</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase ml-1">Full Name</label>
+                <label className="text-xs font-bold text-foreground uppercase ml-1">Full Name</label>
                 <div className="relative">
                   <Input 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10"
                   />
-                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 </div>
               </div>
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase ml-1">Email Address</label>
+                <label className="text-xs font-bold text-foreground uppercase ml-1">Email Address</label>
                 <div className="relative">
                   <Input 
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10"
                   />
-                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-white">
+          <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-card">
             <CardHeader className="border-b border-slate-50 pb-4">
-              <div className="flex items-center gap-2 text-slate-900">
-                <ShieldCheck size={18} className="text-slate-400" />
+              <div className="flex items-center gap-2 text-foreground">
+                <ShieldCheck size={18} className="text-muted-foreground" />
                 <CardTitle className="text-lg">Security</CardTitle>
               </div>
               <CardDescription>Password management</CardDescription>
             </CardHeader>
             <CardContent className="pt-6 space-y-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase ml-1">Current Password</label>
+                <label className="text-xs font-bold text-foreground uppercase ml-1">Current Password</label>
                 <div className="relative">
                   <Input 
                     type={showCurrent ? "text" : "password"}
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Verify it's you"
-                    className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 pr-10 hover:bg-white"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 pr-10 hover:bg-card"
                   />
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                   <button
                     type="button"
                     onClick={() => setShowCurrent(!showCurrent)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showCurrent ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -168,20 +168,20 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase ml-1">New Password</label>
+                <label className="text-xs font-bold text-foreground uppercase ml-1">New Password</label>
                 <div className="relative">
                   <Input 
                     type={showNew ? "text" : "password"}
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Min. 6 characters"
-                    className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 pr-10 hover:bg-white"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 pr-10 hover:bg-card"
                   />
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                   <button
                     type="button"
                     onClick={() => setShowNew(!showNew)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-900"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                   >
                     {showNew ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -189,30 +189,30 @@ export default function ProfilePage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-bold text-slate-700 uppercase ml-1">Confirm New Password</label>
+                <label className="text-xs font-bold text-foreground uppercase ml-1">Confirm New Password</label>
                 <div className="relative">
                   <Input 
                     type={showNew ? "text" : "password"}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
-                    className="h-11 bg-slate-50 border-slate-200 rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 hover:bg-white"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 hover:bg-card"
                   />
-                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" size={16} />
+                  <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 </div>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        <div className="flex items-center justify-end gap-3 p-4 bg-white border border-slate-100 rounded-2xl shadow-sm">
-          <p className="hidden sm:block text-xs text-slate-400 font-medium mr-auto pl-2">
+        <div className="flex items-center justify-end gap-3 p-4 bg-card border border-border/50 rounded-2xl shadow-sm">
+          <p className="hidden sm:block text-xs text-muted-foreground font-medium mr-auto pl-2">
             Make sure to use a strong password for better security.
           </p>
           <Button
             type="submit"
             disabled={isSaving}
-            className="h-11 px-8 bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl shadow-lg shadow-slate-900/10 transition-all active:scale-[0.98]"
+            className="h-11 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-lg shadow-slate-900/10 transition-all active:scale-[0.98]"
           >
             {isSaving ? (
               <>

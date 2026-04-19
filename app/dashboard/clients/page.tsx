@@ -72,13 +72,13 @@ export default function ClientsPage() {
     <div>
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Clients</h1>
-          <p className="text-slate-600 mt-1">
+          <h1 className="text-3xl font-bold text-foreground">Clients</h1>
+          <p className="text-secondary-foreground mt-1">
             Manage your clients and their information
           </p>
         </div>
         <Link href="/dashboard/clients/new">
-          <Button className="bg-slate-900 hover:bg-slate-800 text-white">
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
             Add Client
           </Button>
         </Link>
@@ -96,13 +96,13 @@ export default function ClientsPage() {
 
       {loading ? (
         <Card className="p-8 text-center">
-          <p className="text-slate-600">Loading clients...</p>
+          <p className="text-secondary-foreground">Loading clients...</p>
         </Card>
       ) : clients.length === 0 ? (
         <Card className="p-8 text-center">
-          <p className="text-slate-600 mb-4">No clients yet.</p>
+          <p className="text-secondary-foreground mb-4">No clients yet.</p>
           <Link href="/dashboard/clients/new">
-            <Button className="bg-slate-900 hover:bg-slate-800 text-white">
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">
               Create Your First Client
             </Button>
           </Link>
@@ -117,14 +117,14 @@ export default function ClientsPage() {
               <div className="flex justify-between items-start">
                 <div className="flex-1">
                   <Link href={`/dashboard/clients/${client._id}`}>
-                    <h3 className="font-semibold text-slate-900 hover:text-slate-700 cursor-pointer">
+                    <h3 className="font-semibold text-foreground hover:text-foreground cursor-pointer">
                       {client.name}
                     </h3>
                   </Link>
-                  <p className="text-sm text-slate-600">{client.email}</p>
-                  <div className="flex gap-4 mt-2 text-sm text-slate-600">
+                  <p className="text-sm text-secondary-foreground">{client.email}</p>
+                  <div className="flex gap-4 mt-2 text-sm text-secondary-foreground">
                     <span>{client.phone}</span>
-                    <span className={client.status === 'active' ? "text-green-600 font-medium" : "text-slate-600 font-medium"}>
+                    <span className={client.status === 'active' ? "text-green-600 font-medium" : "text-secondary-foreground font-medium"}>
                       {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
                     </span>
                   </div>
@@ -134,7 +134,7 @@ export default function ClientsPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-slate-200"
+                      className="border-border"
                     >
                       View
                     </Button>

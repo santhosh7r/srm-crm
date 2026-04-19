@@ -280,22 +280,22 @@ export default function DashboardPage() {
   const fmt = (n: number) => `₹${(n ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
   const statCards = [
-    { title: 'Total Clients', value: stats.totalClients, icon: Users, color: 'bg-blue-50 text-blue-600', border: 'border-blue-100' },
-    { title: 'Total Loans', value: stats.totalLoans, icon: Briefcase, color: 'bg-emerald-50 text-emerald-600', border: 'border-emerald-100' },
-    { title: 'Active Loans', value: stats.activeLoans, icon: Activity, color: 'bg-indigo-50 text-indigo-600', border: 'border-indigo-100' },
-    { title: 'Total Collected', value: fmt(stats.totalPaid), icon: Wallet, color: 'bg-green-50 text-green-600', border: 'border-green-100' },
-    { title: 'Total Balance', value: fmt(stats.totalBalance), icon: IndianRupee, color: 'bg-rose-50 text-rose-600', border: 'border-rose-100' },
+    { title: 'Total Clients', value: stats.totalClients, icon: Users, color: 'bg-muted text-primary', border: 'border-border' },
+    { title: 'Total Loans', value: stats.totalLoans, icon: Briefcase, color: 'bg-muted text-primary', border: 'border-border' },
+    { title: 'Active Loans', value: stats.activeLoans, icon: Activity, color: 'bg-muted text-primary', border: 'border-border' },
+    { title: 'Total Collected', value: fmt(stats.totalPaid), icon: Wallet, color: 'bg-muted text-primary', border: 'border-border' },
+    { title: 'Total Balance', value: fmt(stats.totalBalance), icon: IndianRupee, color: 'bg-muted text-primary', border: 'border-border' },
   ];
 
   const pieData = [
-    { name: 'Active', value: stats.activeLoans, color: '#4f46e5' },
-    { name: 'Completed', value: stats.completedLoans, color: '#10b981' },
-    { name: 'Overdue', value: stats.overdueLoans, color: '#ef4444' }
+    { name: 'Active', value: stats.activeLoans, color: 'var(--chart-1)' },
+    { name: 'Completed', value: stats.completedLoans, color: 'var(--chart-2)' },
+    { name: 'Overdue', value: stats.overdueLoans, color: 'var(--chart-3)' }
   ].filter(d => d.value > 0);
 
   const barData = [
-    { name: 'Total Collected', Amount: stats.totalPaid, fill: '#10b981' },
-    { name: 'Total Balance', Amount: stats.totalBalance, fill: '#ef4444' },
+    { name: 'Total Collected', Amount: stats.totalPaid, fill: 'var(--chart-1)' },
+    { name: 'Total Balance', Amount: stats.totalBalance, fill: 'var(--chart-2)' },
   ];
 
   const containerVariants = {
@@ -319,10 +319,10 @@ export default function DashboardPage() {
         transition={{ duration: 0.5 }}
         className="mb-8"
       >
-        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">
+        <h1 className="text-3xl font-bold text-foreground tracking-tight">
           Welcome back{userName ? `, ${userName}` : ''}
         </h1>
-        <p className="text-slate-500 mt-1 text-sm font-medium">
+        <p className="text-muted-foreground mt-1 text-sm font-medium">
           Here is your financial portfolio overview for today.
         </p>
       </motion.div>
@@ -339,16 +339,16 @@ export default function DashboardPage() {
             <motion.div key={stat.title} variants={itemVariants}>
               <Card className={`p-5 border shadow-sm hover:shadow-md transition-shadow duration-300 ${stat.border}`}>
                 <div className="flex items-center justify-between mb-4">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
                     {stat.title}
                   </p>
                   <div className={`p-2 rounded-lg ${stat.color}`}>
                     <Icon className="w-4 h-4" />
                   </div>
                 </div>
-                <h3 className="text-2xl font-bold text-slate-800">
+                <h3 className="text-2xl font-bold text-foreground">
                   {loading ? (
-                    <div className="h-8 w-24 bg-slate-200 animate-pulse rounded"></div>
+                    <div className="h-8 w-24 bg-muted animate-pulse rounded"></div>
                   ) : (
                     stat.value
                   )}
@@ -366,33 +366,33 @@ export default function DashboardPage() {
         transition={{ delay: 0.5, duration: 0.5 }}
         className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8"
       >
-        <Card className="p-6 border-slate-200 shadow-sm flex flex-col">
+        <Card className="p-6 border-border shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-4">
-            <AlertCircle className="w-5 h-5 text-indigo-500" />
-            <h2 className="text-lg font-bold text-slate-800">Weekly Pending Dues</h2>
+            <AlertCircle className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-foreground">Weekly Pending Dues</h2>
           </div>
-          {stats.weeklyPending.length === 0 ? <p className="text-sm text-slate-500">No pending weekly dues at this time.</p> : (
+          {stats.weeklyPending.length === 0 ? <p className="text-sm text-muted-foreground">No pending weekly dues at this time.</p> : (
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
               {stats.weeklyPending.slice(0, 10).map((p, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-3 rounded-lg border border-slate-100 transition-all hover:border-indigo-200">
+                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-card p-3 rounded-lg border border-border/50 transition-all hover:border-primary/50">
                   <div className="flex-1">
-                    <p className="font-bold text-slate-800 text-sm">{p.clientId?.name}</p>
+                    <p className="font-bold text-foreground text-sm">{p.clientId?.name}</p>
                     <div className="flex items-center gap-3">
-                      <p className="text-xs text-slate-500 font-medium">₹{Math.round(p.dueAmount)}</p>
-                      <p className="text-[10px] text-slate-400 italic">Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</p>
+                      <p className="text-xs text-muted-foreground font-medium">₹{Math.round(p.dueAmount)}</p>
+                      <p className="text-[10px] text-muted-foreground italic">Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Link href={`/dashboard/clients/${p.clientId?._id}`} className="flex-1 sm:flex-none">
-                      <Button size="sm" variant="outline" className="h-8 w-full sm:w-auto border-slate-200 hover:bg-slate-100/80">View</Button>
+                      <Button size="sm" variant="outline" className="h-8 w-full sm:w-auto border-border hover:bg-muted/80">View</Button>
                     </Link>
-                    <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('given'); }} className="bg-indigo-600 hover:bg-indigo-700 h-8 flex-1 sm:flex-none">Collect</Button>
+                    <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('given'); }} className="bg-primary hover:bg-primary/90 h-8 flex-1 sm:flex-none">Collect</Button>
                   </div>
                 </div>
               ))}
               {stats.weeklyPending.length > 10 && (
                 <div className="pt-2 pb-1 text-center font-medium">
-                  <Link href="/dashboard/dues" className="text-sm text-indigo-600 hover:text-indigo-800 transition-colors">
+                  <Link href="/dashboard/dues" className="text-sm text-primary hover:text-primary/80 transition-colors">
                     View all {stats.weeklyPending.length} pending dues →
                   </Link>
                 </div>
@@ -401,33 +401,33 @@ export default function DashboardPage() {
           )}
         </Card>
 
-        <Card className="p-6 border-slate-200 shadow-sm flex flex-col">
+        <Card className="p-6 border-border shadow-sm flex flex-col">
           <div className="flex items-center gap-2 mb-4">
-            <Activity className="w-5 h-5 text-emerald-500" />
-            <h2 className="text-lg font-bold text-slate-800">Monthly Pending Dues</h2>
+            <Activity className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-foreground">Monthly Pending Dues</h2>
           </div>
-          {stats.monthlyPending.length === 0 ? <p className="text-sm text-slate-500">No pending monthly dues at this time.</p> : (
+          {stats.monthlyPending.length === 0 ? <p className="text-sm text-muted-foreground">No pending monthly dues at this time.</p> : (
             <div className="space-y-4 max-h-[300px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-slate-200 scrollbar-track-transparent">
               {stats.monthlyPending.slice(0, 10).map((p, i) => (
-                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-3 rounded-lg border border-slate-100 transition-all hover:border-emerald-200">
+                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-card p-3 rounded-lg border border-border/50 transition-all hover:border-primary/50">
                   <div className="flex-1">
-                    <p className="font-bold text-slate-800 text-sm">{p.clientId?.name}</p>
+                    <p className="font-bold text-foreground text-sm">{p.clientId?.name}</p>
                     <div className="flex items-center gap-3">
-                      <p className="text-xs text-slate-500 font-medium text-emerald-700">₹{Math.round(p.dueAmount)}</p>
-                      <p className="text-[10px] text-slate-400 italic">Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</p>
+                      <p className="text-xs text-muted-foreground font-medium text-primary">₹{Math.round(p.dueAmount)}</p>
+                      <p className="text-[10px] text-muted-foreground italic">Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <Link href={`/dashboard/clients/${p.clientId?._id}`} className="flex-1 sm:flex-none">
-                      <Button size="sm" variant="outline" className="h-8 w-full sm:w-auto border-slate-200 hover:bg-slate-100/80">View</Button>
+                      <Button size="sm" variant="outline" className="h-8 w-full sm:w-auto border-border hover:bg-muted/80">View</Button>
                     </Link>
-                    <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('interest'); }} className="bg-emerald-600 hover:bg-emerald-700 h-8 flex-1 sm:flex-none">Collect</Button>
+                    <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('interest'); }} className="bg-primary hover:bg-primary/90 h-8 flex-1 sm:flex-none">Collect</Button>
                   </div>
                 </div>
               ))}
               {stats.monthlyPending.length > 10 && (
                 <div className="pt-2 pb-1 text-center font-medium">
-                  <Link href="/dashboard/dues" className="text-sm text-emerald-600 hover:text-emerald-800 transition-colors">
+                  <Link href="/dashboard/dues" className="text-sm text-primary hover:text-primary/80 transition-colors">
                     View all {stats.monthlyPending.length} pending dues →
                   </Link>
                 </div>
@@ -445,20 +445,20 @@ export default function DashboardPage() {
         className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8"
       >
         {/* Loan Status Pie Chart */}
-        <Card className="p-6 col-span-1 border-slate-200 shadow-sm flex flex-col items-center">
+        <Card className="p-6 col-span-1 border-border shadow-sm flex flex-col items-center">
           <div className="flex items-center gap-2 mb-2 self-start">
-            <Activity className="w-5 h-5 text-indigo-500" />
-            <h2 className="text-lg font-bold text-slate-800">Loan Distribution</h2>
+            <Activity className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-bold text-foreground">Loan Distribution</h2>
           </div>
-          <p className="text-xs text-slate-500 mb-6 self-start">Current composition of all tracked loans</p>
+          <p className="text-xs text-muted-foreground mb-6 self-start">Current composition of all tracked loans</p>
           <div className="flex-1 w-full min-h-[250px] flex items-center justify-center relative">
             {loading ? (
-              <div className="w-40 h-40 border-4 border-slate-100 border-t-indigo-500 rounded-full animate-spin"></div>
+              <div className="w-40 h-40 border-4 border-border/50 border-t-primary rounded-full animate-spin"></div>
             ) : pieData.length > 0 ? (
               <>
                 <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pb-8">
-                  <p className="text-3xl font-bold text-slate-800">{stats.totalLoans}</p>
-                  <p className="text-xs text-slate-500 font-medium">Total Loans</p>
+                  <p className="text-3xl font-bold text-foreground">{stats.totalLoans}</p>
+                  <p className="text-xs text-muted-foreground font-medium">Total Loans</p>
                 </div>
                 <ResponsiveContainer width="100%" height={260}>
                   <PieChart>
@@ -485,28 +485,28 @@ export default function DashboardPage() {
                 </ResponsiveContainer>
               </>
             ) : (
-              <p className="text-slate-400 text-sm">No loan data available.</p>
+              <p className="text-muted-foreground text-sm">No loan data available.</p>
             )}
           </div>
         </Card>
 
         {/* Financial Area Chart */}
-        <Card className="p-6 col-span-1 lg:col-span-2 border-slate-200 shadow-sm flex flex-col">
+        <Card className="p-6 col-span-1 lg:col-span-2 border-border shadow-sm flex flex-col">
           <div className="flex items-center justify-between mb-2">
             <div className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5 text-emerald-500" />
-              <h2 className="text-lg font-bold text-slate-800">Financial Overview</h2>
+              <TrendingUp className="w-5 h-5 text-primary" />
+              <h2 className="text-lg font-bold text-foreground">Financial Overview</h2>
             </div>
           </div>
-          <p className="text-xs text-slate-500 mb-6">Aggregate Totals for the System</p>
+          <p className="text-xs text-muted-foreground mb-6">Aggregate Totals for the System</p>
 
           <div className="flex-1 w-full min-h-[250px] relative">
             {loading ? (
               <div className="w-full h-full flex items-center justify-center">
                 <div className="flex gap-2 items-end h-32">
-                  <div className="w-8 h-full bg-slate-200 animate-pulse rounded-t"></div>
-                  <div className="w-8 h-2/3 bg-slate-200 animate-pulse rounded-t delay-75"></div>
-                  <div className="w-8 h-1/2 bg-slate-200 animate-pulse rounded-t delay-150"></div>
+                  <div className="w-8 h-full bg-muted animate-pulse rounded-t"></div>
+                  <div className="w-8 h-2/3 bg-muted animate-pulse rounded-t delay-75"></div>
+                  <div className="w-8 h-1/2 bg-muted animate-pulse rounded-t delay-150"></div>
                 </div>
               </div>
             ) : (stats.totalPaid > 0 || stats.totalBalance > 0) ? (
@@ -541,7 +541,7 @@ export default function DashboardPage() {
               </ResponsiveContainer>
             ) : (
               <div className="w-full h-full flex items-center justify-center">
-                <p className="text-slate-400 text-sm">No financial history available yet.</p>
+                <p className="text-muted-foreground text-sm">No financial history available yet.</p>
               </div>
             )}
           </div>
@@ -554,67 +554,67 @@ export default function DashboardPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.6, duration: 0.5 }}
       >
-        <h2 className="text-lg font-bold text-slate-800 mb-4 px-1">Quick Actions</h2>
+        <h2 className="text-lg font-bold text-foreground mb-4 px-1">Quick Actions</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <a href="/dashboard/clients" className="group">
-            <Card className="p-4 border-slate-200 hover:border-blue-300 hover:bg-blue-50/50 transition-all flex items-center justify-between shadow-sm cursor-pointer">
+            <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                   <Users className="w-4 h-4" />
                 </div>
-                <span className="font-semibold text-slate-700">Manage Clients</span>
+                <span className="font-semibold text-foreground">Manage Clients</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
             </Card>
           </a>
 
           <a href="/dashboard/loans" className="group">
-            <Card className="p-4 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/50 transition-all flex items-center justify-between shadow-sm cursor-pointer">
+            <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                   <Briefcase className="w-4 h-4" />
                 </div>
-                <span className="font-semibold text-slate-700">View Loans</span>
+                <span className="font-semibold text-foreground">View Loans</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
             </Card>
           </a>
 
           <a href="/dashboard/history" className="group">
-            <Card className="p-4 border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/50 transition-all flex items-center justify-between shadow-sm cursor-pointer">
+            <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-indigo-100 text-indigo-600 rounded-lg group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
                   <Activity className="w-4 h-4" />
                 </div>
-                <span className="font-semibold text-slate-700">Payment History</span>
+                <span className="font-semibold text-foreground">Payment History</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
             </Card>
           </a>
 
           {(stats.overdueLoans > 0) && (
             <a href="/dashboard/loans" className="group">
-              <Card className="p-4 border-slate-200 hover:border-rose-300 hover:bg-rose-50/50 transition-all flex items-center justify-between shadow-sm cursor-pointer ring-1 ring-rose-100">
+              <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer ring-1 ring-rose-100">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-rose-100 text-rose-600 rounded-lg group-hover:bg-rose-600 group-hover:text-white transition-colors animate-pulse">
+                  <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-rose-600 group-hover:text-primary-foreground transition-colors animate-pulse">
                     <AlertCircle className="w-4 h-4" />
                   </div>
-                  <span className="font-semibold text-rose-700">Overdue Alerts ({stats.overdueLoans})</span>
+                  <span className="font-semibold text-foreground">Overdue Alerts ({stats.overdueLoans})</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-rose-400 group-hover:text-rose-600 group-hover:translate-x-1 transition-all" />
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
               </Card>
             </a>
           )}
 
           <a href="/dashboard/dues" className="group">
-            <Card className="p-4 border-slate-200 hover:border-amber-300 hover:bg-amber-50/50 transition-all flex items-center justify-between shadow-sm cursor-pointer">
+            <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-amber-100 text-amber-600 rounded-lg group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-amber-600 group-hover:text-primary-foreground transition-colors">
                   <AlertCircle className="w-4 h-4" />
                 </div>
-                <span className="font-semibold text-slate-700">All Pending Dues</span>
+                <span className="font-semibold text-foreground">All Pending Dues</span>
               </div>
-              <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-1 transition-all" />
+              <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
             </Card>
           </a>
         </div>
@@ -622,34 +622,34 @@ export default function DashboardPage() {
 
       {/* Payment Inline Modal */}
       {paymentLoan && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-          <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 border border-slate-100">
-            <h3 className="text-xl font-bold mb-1 text-slate-900">Add Payment</h3>
-            <p className="text-slate-500 text-sm mb-5">Recording collection for <span className="font-semibold text-slate-700">{paymentLoan.clientId?.name}</span></p>
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+          <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-card rounded-xl shadow-xl w-full max-w-md p-6 border border-border/50">
+            <h3 className="text-xl font-bold mb-1 text-foreground">Add Payment</h3>
+            <p className="text-muted-foreground text-sm mb-5">Recording collection for <span className="font-semibold text-foreground">{paymentLoan.clientId?.name}</span></p>
 
             {submitError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-5 font-medium border border-red-100">{submitError}</div>}
 
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Amount (₹)</label>
-                <input type="number" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                <label className="block text-sm font-medium text-foreground mb-1.5">Amount (₹)</label>
+                <input type="number" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none" />
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Payment Type</label>
-                <select value={paymentType} onChange={(e) => setPaymentType(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <label className="block text-sm font-medium text-foreground mb-1.5">Payment Type</label>
+                <select value={paymentType} onChange={(e) => setPaymentType(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg bg-card focus:ring-2 focus:ring-primary focus:outline-none">
                   <option value="given">Principal (Given Amount)</option>
                   <option value="interest">Monthly Interest</option>
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1.5">Collection Date</label>
-                <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                <label className="block text-sm font-medium text-foreground mb-1.5">Collection Date</label>
+                <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none" />
               </div>
             </div>
 
-            <div className="flex gap-3 justify-end pt-2 border-t border-slate-100">
-              <Button variant="outline" onClick={() => setPaymentLoan(null)} className="border-slate-300">Cancel</Button>
-              <Button onClick={handlePaymentSubmit} disabled={isSubmitting} className="bg-slate-900 hover:bg-slate-800 text-white min-w-[120px]">
+            <div className="flex gap-3 justify-end pt-2 border-t border-border/50">
+              <Button variant="outline" onClick={() => setPaymentLoan(null)} className="border-border">Cancel</Button>
+              <Button onClick={handlePaymentSubmit} disabled={isSubmitting} className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[120px]">
                 {isSubmitting ? (
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                 ) : (

@@ -149,7 +149,7 @@ export default function DuesPage() {
     if (loading) {
         return (
             <div className="w-full h-full min-h-[500px] flex items-center justify-center">
-                <div className="w-12 h-12 border-4 border-slate-100 border-t-indigo-500 rounded-full animate-spin"></div>
+                <div className="w-12 h-12 border-4 border-border/50 border-t-indigo-500 rounded-full animate-spin"></div>
             </div>
         );
     }
@@ -159,13 +159,13 @@ export default function DuesPage() {
             <div className="mb-8 flex items-center justify-between">
                 <div className="flex items-center gap-4">
                     <Link href="/dashboard">
-                        <Button variant="outline" className="border-slate-200">
+                        <Button variant="outline" className="border-border">
                             <ArrowLeft className="w-4 h-4 mr-2" /> Back
                         </Button>
                     </Link>
                     <div>
-                        <h1 className="text-3xl font-bold text-slate-900 tracking-tight">All Pending Dues</h1>
-                        <p className="text-slate-500 mt-1 text-sm font-medium">
+                        <h1 className="text-3xl font-bold text-foreground tracking-tight">All Pending Dues</h1>
+                        <p className="text-muted-foreground mt-1 text-sm font-medium">
                             Comprehensive list of all active loans with pending installments
                         </p>
                     </div>
@@ -179,30 +179,30 @@ export default function DuesPage() {
                 className="grid grid-cols-1 lg:grid-cols-2 gap-8"
             >
                 {/* Weekly Pending Full List */}
-                <Card className="p-6 border-slate-200 shadow-sm flex flex-col">
+                <Card className="p-6 border-border shadow-sm flex flex-col">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
-                            <AlertCircle className="w-6 h-6 text-indigo-500" />
-                            <h2 className="text-xl font-bold text-slate-800">Weekly Pending Dues</h2>
+                            <AlertCircle className="w-6 h-6 text-primary" />
+                            <h2 className="text-xl font-bold text-foreground">Weekly Pending Dues</h2>
                         </div>
-                        <span className="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">{weeklyPending.length} Clients</span>
+                        <span className="bg-muted text-indigo-700 px-3 py-1 rounded-full text-xs font-bold">{weeklyPending.length} Clients</span>
                     </div>
-                    {weeklyPending.length === 0 ? <p className="text-sm text-slate-500 text-center py-10">Amazing! No pending weekly dues at this time.</p> : (
+                    {weeklyPending.length === 0 ? <p className="text-sm text-muted-foreground text-center py-10">Amazing! No pending weekly dues at this time.</p> : (
                         <div className="space-y-4">
                             {weeklyPending.map((p, i) => (
-                                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-xl border border-slate-100 transition-all hover:shadow-md hover:border-indigo-200 group">
+                                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-card p-4 rounded-xl border border-border/50 transition-all hover:shadow-md hover:border-indigo-200 group">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <p className="font-bold text-slate-800 text-base">{p.clientId?.name}</p>
-                                            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-600 border border-indigo-100 italic">
+                                            <p className="font-bold text-foreground text-base">{p.clientId?.name}</p>
+                                            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-indigo-50 text-primary border border-indigo-100 italic">
                                                 Weekly
                                             </span>
                                         </div>
                                         <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                            <p className="text-sm text-slate-500 inline-flex items-center gap-1">
+                                            <p className="text-sm text-muted-foreground inline-flex items-center gap-1">
                                                 Due: <span className="text-red-600 font-bold">₹{Math.round(p.dueAmount)}</span>
                                             </p>
-                                            <p className="text-xs text-slate-400 inline-flex items-center gap-1">
+                                            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                                 Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}
                                             </p>
@@ -210,9 +210,9 @@ export default function DuesPage() {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Link href={`/dashboard/clients/${p.clientId?._id}`} className="flex-1 sm:flex-none">
-                                            <Button size="sm" variant="outline" className="h-9 w-full sm:w-auto border-slate-200 hover:bg-slate-100/80">View</Button>
+                                            <Button size="sm" variant="outline" className="h-9 w-full sm:w-auto border-border hover:bg-muted/80">View</Button>
                                         </Link>
-                                        <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('given'); }} className="bg-indigo-600 hover:bg-indigo-700 h-9 px-4 flex-1 sm:flex-none">Collect</Button>
+                                        <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('given'); }} className="bg-primary hover:bg-primary/90 h-9 px-4 flex-1 sm:flex-none">Collect</Button>
                                     </div>
                                 </div>
                             ))}
@@ -221,30 +221,30 @@ export default function DuesPage() {
                 </Card>
 
                 {/* Monthly Pending Full List */}
-                <Card className="p-6 border-slate-200 shadow-sm flex flex-col">
+                <Card className="p-6 border-border shadow-sm flex flex-col">
                     <div className="flex items-center justify-between mb-6">
                         <div className="flex items-center gap-2">
-                            <Activity className="w-6 h-6 text-emerald-500" />
-                            <h2 className="text-xl font-bold text-slate-800">Monthly Pending Dues</h2>
+                            <Activity className="w-6 h-6 text-primary" />
+                            <h2 className="text-xl font-bold text-foreground">Monthly Pending Dues</h2>
                         </div>
-                        <span className="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold">{monthlyPending.length} Clients</span>
+                        <span className="bg-muted text-primary px-3 py-1 rounded-full text-xs font-bold">{monthlyPending.length} Clients</span>
                     </div>
-                    {monthlyPending.length === 0 ? <p className="text-sm text-slate-500 text-center py-10">Amazing! No pending monthly dues at this time.</p> : (
+                    {monthlyPending.length === 0 ? <p className="text-sm text-muted-foreground text-center py-10">Amazing! No pending monthly dues at this time.</p> : (
                         <div className="space-y-4">
                             {monthlyPending.map((p, i) => (
-                                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-white p-4 rounded-xl border border-slate-100 transition-all hover:shadow-md hover:border-emerald-200 group">
+                                <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 bg-card p-4 rounded-xl border border-border/50 transition-all hover:shadow-md hover:border-emerald-200 group">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2 mb-1">
-                                            <p className="font-bold text-slate-800 text-base">{p.clientId?.name}</p>
-                                            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-600 border border-emerald-100 italic">
+                                            <p className="font-bold text-foreground text-base">{p.clientId?.name}</p>
+                                            <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-emerald-50 text-primary border border-emerald-100 italic">
                                                 Monthly
                                             </span>
                                         </div>
                                         <div className="flex flex-wrap gap-x-4 gap-y-1">
-                                            <p className="text-sm text-slate-500 inline-flex items-center gap-1">
+                                            <p className="text-sm text-muted-foreground inline-flex items-center gap-1">
                                                 Interest: <span className="text-red-600 font-bold">₹{Math.round(p.dueAmount)}</span>
                                             </p>
-                                            <p className="text-xs text-slate-400 inline-flex items-center gap-1">
+                                            <p className="text-xs text-muted-foreground inline-flex items-center gap-1">
                                                 <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
                                                 Due Date: {p.dueDate ? new Date(p.dueDate).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }) : '—'}
                                             </p>
@@ -252,9 +252,9 @@ export default function DuesPage() {
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <Link href={`/dashboard/clients/${p.clientId?._id}`} className="flex-1 sm:flex-none">
-                                            <Button size="sm" variant="outline" className="h-9 w-full sm:w-auto border-slate-200 hover:bg-slate-100/80">View</Button>
+                                            <Button size="sm" variant="outline" className="h-9 w-full sm:w-auto border-border hover:bg-muted/80">View</Button>
                                         </Link>
-                                        <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('interest'); }} className="bg-emerald-600 hover:bg-emerald-700 h-9 px-4 flex-1 sm:flex-none">Collect</Button>
+                                        <Button size="sm" onClick={() => { setPaymentLoan(p); setPaymentAmount(Math.round(p.dueAmount).toString()); setPaymentType('interest'); }} className="bg-primary hover:bg-primary/90 h-9 px-4 flex-1 sm:flex-none">Collect</Button>
                                     </div>
                                 </div>
                             ))}
@@ -265,34 +265,34 @@ export default function DuesPage() {
 
             {/* Payment Inline Modal */}
             {paymentLoan && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/40 backdrop-blur-sm p-4">
-                    <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-white rounded-xl shadow-xl w-full max-w-md p-6 border border-slate-100">
-                        <h3 className="text-xl font-bold mb-1 text-slate-900">Add Payment</h3>
-                        <p className="text-slate-500 text-sm mb-5">Recording collection for <span className="font-semibold text-slate-700">{paymentLoan.clientId?.name}</span></p>
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-primary/40 backdrop-blur-sm p-4">
+                    <motion.div initial={{ opacity: 0, scale: 0.95, y: 10 }} animate={{ opacity: 1, scale: 1, y: 0 }} className="bg-card rounded-xl shadow-xl w-full max-w-md p-6 border border-border/50">
+                        <h3 className="text-xl font-bold mb-1 text-foreground">Add Payment</h3>
+                        <p className="text-muted-foreground text-sm mb-5">Recording collection for <span className="font-semibold text-foreground">{paymentLoan.clientId?.name}</span></p>
 
                         {submitError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-5 font-medium border border-red-100">{submitError}</div>}
 
                         <div className="space-y-4 mb-6">
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1.5">Amount (₹)</label>
-                                <input type="number" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                                <label className="block text-sm font-medium text-foreground mb-1.5">Amount (₹)</label>
+                                <input type="number" value={paymentAmount} onChange={(e) => setPaymentAmount(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none" />
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1.5">Payment Type</label>
-                                <select value={paymentType} onChange={(e) => setPaymentType(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                                <label className="block text-sm font-medium text-foreground mb-1.5">Payment Type</label>
+                                <select value={paymentType} onChange={(e) => setPaymentType(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg bg-card focus:ring-2 focus:ring-primary focus:outline-none">
                                     <option value="given">Principal (Given Amount)</option>
                                     <option value="interest">Monthly Interest</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1.5">Collection Date</label>
-                                <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="w-full px-3 py-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none" />
+                                <label className="block text-sm font-medium text-foreground mb-1.5">Collection Date</label>
+                                <input type="date" value={paymentDate} onChange={(e) => setPaymentDate(e.target.value)} className="w-full px-3 py-2 border border-border rounded-lg focus:ring-2 focus:ring-primary focus:outline-none" />
                             </div>
                         </div>
 
-                        <div className="flex gap-3 justify-end pt-2 border-t border-slate-100">
-                            <Button variant="outline" onClick={() => setPaymentLoan(null)} className="border-slate-300">Cancel</Button>
-                            <Button onClick={handlePaymentSubmit} disabled={isSubmitting} className="bg-slate-900 hover:bg-slate-800 text-white min-w-[120px]">
+                        <div className="flex gap-3 justify-end pt-2 border-t border-border/50">
+                            <Button variant="outline" onClick={() => setPaymentLoan(null)} className="border-border">Cancel</Button>
+                            <Button onClick={handlePaymentSubmit} disabled={isSubmitting} className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[120px]">
                                 {isSubmitting ? (
                                     <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
                                 ) : (

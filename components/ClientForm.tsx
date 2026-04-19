@@ -83,7 +83,7 @@ export default function ClientForm({
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Name *
             </label>
             <Input
@@ -97,7 +97,7 @@ export default function ClientForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Phone *
             </label>
             <Input
@@ -113,9 +113,9 @@ export default function ClientForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Email
-              <span className="text-xs font-normal text-slate-400 ml-1">(Optional)</span>
+              <span className="text-xs font-normal text-muted-foreground ml-1">(Optional)</span>
             </label>
             <Input
               type="email"
@@ -129,7 +129,7 @@ export default function ClientForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Status
             </label>
             <Select
@@ -151,7 +151,7 @@ export default function ClientForm({
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">
+          <label className="block text-sm font-medium text-foreground mb-1">
             Address *
           </label>
           <Input
@@ -168,7 +168,7 @@ export default function ClientForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Pincode *
             </label>
             <div className="relative">
@@ -182,13 +182,13 @@ export default function ClientForm({
                 placeholder="6-digit Pincode"
               />
               {isPincodeLoading && (
-                <div className="absolute right-3 top-2.5 h-4 w-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin" />
+                <div className="absolute right-3 top-2.5 h-4 w-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
               )}
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               City *
             </label>
             <Input
@@ -206,7 +206,7 @@ export default function ClientForm({
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               State *
             </label>
             <Input
@@ -222,7 +222,7 @@ export default function ClientForm({
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
+            <label className="block text-sm font-medium text-foreground mb-1">
               Country *
             </label>
             <Input
@@ -247,7 +247,7 @@ export default function ClientForm({
         <div className="flex gap-4">
           <Button
             type="submit"
-            className="bg-slate-900 hover:bg-slate-800 text-white"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground"
             disabled={isLoading}
           >
             {isLoading ? 'Saving...' : 'Save Client'}

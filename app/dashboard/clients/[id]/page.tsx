@@ -38,10 +38,10 @@ interface Loan {
 function statusBadge(status: string) {
   const map: Record<string, string> = {
     active: 'bg-green-100 text-green-700 border border-green-200',
-    completed: 'bg-slate-100 text-slate-600 border border-slate-200',
+    completed: 'bg-muted text-secondary-foreground border border-border',
     overdue: 'bg-red-100 text-red-700 border border-red-200',
   };
-  return `px-2 py-0.5 rounded text-xs font-semibold ${map[status] || 'bg-slate-100 text-slate-600'}`;
+  return `px-2 py-0.5 rounded text-xs font-semibold ${map[status] || 'bg-muted text-secondary-foreground'}`;
 }
 
 export default function ClientDetailPage() {
@@ -93,7 +93,7 @@ export default function ClientDetailPage() {
   if (loading) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-slate-600">Loading client...</p>
+        <p className="text-secondary-foreground">Loading client...</p>
       </Card>
     );
   }
@@ -101,9 +101,9 @@ export default function ClientDetailPage() {
   if (!client) {
     return (
       <Card className="p-8 text-center">
-        <p className="text-slate-600 mb-4">Client not found</p>
+        <p className="text-secondary-foreground mb-4">Client not found</p>
         <Link href="/dashboard/clients">
-          <Button className="bg-slate-900 hover:bg-slate-800 text-white">Back to Clients</Button>
+          <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Back to Clients</Button>
         </Link>
       </Card>
     );
@@ -117,32 +117,32 @@ export default function ClientDetailPage() {
     const progress = totalRepay > 0 ? Math.min(100, ((loan.totalPaid ?? 0) / totalRepay) * 100) : 0;
 
     return (
-      <div className="border border-slate-200 rounded-lg p-4 hover:border-slate-300 transition-colors">
+      <div className="border border-border rounded-lg p-4 hover:border-border transition-colors">
         <div className="flex items-center justify-between">
           <div className="flex-1">
             <div className="flex items-center gap-3 mb-1">
-              <p className="font-semibold text-slate-900 text-sm">
+              <p className="font-semibold text-foreground text-sm">
                 {loan.planId?.name || 'Loan'}
               </p>
               <span className={statusBadge(loan.status)}>{loan.status}</span>
             </div>
-            <div className="flex gap-4 text-xs text-slate-500 mb-2">
-              <span>Disbursed: <span className="font-medium text-slate-700">₹{(loan.disposeAmount ?? 0).toFixed(2)}</span></span>
+            <div className="flex gap-4 text-xs text-muted-foreground mb-2">
+              <span>Disbursed: <span className="font-medium text-foreground">₹{(loan.disposeAmount ?? 0).toFixed(2)}</span></span>
               <span>Paid: <span className="font-medium text-green-700">₹{(loan.totalPaid ?? 0).toFixed(2)}</span></span>
               <span>Balance: <span className="font-medium text-red-600">₹{(loan.balance ?? 0).toFixed(2)}</span></span>
             </div>
-            <div className="w-full bg-slate-100 rounded-full h-1.5 max-w-sm">
+            <div className="w-full bg-muted rounded-full h-1.5 max-w-sm">
               <div
                 className="bg-green-500 h-1.5 rounded-full"
                 style={{ width: `${progress}%` }}
               />
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">{progress.toFixed(0)}% repaid</p>
+            <p className="text-xs text-muted-foreground mt-0.5">{progress.toFixed(0)}% repaid</p>
           </div>
           <div className="ml-4">
             <Button
               size="sm"
-              className="bg-slate-900 hover:bg-slate-800 text-white"
+              className="bg-primary hover:bg-primary/90 text-primary-foreground"
               onClick={() => router.push(`/dashboard/loans/${loan._id}?from=client&clientId=${id}`)}
             >
               View →
@@ -159,23 +159,23 @@ export default function ClientDetailPage() {
       <div className="mb-8 flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link href="/dashboard/clients">
-            <Button variant="outline" className="border-slate-200">← Back</Button>
+            <Button variant="outline" className="border-border">← Back</Button>
           </Link>
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">{client.name}</h1>
-            <p className="text-slate-600 mt-1">Client profile & loan history</p>
+            <h1 className="text-3xl font-bold text-foreground">{client.name}</h1>
+            <p className="text-secondary-foreground mt-1">Client profile & loan history</p>
           </div>
         </div>
         <div className="flex gap-3">
           <Button
             variant="outline"
-            className="border-slate-200"
+            className="border-border"
             onClick={() => setShowEditForm(!showEditForm)}
           >
             {showEditForm ? 'Cancel Edit' : '✏️ Edit Details'}
           </Button>
           <Link href="/dashboard/loans/new">
-            <Button className="bg-slate-900 hover:bg-slate-800 text-white">+ Assign Loan</Button>
+            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">+ Assign Loan</Button>
           </Link>
         </div>
       </div>
@@ -188,7 +188,7 @@ export default function ClientDetailPage() {
           {showEditForm && (
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <h3 className="font-semibold text-slate-900">Edit Client Details</h3>
+                <h3 className="font-semibold text-foreground">Edit Client Details</h3>
               </div>
               <ClientForm initialData={client} onSubmit={handleUpdate} isLoading={isUpdating} />
             </div>
@@ -197,7 +197,7 @@ export default function ClientDetailPage() {
           {/* Client details card (always visible) */}
           {!showEditForm && (
             <Card className="p-6">
-              <h3 className="font-semibold text-slate-900 mb-4">Client Details</h3>
+              <h3 className="font-semibold text-foreground mb-4">Client Details</h3>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 {[
                   ['Name', client.name],
@@ -208,8 +208,8 @@ export default function ClientDetailPage() {
                   ['Country', client.country],
                 ].map(([label, value]) => (
                   <div key={label}>
-                    <p className="text-xs text-slate-500 uppercase tracking-wide">{label}</p>
-                    <p className="font-medium text-slate-900">{value || '—'}</p>
+                    <p className="text-xs text-muted-foreground uppercase tracking-wide">{label}</p>
+                    <p className="font-medium text-foreground">{value || '—'}</p>
                   </div>
                 ))}
               </div>
@@ -219,16 +219,16 @@ export default function ClientDetailPage() {
           {/* Active Loans */}
           <Card className="p-6">
             <div className="flex items-center gap-2 mb-4">
-              <h3 className="font-semibold text-slate-900">Active Loans</h3>
+              <h3 className="font-semibold text-foreground">Active Loans</h3>
               <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
                 {activeLoans.length}
               </span>
             </div>
             {activeLoans.length === 0 ? (
               <div className="text-center py-6">
-                <p className="text-sm text-slate-500 mb-3">No active loans</p>
+                <p className="text-sm text-muted-foreground mb-3">No active loans</p>
                 <Link href="/dashboard/loans/new">
-                  <Button variant="outline" size="sm" className="border-slate-200">
+                  <Button variant="outline" size="sm" className="border-border">
                     Assign a Loan
                   </Button>
                 </Link>
@@ -244,8 +244,8 @@ export default function ClientDetailPage() {
           {completedLoans.length > 0 && (
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-4">
-                <h3 className="font-semibold text-slate-900">Completed Loans</h3>
-                <span className="text-xs bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium">
+                <h3 className="font-semibold text-foreground">Completed Loans</h3>
+                <span className="text-xs bg-muted text-secondary-foreground px-2 py-0.5 rounded-full font-medium">
                   {completedLoans.length}
                 </span>
               </div>
@@ -259,29 +259,29 @@ export default function ClientDetailPage() {
         {/* Right col: summary */}
         <div className="space-y-4">
           <Card className="p-6">
-            <h3 className="font-semibold text-slate-900 mb-4">Loan Summary</h3>
+            <h3 className="font-semibold text-foreground mb-4">Loan Summary</h3>
             <div className="space-y-2 text-sm">
               <div className="flex justify-between">
-                <span className="text-slate-600">Total Loans</span>
+                <span className="text-secondary-foreground">Total Loans</span>
                 <span className="font-semibold">{loans.length}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Active</span>
+                <span className="text-secondary-foreground">Active</span>
                 <span className="font-semibold text-green-700">{activeLoans.length}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-600">Completed</span>
-                <span className="font-semibold text-slate-500">{completedLoans.length}</span>
+                <span className="text-secondary-foreground">Completed</span>
+                <span className="font-semibold text-muted-foreground">{completedLoans.length}</span>
               </div>
-              <div className="border-t border-slate-100 pt-3 mt-2 space-y-2">
+              <div className="border-t border-border/50 pt-3 mt-2 space-y-2">
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Total Paid</span>
+                  <span className="text-secondary-foreground">Total Paid</span>
                   <span className="font-semibold text-green-700">
                     ₹{loans.reduce((s, l) => s + (l.totalPaid ?? 0), 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-slate-600">Total Balance</span>
+                  <span className="text-secondary-foreground">Total Balance</span>
                   <span className="font-semibold text-red-600">
                     ₹{loans.reduce((s, l) => s + (l.balance ?? 0), 0).toFixed(2)}
                   </span>

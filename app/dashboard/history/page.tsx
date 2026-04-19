@@ -39,7 +39,7 @@ const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString('en-IN'
 
 const statusStyle: Record<string, string> = {
     active: 'bg-green-100 text-green-700',
-    completed: 'bg-slate-100 text-slate-600',
+    completed: 'bg-muted text-secondary-foreground',
     overdue: 'bg-red-100 text-red-700',
 };
 
@@ -268,8 +268,8 @@ export default function HistoryPage() {
             {/* Page header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
                 <div>
-                    <h1 className="text-2xl font-bold text-slate-900">Payment History</h1>
-                    <p className="text-slate-500 text-sm mt-0.5">All loan records with payment summaries</p>
+                    <h1 className="text-2xl font-bold text-foreground">Payment History</h1>
+                    <p className="text-muted-foreground text-sm mt-0.5">All loan records with payment summaries</p>
                 </div>
                 <div className="flex gap-2">
                     <Button
@@ -302,7 +302,7 @@ export default function HistoryPage() {
                 <form onSubmit={applyFilters}>
                     <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
                         <div className="md:col-span-2">
-                            <label className="block text-xs font-medium text-slate-600 mb-1">Search Client</label>
+                            <label className="block text-xs font-medium text-secondary-foreground mb-1">Search Client</label>
                             <div className="relative">
                                 <Input
                                     placeholder="Search by name or phone..."
@@ -310,26 +310,26 @@ export default function HistoryPage() {
                                     onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
                                     className="pl-9"
                                 />
-                                <svg className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <svg className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                                 </svg>
                             </div>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-600 mb-1">From Date</label>
+                            <label className="block text-xs font-medium text-secondary-foreground mb-1">From Date</label>
                             <Input type="date" value={from} onChange={e => setFrom(e.target.value)} />
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-600 mb-1">To Date</label>
+                            <label className="block text-xs font-medium text-secondary-foreground mb-1">To Date</label>
                             <Input type="date" value={to} onChange={e => setTo(e.target.value)} />
                         </div>
 
                         <div>
-                            <label className="block text-xs font-medium text-slate-600 mb-1">Plan</label>
+                            <label className="block text-xs font-medium text-secondary-foreground mb-1">Plan</label>
                             <select
                                 value={planId}
                                 onChange={e => setPlanId(e.target.value)}
-                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-slate-900"
                             >
                                 <option value="">All Plans</option>
                                 {plans.map(p => (
@@ -338,11 +338,11 @@ export default function HistoryPage() {
                             </select>
                         </div>
                         <div>
-                            <label className="block text-xs font-medium text-slate-600 mb-1">Status</label>
+                            <label className="block text-xs font-medium text-secondary-foreground mb-1">Status</label>
                             <select
                                 value={status}
                                 onChange={e => setStatus(e.target.value)}
-                                className="w-full border border-slate-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-slate-900"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-slate-900"
                             >
                                 <option value="">All Status</option>
                                 <option value="active">Active</option>
@@ -351,22 +351,22 @@ export default function HistoryPage() {
                             </select>
                         </div>
                     </div>
-                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-slate-100">
-                        <Button type="submit" className="bg-slate-900 hover:bg-slate-800 text-white px-5">
+                    <div className="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-border/50">
+                        <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground px-5">
                             Apply Filters
                         </Button>
-                        <Button type="button" variant="outline" onClick={clearFilters} className="border-slate-200">
+                        <Button type="button" variant="outline" onClick={clearFilters} className="border-border">
                             Clear
                         </Button>
 
                         <div className="flex items-center gap-3 ml-auto">
-                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Sorting</span>
+                            <span className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider">Sorting</span>
                             <Button
                                 type="button"
                                 onClick={() => setStatusPrimary(!statusPrimary)}
                                 className={`h-9 px-4 rounded-xl text-xs font-bold transition-all gap-2 ${statusPrimary
-                                        ? 'bg-slate-900 text-white shadow-md'
-                                        : 'bg-white border border-slate-200 text-slate-500 hover:bg-slate-50'
+                                        ? 'bg-primary text-primary-foreground shadow-md'
+                                        : 'bg-card border border-border text-muted-foreground hover:bg-background'
                                     }`}
                             >
                                 <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
@@ -376,7 +376,7 @@ export default function HistoryPage() {
 
                         <span className="hidden md:inline-block text-xs text-slate-300 mx-2">|</span>
 
-                        <span className="text-xs text-slate-400 self-center px-1">
+                        <span className="text-xs text-muted-foreground self-center px-1">
                             {filteredRows.length} record{filteredRows.length !== 1 ? 's' : ''}
                         </span>
                     </div>
@@ -387,15 +387,15 @@ export default function HistoryPage() {
             {rows.length > 0 && (
                 <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-5">
                     {[
-                        { label: 'Total Disposed', value: fmt(totals.dispose), color: 'text-slate-900' },
-                        { label: 'Init. Interest', value: fmt(totals.interest), color: 'text-slate-700' },
-                        { label: 'Total Loans', value: fmt(totals.total), color: 'text-slate-900' },
+                        { label: 'Total Disposed', value: fmt(totals.dispose), color: 'text-foreground' },
+                        { label: 'Init. Interest', value: fmt(totals.interest), color: 'text-foreground' },
+                        { label: 'Total Loans', value: fmt(totals.total), color: 'text-foreground' },
                         { label: 'Coll. Interest', value: fmt(totals.collectedInterest), color: 'text-blue-700' },
                         { label: 'Total Given', value: fmt(totals.given), color: 'text-green-700' },
                         { label: 'Total Balance', value: fmt(totals.balance), color: 'text-red-600' },
                     ].map(s => (
                         <Card key={s.label} className="p-3 text-center">
-                            <p className="text-xs text-slate-400 mb-1">{s.label}</p>
+                            <p className="text-xs text-muted-foreground mb-1">{s.label}</p>
                             <p className={`text-sm font-bold ${s.color}`}>{s.value}</p>
                         </Card>
                     ))}
@@ -405,12 +405,12 @@ export default function HistoryPage() {
             {/* ── Table ── */}
             {loading ? (
                 <Card className="p-10 text-center">
-                    <div className="h-6 w-6 bg-slate-200 rounded-full animate-pulse mx-auto mb-3" />
-                    <p className="text-slate-500 text-sm">Loading history...</p>
+                    <div className="h-6 w-6 bg-muted rounded-full animate-pulse mx-auto mb-3" />
+                    <p className="text-muted-foreground text-sm">Loading history...</p>
                 </Card>
             ) : rows.length === 0 ? (
                 <Card className="p-10 text-center">
-                    <p className="text-slate-500">No records found. Try adjusting your filters.</p>
+                    <p className="text-muted-foreground">No records found. Try adjusting your filters.</p>
                 </Card>
             ) : (
                 <Card className="overflow-hidden">
@@ -418,7 +418,7 @@ export default function HistoryPage() {
                     <div className="hidden md:block overflow-x-auto">
                         <table className="w-full text-sm">
                             <thead>
-                                <tr className="bg-slate-900 text-white">
+                                <tr className="bg-primary text-primary-foreground">
                                     {['Client', 'Plan', 'Disposed', 'Init. Interest', 'Total',
                                         'Coll. Interest', 'Given', 'Balance', 'Status', 'Start', 'End'].map(h => (
                                             <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide whitespace-nowrap">
@@ -429,17 +429,17 @@ export default function HistoryPage() {
                             </thead>
                             <tbody className="divide-y divide-slate-100">
                                 {paginatedRows.map((r, i) => (
-                                    <tr key={r._id} className={i % 2 === 0 ? 'bg-white' : 'bg-slate-50/60'}>
-                                        <td className="px-4 py-3 font-medium text-slate-900 whitespace-nowrap">{r.clientName}</td>
+                                    <tr key={r._id} className={`transition-colors ${i % 2 === 0 ? 'bg-card' : 'bg-muted/40'} hover:bg-muted/60`}>
+                                        <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">{r.clientName}</td>
                                         <td className="px-4 py-3 whitespace-nowrap">
-                                            <p className="text-slate-900 font-medium mb-1">{r.planName}</p>
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${r.planType === 'weekly' ? 'bg-blue-100 text-blue-700' : 'bg-slate-200 text-slate-600'}`}>
+                                            <p className="text-foreground font-medium mb-1">{r.planName}</p>
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${r.planType === 'weekly' ? 'bg-muted text-blue-700' : 'bg-muted text-secondary-foreground'}`}>
                                                 {r.planType === 'weekly' ? `Weekly${r.duration ? ` (${r.duration}w)` : ''}` : 'Monthly'}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 text-slate-900 font-medium">{fmt(r.disposeAmount)}</td>
-                                        <td className="px-4 py-3 text-slate-900">{fmt(r.initialInterest)}</td>
-                                        <td className="px-4 py-3 font-semibold text-slate-900">{fmt(r.totalAmount)}</td>
+                                        <td className="px-4 py-3 text-foreground font-medium">{fmt(r.disposeAmount)}</td>
+                                        <td className="px-4 py-3 text-foreground">{fmt(r.initialInterest)}</td>
+                                        <td className="px-4 py-3 font-semibold text-foreground">{fmt(r.totalAmount)}</td>
                                         <td className="px-4 py-3 text-blue-700 font-medium">{fmt(r.collectedInterest)}</td>
                                         <td className="px-4 py-3 text-green-700 font-medium">{fmt(r.collectedGiven)}</td>
                                         <td className="px-4 py-3 text-red-600 font-medium">{fmt(r.balance)}</td>
@@ -448,8 +448,8 @@ export default function HistoryPage() {
                                                 {r.status.toUpperCase()}
                                             </span>
                                         </td>
-                                        <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{fmtDate(r.startDate)}</td>
-                                        <td className="px-4 py-3 text-slate-500 whitespace-nowrap text-xs">{fmtDate(r.endDate)}</td>
+                                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{fmtDate(r.startDate)}</td>
+                                        <td className="px-4 py-3 text-muted-foreground whitespace-nowrap text-xs">{fmtDate(r.endDate)}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -462,8 +462,8 @@ export default function HistoryPage() {
                             <div key={r._id} className="p-4 space-y-2">
                                 <div className="flex items-start justify-between">
                                     <div>
-                                        <p className="font-semibold text-slate-900">{r.clientName}</p>
-                                        <p className="text-xs text-slate-500">{r.planName} · {r.planType === 'weekly' ? `Weekly${r.duration ? ` (${r.duration}w)` : ''}` : 'Monthly'}</p>
+                                        <p className="font-semibold text-foreground">{r.clientName}</p>
+                                        <p className="text-xs text-muted-foreground">{r.planName} · {r.planType === 'weekly' ? `Weekly${r.duration ? ` (${r.duration}w)` : ''}` : 'Monthly'}</p>
                                     </div>
                                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${statusStyle[r.status]}`}>
                                         {r.status.toUpperCase()}
@@ -471,31 +471,31 @@ export default function HistoryPage() {
                                 </div>
                                 <div className="grid grid-cols-3 gap-2 text-xs">
                                     <div>
-                                        <p className="text-slate-400">Disposed</p>
-                                        <p className="font-semibold text-slate-900">{fmt(r.disposeAmount)}</p>
+                                        <p className="text-muted-foreground">Disposed</p>
+                                        <p className="font-semibold text-foreground">{fmt(r.disposeAmount)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Init. Interest</p>
-                                        <p className="font-semibold text-slate-900">{fmt(r.initialInterest)}</p>
+                                        <p className="text-muted-foreground">Init. Interest</p>
+                                        <p className="font-semibold text-foreground">{fmt(r.initialInterest)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Total</p>
-                                        <p className="font-semibold text-slate-900">{fmt(r.totalAmount)}</p>
+                                        <p className="text-muted-foreground">Total</p>
+                                        <p className="font-semibold text-foreground">{fmt(r.totalAmount)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Coll. Interest</p>
+                                        <p className="text-muted-foreground">Coll. Interest</p>
                                         <p className="font-semibold text-blue-700">{fmt(r.collectedInterest)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Given</p>
+                                        <p className="text-muted-foreground">Given</p>
                                         <p className="font-semibold text-green-700">{fmt(r.collectedGiven)}</p>
                                     </div>
                                     <div>
-                                        <p className="text-slate-400">Balance</p>
+                                        <p className="text-muted-foreground">Balance</p>
                                         <p className="font-semibold text-red-600">{fmt(r.balance)}</p>
                                     </div>
                                 </div>
-                                <p className="text-xs text-slate-400">{fmtDate(r.startDate)} → {fmtDate(r.endDate)}</p>
+                                <p className="text-xs text-muted-foreground">{fmtDate(r.startDate)} → {fmtDate(r.endDate)}</p>
                             </div>
                         ))}
                     </div>
@@ -505,8 +505,8 @@ export default function HistoryPage() {
             {/* Pagination Controls */}
             {!loading && filteredRows.length > itemsPerPage && (
                 <div className="flex items-center justify-between mt-6 px-1">
-                    <p className="text-sm text-slate-500">
-                        Showing <span className="font-semibold text-slate-900">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-semibold text-slate-900">{Math.min(currentPage * itemsPerPage, filteredRows.length)}</span> of <span className="font-semibold text-slate-900">{filteredRows.length}</span> results
+                    <p className="text-sm text-muted-foreground">
+                        Showing <span className="font-semibold text-foreground">{((currentPage - 1) * itemsPerPage) + 1}</span> to <span className="font-semibold text-foreground">{Math.min(currentPage * itemsPerPage, filteredRows.length)}</span> of <span className="font-semibold text-foreground">{filteredRows.length}</span> results
                     </p>
                     <div className="flex gap-2">
                         <Button
@@ -514,7 +514,7 @@ export default function HistoryPage() {
                             size="sm"
                             disabled={currentPage === 1}
                             onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                            className="bg-white"
+                            className="bg-card"
                         >
                             Previous
                         </Button>
@@ -532,7 +532,7 @@ export default function HistoryPage() {
                                         key={pageNum}
                                         variant={currentPage === pageNum ? 'default' : 'outline'}
                                         size="sm"
-                                        className={`h-8 w-8 p-0 ${currentPage === pageNum ? 'bg-slate-900 text-white' : 'bg-white text-slate-600'}`}
+                                        className={`h-8 w-8 p-0 ${currentPage === pageNum ? 'bg-primary text-primary-foreground' : 'bg-card text-secondary-foreground'}`}
                                         onClick={() => setCurrentPage(pageNum)}
                                     >
                                         {pageNum}
@@ -545,7 +545,7 @@ export default function HistoryPage() {
                             size="sm"
                             disabled={currentPage === totalPages}
                             onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                            className="bg-white"
+                            className="bg-card"
                         >
                             Next
                         </Button>

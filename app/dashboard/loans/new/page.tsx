@@ -105,11 +105,11 @@ export default function NewLoanPage() {
     <div>
       <div className="mb-8 flex items-center gap-4">
         <Link href="/dashboard/loans">
-          <Button variant="outline" className="border-slate-200">← Back</Button>
+          <Button variant="outline" className="border-border">← Back</Button>
         </Link>
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Assign Loan</h1>
-          <p className="text-slate-600 mt-1">Allocate a loan plan to a client with specific amounts</p>
+          <h1 className="text-3xl font-bold text-foreground">Assign Loan</h1>
+          <p className="text-secondary-foreground mt-1">Allocate a loan plan to a client with specific amounts</p>
         </div>
       </div>
 
@@ -121,8 +121,8 @@ export default function NewLoanPage() {
               {/* Client */}
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="block text-sm font-medium text-slate-700">Client *</label>
-                  <Link href="/dashboard/clients/new" className="text-xs text-indigo-600 font-semibold hover:underline flex items-center gap-1">
+                  <label className="block text-sm font-medium text-foreground">Client *</label>
+                  <Link href="/dashboard/clients/new" className="text-xs text-primary font-semibold hover:underline flex items-center gap-1">
                     <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
                     New Client?
                   </Link>
@@ -133,23 +133,23 @@ export default function NewLoanPage() {
                       placeholder="Search for client..."
                       value={clientSearch}
                       onChange={(e) => setClientSearch(e.target.value)}
-                      className="pl-9 h-10 border-slate-200 focus:ring-indigo-500"
+                      className="pl-9 h-10 border-border focus:ring-primary"
                     />
-                    <svg className="absolute left-3 top-3 h-4 w-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                    <svg className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                   </div>
                   <Select value={clientId} onValueChange={setClientId} disabled={loading}>
-                    <SelectTrigger className="h-11 border-slate-200">
+                    <SelectTrigger className="h-11 border-border">
                       <SelectValue placeholder={clientSearch ? `Select from ${filteredClients.length} results` : "Or select from list"} />
                     </SelectTrigger>
                     <SelectContent>
                       {filteredClients.length === 0 ? (
-                        <div className="p-4 text-center text-sm text-slate-400 font-medium italic">No clients found matching "{clientSearch}"</div>
+                        <div className="p-4 text-center text-sm text-muted-foreground font-medium italic">No clients found matching "{clientSearch}"</div>
                       ) : (
                         filteredClients.map(c => (
                           <SelectItem key={c._id} value={c._id} className="cursor-pointer py-2.5">
                             <div className="flex flex-col">
-                              <span className="font-bold text-slate-900">{c.name}</span>
-                              <span className="text-xs text-slate-400">{c.phone}</span>
+                              <span className="font-bold text-foreground">{c.name}</span>
+                              <span className="text-xs text-muted-foreground">{c.phone}</span>
                             </div>
                           </SelectItem>
                         ))
@@ -161,7 +161,7 @@ export default function NewLoanPage() {
 
               {/* Plan */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Plan *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Plan *</label>
                 <Select value={planId} onValueChange={handlePlanChange} disabled={loading}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select a plan" />
@@ -178,7 +178,7 @@ export default function NewLoanPage() {
 
               {/* Start Date */}
               <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Start Date *</label>
+                <label className="block text-sm font-medium text-foreground mb-1">Start Date *</label>
                 <Input
                   type="date"
                   value={startDate}
@@ -186,7 +186,7 @@ export default function NewLoanPage() {
                   disabled={loading}
                 />
                 {endDatePreview && (
-                  <p className="text-xs text-slate-400 mt-1">
+                  <p className="text-xs text-muted-foreground mt-1">
                     📅 End date: {endDatePreview} ({selectedPlan?.duration} weeks)
                   </p>
                 )}
@@ -195,9 +195,9 @@ export default function NewLoanPage() {
               {/* Amounts */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Dispose Amount (₹) *
-                    <span className="text-xs font-normal text-slate-400 ml-1">Amount given to client</span>
+                    <span className="text-xs font-normal text-muted-foreground ml-1">Amount given to client</span>
                   </label>
                   <Input
                     type="number"
@@ -210,10 +210,10 @@ export default function NewLoanPage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-slate-700 mb-1">
+                  <label className="block text-sm font-medium text-foreground mb-1">
                     Interest Amount (₹) *
                     {selectedPlan && (
-                      <span className="text-xs font-normal text-slate-400 ml-1">
+                      <span className="text-xs font-normal text-muted-foreground ml-1">
                         ({selectedPlan.interestType === 'percentage' ? '% based' : 'fixed ₹'})
                       </span>
                     )}
@@ -232,20 +232,20 @@ export default function NewLoanPage() {
 
               {/* Total — auto-calculated */}
               {(disposeAmount || interestAmount) && (
-                <div className="bg-slate-50 border border-slate-200 rounded-lg p-4">
+                <div className="bg-background border border-border rounded-lg p-4">
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="text-sm text-slate-500">Total Amount (auto-calculated)</p>
-                      <p className="text-xs text-slate-400">Dispose + Interest = Total</p>
+                      <p className="text-sm text-muted-foreground">Total Amount (auto-calculated)</p>
+                      <p className="text-xs text-muted-foreground">Dispose + Interest = Total</p>
                     </div>
-                    <p className="text-2xl font-bold text-slate-900">₹{total.toFixed(2)}</p>
+                    <p className="text-2xl font-bold text-foreground">₹{total.toFixed(2)}</p>
                   </div>
-                  <div className="flex gap-4 mt-3 text-xs text-slate-500">
+                  <div className="flex gap-4 mt-3 text-xs text-muted-foreground">
                     <span>₹{dispose.toFixed(2)} dispose</span>
                     <span>+</span>
                     <span>₹{interest.toFixed(2)} interest</span>
                     <span>=</span>
-                    <span className="font-semibold text-slate-700">₹{total.toFixed(2)}</span>
+                    <span className="font-semibold text-foreground">₹{total.toFixed(2)}</span>
                   </div>
                 </div>
               )}
@@ -257,7 +257,7 @@ export default function NewLoanPage() {
               <Button
                 type="submit"
                 disabled={loading || !clientId || !planId || !disposeAmount || !interestAmount}
-                className="bg-slate-900 hover:bg-slate-800 text-white w-full py-3"
+                className="bg-primary hover:bg-primary/90 text-primary-foreground w-full py-3"
               >
                 {loading ? 'Assigning...' : 'Assign Loan'}
               </Button>
@@ -268,37 +268,37 @@ export default function NewLoanPage() {
         {/* Plan summary */}
         {selectedPlan && (
           <Card className="p-5 h-fit">
-            <h3 className="font-semibold text-slate-900 mb-4">Plan Rules</h3>
+            <h3 className="font-semibold text-foreground mb-4">Plan Rules</h3>
             <div className="space-y-3 text-sm">
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Plan</p>
-                <p className="font-medium text-slate-900">{selectedPlan.name}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Plan</p>
+                <p className="font-medium text-foreground">{selectedPlan.name}</p>
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Type</p>
-                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${selectedPlan.planType === 'weekly' ? 'bg-blue-100 text-blue-700' : 'bg-slate-100 text-slate-600'
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Type</p>
+                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${selectedPlan.planType === 'weekly' ? 'bg-muted text-blue-700' : 'bg-muted text-secondary-foreground'
                   }`}>
                   {selectedPlan.planType === 'weekly' ? '📆 Weekly' : '📅 Monthly'}
                 </span>
               </div>
               {selectedPlan.planType === 'weekly' && selectedPlan.duration && (
                 <div>
-                  <p className="text-xs text-slate-500 uppercase tracking-wide">Duration</p>
-                  <p className="font-medium text-slate-900">{selectedPlan.duration} week(s)</p>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
+                  <p className="font-medium text-foreground">{selectedPlan.duration} week(s)</p>
                 </div>
               )}
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Interest Type</p>
-                <p className="font-medium text-slate-900">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Interest Type</p>
+                <p className="font-medium text-foreground">
                   {selectedPlan.interestType === 'fixed' ? '₹ Fixed Amount' : '% Percentage'}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-slate-500 uppercase tracking-wide">Description</p>
-                <p className="text-slate-700">{selectedPlan.description}</p>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Description</p>
+                <p className="text-foreground">{selectedPlan.description}</p>
               </div>
-              <div className="border-t border-slate-100 pt-3">
-                <p className="text-xs text-slate-400">💡 Amounts are defined per client loan, not on the plan itself.</p>
+              <div className="border-t border-border/50 pt-3">
+                <p className="text-xs text-muted-foreground">💡 Amounts are defined per client loan, not on the plan itself.</p>
               </div>
             </div>
           </Card>
