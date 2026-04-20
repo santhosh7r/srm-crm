@@ -300,8 +300,8 @@ export default function HistoryPage() {
             {/* ── Filters ── */}
             <Card className="p-4 mb-5">
                 <form onSubmit={applyFilters}>
-                    <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-                        <div className="md:col-span-2">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
+                        <div className="sm:col-span-2 lg:col-span-2">
                             <label className="block text-xs font-medium text-secondary-foreground mb-1">Search Client</label>
                             <div className="relative">
                                 <Input
@@ -385,7 +385,7 @@ export default function HistoryPage() {
 
             {/* ── Summary totals bar ── */}
             {rows.length > 0 && (
-                <div className="grid grid-cols-3 md:grid-cols-6 gap-3 mb-5">
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-5">
                     {[
                         { label: 'Total Disposed', value: fmt(totals.dispose), color: 'text-foreground' },
                         { label: 'Init. Interest', value: fmt(totals.interest), color: 'text-foreground' },
@@ -394,9 +394,9 @@ export default function HistoryPage() {
                         { label: 'Total Given', value: fmt(totals.given), color: 'text-green-700' },
                         { label: 'Total Balance', value: fmt(totals.balance), color: 'text-red-600' },
                     ].map(s => (
-                        <Card key={s.label} className="p-3 text-center">
-                            <p className="text-xs text-muted-foreground mb-1">{s.label}</p>
-                            <p className={`text-sm font-bold ${s.color}`}>{s.value}</p>
+                        <Card key={s.label} className="p-3 text-center flex flex-col justify-center items-center overflow-hidden">
+                            <p className="text-[10px] sm:text-xs text-muted-foreground mb-1 truncate w-full">{s.label}</p>
+                            <p className={`text-xs sm:text-sm font-bold ${s.color} truncate w-full`}>{s.value}</p>
                         </Card>
                     ))}
                 </div>

@@ -1,6 +1,15 @@
 import mongoose from "mongoose"
 import dns from "dns"
 
+// Import all models here so that they are always registered with mongoose
+// whenever a database connection is established. This prevents the "Schema hasn't
+// been registered" errors during Vercel serverless cold starts.
+import '@/models/User';
+import '@/models/Client';
+import '@/models/Plan';
+import '@/models/Loan';
+import '@/models/Payment';
+
 let isConnected = false
 
 async function resolveSrvAndConnect(uri: string): Promise<typeof mongoose> {
