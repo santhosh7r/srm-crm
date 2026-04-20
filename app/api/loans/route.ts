@@ -73,15 +73,16 @@ export async function POST(req: NextRequest) {
 
     await loan.save();
 
-    // Request: in monthly the initial interest need to come as first payment record
-    if (plan.planType === 'monthly' && interest > 0) {
+    // Record initial interest payment at allocation for both monthly and weekly plans
+    if (interest > 0 && (plan.planType === 'monthly' || plan.planType === 'weekly')) {
+      const label = plan.planType === 'monthly' ? 'monthly' : 'weekly';
       const initialPayment = new Payment({
         userId,
         loanId: loan._id,
         amount: interest,
         type: 'interest',
         date: start,
-        notes: 'Initial monthly interest (recorded at allocation)',
+        notes: `Initial ${label} interest (recorded at allocation)`,
       });
       await initialPayment.save();
     }

@@ -75,11 +75,12 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const [clientsRes, loansRes, paymentsRes, userRes] = await Promise.all([
+        const [clientsRes, loansRes, paymentsRes, userRes, duesRes] = await Promise.all([
           fetch('/api/clients').then(res => res.json()),
           fetch('/api/loans').then(res => res.json()),
           fetch('/api/payments').then(res => res.json()),
-          fetch('/api/auth/me').then(res => res.json())
+          fetch('/api/auth/me').then(res => res.json()),
+          fetch('/api/dues').then(res => res.json()),
         ]);
 
         const clientsData = clientsRes.data || [];
@@ -153,74 +154,9 @@ export default function DashboardPage() {
           }
         });
 
-        const weeklyPending: any[] = [];
-        const monthlyPending: any[] = [];
-
-        loansData.forEach((loan: any) => {
-          if (loan.status === 'completed') return;
-          const plan = loan.planId;
-          if (!plan) return;
-
-          if (plan.planType === 'weekly' && plan.duration) {
-            const msInWeek = 7 * 24 * 60 * 60 * 1000;
-            // Weekly principal payment schedule
-            const expectedWeeklyPrincipal = loan.disposeAmount / plan.duration;
-            let weeksPassed = Math.floor((now.getTime() - new Date(loan.startDate).getTime()) / msInWeek);
-
-            // Only show after next week
-            if (weeksPassed >= 1) {
-              weeksPassed = Math.min(weeksPassed, plan.duration);
-
-              const expectedTotalPrincipalPaid = weeksPassed * expectedWeeklyPrincipal;
-              const pendingPrincipal = expectedTotalPrincipalPaid - (loan.totalPaid || 0);
-
-              // Check for 1-time interest
-              const interestPayments = paymentsData.filter((p: any) => {
-                const pid = p.loanId?._id || p.loanId;
-                return String(pid) === String(loan._id) && p.type === 'interest';
-              });
-              const totalInterestPaid = interestPayments.reduce((sum: number, p: any) => sum + p.amount, 0);
-              const pendingInterest = loan.interestAmount > 0 ? Math.max(0, loan.interestAmount - totalInterestPaid) : 0;
-
-              const totalPendingDue = Math.max(0, pendingPrincipal) + pendingInterest;
-
-              if (Math.round(totalPendingDue) > 0) {
-                const dueDate = new Date(new Date(loan.startDate).getTime() + (weeksPassed * msInWeek));
-                weeklyPending.push({ ...loan, dueAmount: totalPendingDue, dueDate });
-              }
-            }
-          } else if (plan.planType === 'monthly') {
-            const start = new Date(loan.startDate);
-
-            let fullMonthsPassed = (now.getFullYear() - start.getFullYear()) * 12 + (now.getMonth() - start.getMonth());
-            if (now.getDate() < start.getDate()) {
-              fullMonthsPassed--;
-            }
-
-            const activeMonths = Math.max(0, fullMonthsPassed);
-
-            // Monthly recurring expects 1 for each full month passed (Excluding upfront day-0 interest)
-            const expectedRecurringInterest = activeMonths * loan.interestAmount;
-
-            // Only count interest payments that are NOT the initial Day-0 payment
-            const recurringInterestPayments = paymentsData.filter((p: any) => {
-              const pid = p.loanId?._id || p.loanId;
-              return String(pid) === String(loan._id) &&
-                p.type === 'interest' &&
-                !(p.notes || '').toLowerCase().includes('initial');
-            });
-            const totalRecurringPaid = recurringInterestPayments.reduce((sum: number, p: any) => sum + p.amount, 0);
-
-            const pendingInterest = expectedRecurringInterest - totalRecurringPaid;
-
-            // Only show in pending list if debt is at least 1 unit after rounding
-            if (Math.round(pendingInterest) > 0 && activeMonths >= 1) {
-              const dueDate = new Date(start);
-              dueDate.setMonth(start.getMonth() + activeMonths);
-              monthlyPending.push({ ...loan, dueAmount: pendingInterest, dueDate });
-            }
-          }
-        });
+        // Use server-side computed dues for accuracy
+        const weeklyPending = duesRes.data?.weekly || [];
+        const monthlyPending = duesRes.data?.monthly || [];
 
         setStats({
           totalClients: clientsData.length,

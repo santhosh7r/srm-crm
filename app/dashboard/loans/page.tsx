@@ -12,6 +12,7 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { Calendar } from 'lucide-react';
 
 interface Loan {
   _id: string;
@@ -54,10 +55,19 @@ export default function LoansPage() {
   };
 
   const statusStyle = (status: string) => ({
-    active: 'bg-blue-50 text-blue-700 border border-blue-200',
-    completed: 'bg-green-50 text-green-700 border border-green-200',
-    overdue: 'bg-red-50 text-red-700 border border-red-200',
-  }[status] || 'bg-background text-foreground');
+    active: 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/50',
+    completed: 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800/50',
+    overdue: 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800/50',
+  }[status] || 'bg-muted text-foreground');
+
+  const fmtDate = (d: string) =>
+    new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+  // Days since start
+  const daysSince = (d: string) => {
+    const diff = Date.now() - new Date(d).getTime();
+    return Math.floor(diff / (1000 * 60 * 60 * 24));
+  };
 
   return (
     <div>
@@ -84,14 +94,21 @@ export default function LoansPage() {
         <div className="grid grid-cols-1 gap-3">
           {loans.map(loan => {
             const progress = Math.min(100, (loan.totalPaid / (loan.totalAmount || 1)) * 100);
+            const days = daysSince(loan.startDate);
+            const isOverdue = loan.status === 'overdue';
+
             return (
-              <Card key={loan._id} className="p-5 hover:shadow-md transition-shadow">
+              <Card
+                key={loan._id}
+                className={`p-5 hover:shadow-md transition-shadow border ${isOverdue ? 'border-red-200 dark:border-red-800/50' : 'border-border'}`}
+              >
                 <div className="flex items-start justify-between gap-4">
-                  {/* Left: info */}
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-1">
+                  {/* Left */}
+                  <div className="flex-1 min-w-0">
+                    {/* Name + status row */}
+                    <div className="flex items-center gap-3 mb-1 flex-wrap">
                       <Link href={`/dashboard/loans/${loan._id}`}>
-                        <h3 className="font-semibold text-foreground hover:underline cursor-pointer">
+                        <h3 className="font-bold text-foreground hover:underline cursor-pointer text-lg">
                           {loan.clientId?.name ?? '—'}
                         </h3>
                       </Link>
@@ -99,31 +116,60 @@ export default function LoansPage() {
                         {loan.status}
                       </span>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">
-                      {loan.planId?.name ?? '—'} ·{' '}
-                      {loan.planId?.planType === 'weekly'
-                        ? `📆 Weekly${loan.planId.duration ? ` (${loan.planId.duration}w)` : ''}`
-                        : '📅 Monthly'}
-                    </p>
+
+                    {/* Plan + START DATE row — start date is super visible */}
+                    <div className="flex items-center gap-3 mb-3 flex-wrap">
+                      <p className="text-sm text-muted-foreground">
+                        {loan.planId?.name ?? '—'} ·{' '}
+                        {loan.planId?.planType === 'weekly'
+                          ? `📆 Weekly${loan.planId.duration ? ` (${loan.planId.duration}w)` : ''}`
+                          : '📅 Monthly'}
+                      </p>
+
+                      {/* ── PROMINENT START DATE ── */}
+                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-primary">
+                        <Calendar className="w-3.5 h-3.5 shrink-0" />
+                        <span className="text-xs font-bold">Started {fmtDate(loan.startDate)}</span>
+                        <span className="text-[10px] font-medium text-primary/70 ml-0.5">({days}d ago)</span>
+                      </div>
+
+                      {/* End date for weekly */}
+                      {loan.planId?.planType === 'weekly' && loan.endDate && (
+                        <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border
+                          ${new Date(loan.endDate) < new Date()
+                            ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-800/50 dark:text-red-400'
+                            : 'bg-muted border-border text-muted-foreground'
+                          }`}
+                        >
+                          Ends {fmtDate(loan.endDate)}
+                          {new Date(loan.endDate) < new Date() && ' ⚠'}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Amounts row */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-x-4 gap-y-2 text-sm mb-3">
                       <div>
                         <p className="text-xs text-muted-foreground">Disposed</p>
-                        <p className="font-semibold text-foreground">₹{(loan.disposeAmount ?? 0).toFixed(2)}</p>
+                        <p className="font-semibold text-foreground">₹{(loan.disposeAmount ?? 0).toLocaleString('en-IN')}</p>
                       </div>
                       <div>
-                        <p className="text-xs text-muted-foreground">Interest</p>
-                        <p className="font-semibold text-foreground">₹{(loan.interestAmount ?? 0).toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {loan.planId?.planType === 'weekly' ? 'Interest (one-time)' : 'Interest/month'}
+                        </p>
+                        <p className="font-semibold text-foreground">
+                          ₹{(loan.interestAmount ?? 0).toLocaleString('en-IN')}
+                          {loan.planId?.planType === 'monthly' && loan.interestAmount > 0 && '/mo'}
+                        </p>
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Paid</p>
-                        <p className="font-semibold text-green-700">₹{(loan.totalPaid ?? 0).toFixed(2)}</p>
+                        <p className="font-semibold text-green-700 dark:text-green-400">₹{(loan.totalPaid ?? 0).toLocaleString('en-IN')}</p>
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Balance</p>
-                        <p className={`font-semibold ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>
-                          ₹{(loan.balance ?? 0).toFixed(2)}
+                        <p className={`font-bold ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                          ₹{(loan.balance ?? 0).toLocaleString('en-IN')}
                         </p>
                       </div>
                     </div>
@@ -131,11 +177,13 @@ export default function LoansPage() {
                     {/* Progress bar */}
                     <div className="w-full bg-muted rounded-full h-1.5 max-w-sm">
                       <div
-                        className="bg-green-500 h-1.5 rounded-full transition-all"
+                        className={`h-1.5 rounded-full transition-all ${progress === 100 ? 'bg-green-500' : 'bg-primary'}`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5">{progress.toFixed(0)}% repaid of ₹{(loan.totalAmount ?? 0).toFixed(2)}</p>
+                    <p className="text-xs text-muted-foreground mt-0.5">
+                      {progress.toFixed(0)}% repaid of ₹{(loan.totalAmount ?? 0).toLocaleString('en-IN')}
+                    </p>
                   </div>
 
                   {/* Right: actions */}
