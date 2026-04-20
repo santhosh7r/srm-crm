@@ -36,6 +36,8 @@ const planSchema = new Schema<IPlan>(
   { timestamps: true }
 );
 
-// Always recompile to avoid stale schema cache
-if (mongoose.models.Plan) delete (mongoose.models as any).Plan;
-export default mongoose.model<IPlan>('Plan', planSchema);
+const Plan: mongoose.Model<IPlan> =
+  (mongoose.models['Plan'] as mongoose.Model<IPlan>) ||
+  mongoose.model<IPlan>('Plan', planSchema);
+
+export default Plan;

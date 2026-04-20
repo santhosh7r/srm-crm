@@ -31,8 +31,8 @@ const paymentSchema = new Schema<IPayment>(
   { timestamps: true }
 );
 
-if (mongoose.models.Payment) {
-  delete (mongoose.models as any).Payment;
-}
+const Payment: mongoose.Model<IPayment> =
+  (mongoose.models['Payment'] as mongoose.Model<IPayment>) ||
+  mongoose.model<IPayment>('Payment', paymentSchema);
 
-export default mongoose.model<IPayment>('Payment', paymentSchema);
+export default Payment;

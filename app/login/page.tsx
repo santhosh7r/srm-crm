@@ -168,8 +168,8 @@ export default function LoginPage() {
           <p className="text-xs font-medium text-muted-foreground">
             © {currentYear} RIYA FINANCE LTD. All rights reserved.
           </p>
-          <p className="text-xs font-medium text-muted-foreground/70">
-            Software by <a href="https://webzystudios.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">webzystudios.com</a>
+          <p className="text-xs font-medium text-muted-foreground/70 flex items-center justify-center gap-1">
+            Software by <a href="https://webzystudios.com" target="_blank" rel="noopener noreferrer" className="bg-primary/10 text-primary px-2 py-0.5 rounded-md font-bold hover:bg-primary hover:text-primary-foreground transition-all">webzystudios.com</a>
           </p>
         </div>
       </motion.div>

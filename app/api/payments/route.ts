@@ -1,6 +1,8 @@
 import { connectDB } from '@/lib/db';
 import Payment from '@/models/Payment';
 import Loan from '@/models/Loan';
+import Plan from '@/models/Plan'; // register schema for any nested populate chains
+import Client from '@/models/Client'; // register schema for any nested populate chains
 import { getCurrentUser } from '@/lib/jwt';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -52,7 +54,7 @@ export async function POST(req: NextRequest) {
       if (loan.balance <= 0) {
         loan.status = 'completed';
         loan.balance = 0;
-      } else if (new Date() > loan.endDate && loan.status === 'active') {
+      } else if (loan.endDate && new Date() > loan.endDate && loan.status === 'active') {
         loan.status = 'overdue';
       }
 

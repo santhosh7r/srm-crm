@@ -238,8 +238,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <p className="text-xs text-muted-foreground font-medium text-center md:text-left">
             © {new Date().getFullYear()} RIYA FINANCE LTD. All rights reserved.
           </p>
-          <p className="text-xs text-muted-foreground/80 font-medium text-center md:text-right">
-            Software by <a href="https://webzystudios.com" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">webzystudios.com</a>
+          <p className="text-xs text-muted-foreground/80 font-medium text-center md:text-right flex items-center justify-center md:justify-end gap-1">
+            Software by <a href="https://webzystudios.com" target="_blank" rel="noopener noreferrer" className="bg-primary/10 text-primary px-2 py-0.5 rounded-md font-bold hover:bg-primary hover:text-primary-foreground transition-all">webzystudios.com</a>
           </p>
         </div>
       </footer>

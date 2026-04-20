@@ -37,5 +37,8 @@ const loanSchema = new Schema<ILoan>(
   { timestamps: true }
 );
 
-if (mongoose.models.Loan) delete (mongoose.models as any).Loan;
-export default mongoose.model<ILoan>('Loan', loanSchema);
+const Loan: mongoose.Model<ILoan> =
+  (mongoose.models['Loan'] as mongoose.Model<ILoan>) ||
+  mongoose.model<ILoan>('Loan', loanSchema);
+
+export default Loan;

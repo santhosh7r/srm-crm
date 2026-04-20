@@ -88,7 +88,6 @@ export default function LoansPage() {
         <div className="grid grid-cols-1 gap-3">
           {loans.map(loan => {
             const progress = Math.min(100, (loan.totalPaid / (loan.totalAmount || 1)) * 100);
-            const days = daysSince(loan.startDate);
             const isOverdue = loan.status === 'overdue';
 
             return (

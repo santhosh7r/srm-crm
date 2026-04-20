@@ -1,5 +1,7 @@
 import { connectDB } from '@/lib/db';
 import Loan from '@/models/Loan';
+import Plan from '@/models/Plan'; // must be imported to register schema for Loan.populate('planId')
+import Client from '@/models/Client'; // must be imported to register schema for Loan.populate('clientId')
 import Payment from '@/models/Payment';
 import { getCurrentUser } from '@/lib/jwt';
 import { NextRequest, NextResponse } from 'next/server';
