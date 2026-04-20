@@ -89,7 +89,7 @@ export default function ClientForm({
             <Input
               type="text"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => setFormData({ ...formData, name: e.target.value.toUpperCase() })}
               required
               disabled={isLoading}
               placeholder="Client name"
