@@ -63,12 +63,6 @@ export default function LoansPage() {
   const fmtDate = (d: string) =>
     new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  // Days since start
-  const daysSince = (d: string) => {
-    const diff = Date.now() - new Date(d).getTime();
-    return Math.floor(diff / (1000 * 60 * 60 * 24));
-  };
-
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -130,7 +124,6 @@ export default function LoansPage() {
                       <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-primary">
                         <Calendar className="w-3.5 h-3.5 shrink-0" />
                         <span className="text-xs font-bold">Started {fmtDate(loan.startDate)}</span>
-                        <span className="text-[10px] font-medium text-primary/70 ml-0.5">({days}d ago)</span>
                       </div>
 
                       {/* End date for weekly */}
