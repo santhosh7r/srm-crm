@@ -64,4 +64,8 @@ const clientSchema = new Schema<IClient>(
   { timestamps: true }
 );
 
-export default mongoose.models.Client || mongoose.model<IClient>('Client', clientSchema);
+const Client: mongoose.Model<IClient> =
+  (mongoose.models['Client'] as mongoose.Model<IClient>) ||
+  mongoose.model<IClient>('Client', clientSchema);
+
+export default Client;

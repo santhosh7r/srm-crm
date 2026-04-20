@@ -1,6 +1,7 @@
 import { connectDB } from '@/lib/db';
 import Loan from '@/models/Loan';
 import Plan from '@/models/Plan';
+import Client from '@/models/Client';
 import Payment from '@/models/Payment';
 import { getCurrentUser } from '@/lib/jwt';
 import { NextRequest, NextResponse } from 'next/server';
