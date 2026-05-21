@@ -6,6 +6,15 @@ import Link from 'next/link';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { IndianRupee, TrendingUp, Wallet, Trash2 } from 'lucide-react';
 
 interface Plan {
   name: string;
@@ -54,6 +63,7 @@ export default function LoanDetailPage() {
   const [error, setError] = useState('');
   const [historyTab, setHistoryTab] = useState<'all' | 'given' | 'interest'>('all');
   const [infoOpen, setInfoOpen] = useState(false);
+  const [deletePayment, setDeletePayment] = useState<Payment | null>(null);
 
   const fetchData = async () => {
     try {
@@ -91,6 +101,23 @@ export default function LoanDetailPage() {
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed');
     } finally { setIsSubmitting(false); }
+  };
+
+  const handleDeletePayment = async () => {
+    if (!deletePayment) return;
+
+    setError('');
+    try {
+      const res = await fetch(`/api/payments/${deletePayment._id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body?.error || 'Failed to delete payment');
+      }
+      setDeletePayment(null);
+      await fetchData();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete payment');
+    }
   };
 
   if (loading) return (
@@ -321,16 +348,49 @@ export default function LoanDetailPage() {
                   <p className="font-semibold text-foreground">{fmt(p.amount)}</p>
                   {p.notes && <p className="text-xs text-muted-foreground mt-0.5">{p.notes}</p>}
                 </div>
-                <div className="text-right shrink-0 ml-3">
-                  <p className="text-xs text-muted-foreground">{new Date(p.date).toLocaleDateString('en-IN')}</p>
-                  <span className={`text-xs font-medium ${p.type === 'interest' ? 'text-primary' : 'text-muted-foreground'}`}>
-                    {p.type === 'interest' ? 'Interest' : 'Given'}
-                  </span>
+                <div className="flex items-center gap-3 text-right shrink-0 ml-3">
+                  <div>
+                    <p className="text-xs text-muted-foreground">{new Date(p.date).toLocaleDateString('en-IN')}</p>
+                    <span className={`text-xs font-medium ${p.type === 'interest' ? 'text-primary' : 'text-muted-foreground'}`}>
+                      {p.type === 'interest' ? 'Interest' : 'Given'}
+                    </span>
+                  </div>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    className="text-red-600 hover:bg-red-50"
+                    onClick={() => setDeletePayment(p)}
+                    aria-label="Delete payment"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             ))}
           </div>
         )}
+
+        <AlertDialog open={!!deletePayment} onOpenChange={(open) => !open && setDeletePayment(null)}>
+          <AlertDialogContent>
+            <AlertDialogTitle>Confirm Delete Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete this payment?
+              {deletePayment && (
+                <span className="block mt-2 text-sm text-muted-foreground">
+                  {deletePayment.type === 'interest' ? 'Interest' : 'Given'} payment of {fmt(deletePayment.amount)} on {new Date(deletePayment.date).toLocaleDateString('en-IN')}.
+                </span>
+              )}
+              This action cannot be undone.
+            </AlertDialogDescription>
+            <div className="flex justify-end gap-2 mt-4">
+              <AlertDialogCancel>Cancel</AlertDialogCancel>
+              <AlertDialogAction onClick={handleDeletePayment} className="bg-red-600 hover:bg-red-700">
+                Delete
+              </AlertDialogAction>
+            </div>
+          </AlertDialogContent>
+        </AlertDialog>
 
         {/* Summary footer */}
         {payments.length > 0 && (
