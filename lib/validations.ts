@@ -26,13 +26,25 @@ export const ClientSchema = z.object({
 });
 
 // Plan schemas — rules only, no monetary values
-export const PlanSchema = z.object({
+const PlanSchemaBase = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   description: z.string().min(1, 'Description is required'),
-  planType: z.enum(['weekly', 'monthly']),
+  planType: z.enum(['weekly', 'monthly', 'days']),
   interestType: z.enum(['fixed', 'percentage']),
-  duration: z.number().min(1).optional(), // only for weekly plans
+  duration: z.number().min(1).optional(), // weekly: number of weeks
+  intervalDays: z.number().min(1).optional(), // days: number of days per cycle
 });
+
+export const PlanSchema = PlanSchemaBase.superRefine((val, ctx) => {
+  if (val.planType === 'weekly' && (val.duration ?? 0) < 1) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Weekly plans need a duration', path: ['duration'] });
+  }
+  if (val.planType === 'days' && (!val.intervalDays || val.intervalDays < 1)) {
+    ctx.addIssue({ code: z.ZodIssueCode.custom, message: 'Days plans need an interval (in days)', path: ['intervalDays'] });
+  }
+});
+
+export const PlanUpdateSchema = PlanSchemaBase.partial();
 
 // Loan schemas — monetary values entered at allocation time
 export const LoanSchema = z.object({

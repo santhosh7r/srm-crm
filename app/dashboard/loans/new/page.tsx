@@ -24,9 +24,10 @@ interface Plan {
   _id: string;
   name: string;
   description: string;
-  planType: 'weekly' | 'monthly';
+  planType: 'weekly' | 'monthly' | 'days';
   interestType: 'fixed' | 'percentage';
   duration?: number;
+  intervalDays?: number;
 }
 
 export default function NewLoanPage() {
@@ -53,7 +54,7 @@ export default function NewLoanPage() {
     if (!selectedPlan || selectedPlan.planType !== 'weekly' || !selectedPlan.duration || !startDate) return null;
     const d = new Date(startDate);
     d.setDate(d.getDate() + selectedPlan.duration * 7);
-    return d.toLocaleDateString('en-IN');
+    return { date: d.toLocaleDateString('en-IN'), label: `${selectedPlan.duration} weeks` };
   })();
 
   useEffect(() => {
@@ -169,7 +170,11 @@ export default function NewLoanPage() {
                   <SelectContent>
                     {plans.map(p => (
                       <SelectItem key={p._id} value={p._id}>
-                        {p.name} — {p.planType === 'weekly' ? `Weekly (${p.duration}w)` : 'Monthly'}
+                        {p.name} — {
+                          p.planType === 'weekly' ? `Weekly (${p.duration}w)` :
+                          p.planType === 'days' ? `Every ${p.intervalDays}d` :
+                          'Monthly'
+                        }
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -187,7 +192,7 @@ export default function NewLoanPage() {
                 />
                 {endDatePreview && (
                   <p className="text-xs text-muted-foreground mt-1">
-                    📅 End date: {endDatePreview} ({selectedPlan?.duration} weeks)
+                    📅 End date: {endDatePreview.date} ({endDatePreview.label})
                   </p>
                 )}
               </div>
@@ -276,15 +281,25 @@ export default function NewLoanPage() {
               </div>
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Type</p>
-                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${selectedPlan.planType === 'weekly' ? 'bg-muted text-blue-700' : 'bg-muted text-secondary-foreground'
-                  }`}>
-                  {selectedPlan.planType === 'weekly' ? '📆 Weekly' : '📅 Monthly'}
+                <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${
+                  selectedPlan.planType === 'weekly' ? 'bg-muted text-blue-700' :
+                  selectedPlan.planType === 'days' ? 'bg-muted text-purple-700' :
+                  'bg-muted text-secondary-foreground'
+                }`}>
+                  {selectedPlan.planType === 'weekly' ? '📆 Weekly' :
+                   selectedPlan.planType === 'days' ? '🗓️ Days' : '📅 Monthly'}
                 </span>
               </div>
               {selectedPlan.planType === 'weekly' && selectedPlan.duration && (
                 <div>
                   <p className="text-xs text-muted-foreground uppercase tracking-wide">Duration</p>
                   <p className="font-medium text-foreground">{selectedPlan.duration} week(s)</p>
+                </div>
+              )}
+              {selectedPlan.planType === 'days' && (
+                <div>
+                  <p className="text-xs text-muted-foreground uppercase tracking-wide">Cycle</p>
+                  <p className="font-medium text-foreground">every {selectedPlan.intervalDays ?? '?'} day(s)</p>
                 </div>
               )}
               <div>

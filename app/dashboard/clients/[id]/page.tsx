@@ -30,8 +30,9 @@ interface Loan {
   planId?: {
     name: string;
     totalAmount: number;
-    planType: 'weekly' | 'monthly';
+    planType: 'weekly' | 'monthly' | 'days';
     duration?: number;
+    intervalDays?: number;
   };
 }
 

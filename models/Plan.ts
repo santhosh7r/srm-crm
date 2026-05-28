@@ -4,9 +4,10 @@ export interface IPlan extends Document {
   userId: mongoose.Types.ObjectId;
   name: string;
   description: string;
-  planType: 'weekly' | 'monthly';
+  planType: 'weekly' | 'monthly' | 'days';
   interestType: 'fixed' | 'percentage';
-  duration?: number; // only for weekly plans
+  duration?: number; // weekly: number of weeks
+  intervalDays?: number; // days: number of days per repeating cycle
   createdAt: Date;
   updatedAt: Date;
 }
@@ -18,7 +19,7 @@ const planSchema = new Schema<IPlan>(
     description: { type: String, required: [true, 'Description is required'] },
     planType: {
       type: String,
-      enum: ['weekly', 'monthly'],
+      enum: ['weekly', 'monthly', 'days'],
       required: true,
       default: 'monthly',
     },
@@ -29,6 +30,10 @@ const planSchema = new Schema<IPlan>(
       default: 'fixed',
     },
     duration: {
+      type: Number,
+      min: 1,
+    },
+    intervalDays: {
       type: Number,
       min: 1,
     },

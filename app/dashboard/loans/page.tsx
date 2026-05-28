@@ -23,7 +23,12 @@ interface Loan {
   totalPaid: number;
   status: 'active' | 'completed' | 'overdue';
   clientId: { name: string; _id: string };
-  planId: { name: string; planType: 'weekly' | 'monthly'; duration?: number };
+  planId: {
+    name: string;
+    planType: 'weekly' | 'monthly' | 'days';
+    duration?: number;
+    intervalDays?: number;
+  };
   startDate: string;
   endDate?: string;
 }
@@ -116,7 +121,9 @@ export default function LoansPage() {
                         {loan.planId?.name ?? '—'} ·{' '}
                         {loan.planId?.planType === 'weekly'
                           ? `📆 Weekly${loan.planId.duration ? ` (${loan.planId.duration}w)` : ''}`
-                          : '📅 Monthly'}
+                          : loan.planId?.planType === 'days'
+                            ? `🗓️ Every ${loan.planId.intervalDays ?? '?'}d`
+                            : '📅 Monthly'}
                       </p>
 
                       {/* ── PROMINENT START DATE ── */}
@@ -147,11 +154,16 @@ export default function LoansPage() {
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">
-                          {loan.planId?.planType === 'weekly' ? 'Interest (one-time)' : 'Interest/month'}
+                          {loan.planId?.planType === 'weekly'
+                            ? 'Interest (one-time)'
+                            : loan.planId?.planType === 'days'
+                              ? `Interest / ${loan.planId.intervalDays ?? '?'}d`
+                              : 'Interest/month'}
                         </p>
                         <p className="font-semibold text-foreground">
                           ₹{(loan.interestAmount ?? 0).toLocaleString('en-IN')}
                           {loan.planId?.planType === 'monthly' && loan.interestAmount > 0 && '/mo'}
+                          {loan.planId?.planType === 'days' && loan.interestAmount > 0 && `/${loan.planId.intervalDays}d`}
                         </p>
                       </div>
                       <div>

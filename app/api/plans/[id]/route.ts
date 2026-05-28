@@ -1,7 +1,7 @@
 import { connectDB } from '@/lib/db';
 import Plan from '@/models/Plan';
 import { getCurrentUser } from '@/lib/jwt';
-import { PlanSchema } from '@/lib/validations';
+import { PlanUpdateSchema } from '@/lib/validations';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(
@@ -56,7 +56,7 @@ export async function PUT(
 
     const { id } = await params;
     const body = await req.json();
-    const validatedData = PlanSchema.partial().parse(body);
+    const validatedData = PlanUpdateSchema.parse(body);
 
     const plan = await Plan.findOneAndUpdate(
       { _id: id, userId },

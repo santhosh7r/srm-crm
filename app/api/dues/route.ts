@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 
     const loans = await Loan.find({ userId, status: { $ne: 'completed' } })
       .populate('clientId', 'name email phone')
-      .populate('planId', 'name planType interestType duration')
+      .populate('planId', 'name planType interestType duration intervalDays')
       .lean();
 
     // Payments without populate — loanId is a raw ObjectId, safe for String() comparison
@@ -24,6 +24,7 @@ export async function GET(req: NextRequest) {
 
     const weeklyPending: any[] = [];
     const monthlyPending: any[] = [];
+    const daysPending: any[] = [];
 
     for (const loan of loans) {
       const plan = loan.planId as any;
@@ -175,6 +176,48 @@ export async function GET(req: NextRequest) {
           hasInterest: interestPerMonth > 0,
         });
       }
+
+      // ─────────────────────────────────────────────────────────────
+      // DAYS LOANS
+      //
+      // Behaves exactly like monthly, but cycle repeats every N days
+      // instead of every month anniversary. Interest-only repeating
+      // cycle — runs until balance is cleared.
+      // ─────────────────────────────────────────────────────────────
+      else if (plan.planType === 'days' && plan.intervalDays) {
+        const msInCycle = plan.intervalDays * 24 * 60 * 60 * 1000;
+        const startDate = new Date(loan.startDate);
+        const totalCyclesPassed = Math.floor(
+          (now.getTime() - startDate.getTime()) / msInCycle
+        );
+
+        if (totalCyclesPassed < 1) continue;
+        if ((loan.balance || 0) <= 0) continue;
+
+        const paidPeriods = nonInitialPayments.length;
+        const unpaidCycles = totalCyclesPassed - paidPeriods;
+        if (unpaidCycles <= 0) continue;
+
+        const firstUnpaidDueDate = new Date(
+          startDate.getTime() + (paidPeriods + 1) * msInCycle
+        );
+
+        const interestPerCycle = loan.interestAmount || 0;
+        const dueAmount = interestPerCycle > 0 ? unpaidCycles * interestPerCycle : 0;
+
+        daysPending.push({
+          ...loan,
+          intervalDays: plan.intervalDays,
+          dueAmount,
+          interestPerCycle,
+          unpaidCycles,
+          paidPeriods,
+          cyclesSoFar: totalCyclesPassed,
+          outstandingBalance: loan.balance || 0,
+          dueDate: firstUnpaidDueDate,
+          hasInterest: interestPerCycle > 0,
+        });
+      }
     }
 
     // Sort: overdue first (weekly), then by amount
@@ -183,10 +226,11 @@ export async function GET(req: NextRequest) {
       return b.dueAmount - a.dueAmount;
     });
     monthlyPending.sort((a, b) => b.dueAmount - a.dueAmount || b.outstandingBalance - a.outstandingBalance);
+    daysPending.sort((a, b) => b.dueAmount - a.dueAmount || b.outstandingBalance - a.outstandingBalance);
 
     return NextResponse.json({
       success: true,
-      data: { weekly: weeklyPending, monthly: monthlyPending },
+      data: { weekly: weeklyPending, monthly: monthlyPending, days: daysPending },
     });
   } catch (error) {
     console.error('Fetch dues error:', error);

@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
 
         const loans = await Loan.find(loanQuery)
             .populate('clientId', 'name phone email')
-            .populate('planId', 'name planType interestType duration')
+            .populate('planId', 'name planType interestType duration intervalDays')
             .sort({ createdAt: -1 })
             .lean();
 
@@ -74,6 +74,7 @@ export async function GET(req: NextRequest) {
                 planName: l.planId?.name ?? '—',
                 planType: l.planId?.planType ?? '—',
                 duration: l.planId?.duration ?? null,
+                intervalDays: l.planId?.intervalDays ?? null,
                 disposeAmount: l.disposeAmount ?? 0,
                 initialInterest: pm.initialInterest, // Now returns PAID initial interest
                 expectedInterest: l.interestAmount ?? 0, // Keep this just in case, though not used yet

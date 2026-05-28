@@ -13,21 +13,25 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 
+type PlanType = 'weekly' | 'monthly' | 'days';
+
 interface Plan {
   _id: string;
   name: string;
   description: string;
-  planType: 'weekly' | 'monthly';
+  planType: PlanType;
   interestType: 'fixed' | 'percentage';
   duration?: number;
+  intervalDays?: number;
 }
 
 const emptyForm = {
   name: '',
   description: '',
-  planType: 'monthly' as 'weekly' | 'monthly',
+  planType: 'monthly' as PlanType,
   interestType: 'fixed' as 'fixed' | 'percentage',
   duration: '',
+  intervalDays: '',
 };
 
 export default function PlansPage() {
@@ -62,6 +66,10 @@ export default function PlansPage() {
     };
     if (form.planType === 'weekly' && form.duration) {
       payload.duration = parseInt(form.duration);
+    }
+    if (form.planType === 'days') {
+      if (!form.intervalDays) { setError('Interval (days) is required'); return; }
+      payload.intervalDays = parseInt(form.intervalDays);
     }
 
     const url = editingId ? `/api/plans/${editingId}` : '/api/plans';
@@ -98,6 +106,7 @@ export default function PlansPage() {
       planType: plan.planType,
       interestType: plan.interestType,
       duration: plan.duration?.toString() || '',
+      intervalDays: plan.intervalDays?.toString() || '',
     });
     setEditingId(plan._id);
     setShowForm(true);
@@ -117,7 +126,7 @@ export default function PlansPage() {
     onChange: (v: string) => void;
     options: { value: string; label: string }[];
   }) => (
-    <div className="flex rounded-lg border border-border overflow-hidden w-fit">
+    <div className="flex rounded-lg border border-border overflow-hidden w-fit flex-wrap">
       {options.map(o => (
         <button
           key={o.value}
@@ -133,6 +142,12 @@ export default function PlansPage() {
       ))}
     </div>
   );
+
+  const planLabel = (p: Plan) => {
+    if (p.planType === 'weekly') return `📆 Weekly${p.duration ? ` (${p.duration}w)` : ''}`;
+    if (p.planType === 'monthly') return '📅 Monthly';
+    return `🗓️ Every ${p.intervalDays ?? '?'}d`;
+  };
 
   return (
     <div>
@@ -169,10 +184,16 @@ export default function PlansPage() {
               <label className="block text-sm font-medium text-foreground mb-2">Plan Type *</label>
               <Toggle
                 value={form.planType}
-                onChange={v => setForm({ ...form, planType: v as 'weekly' | 'monthly', duration: '' })}
+                onChange={v => setForm({
+                  ...form,
+                  planType: v as PlanType,
+                  duration: '',
+                  intervalDays: '',
+                })}
                 options={[
                   { value: 'monthly', label: '📅 Monthly' },
                   { value: 'weekly', label: '📆 Weekly' },
+                  { value: 'days', label: '🗓️ Days' },
                 ]}
               />
             </div>
@@ -193,6 +214,25 @@ export default function PlansPage() {
                 {form.duration && (
                   <p className="text-xs text-muted-foreground mt-1">{form.duration} week(s)</p>
                 )}
+              </div>
+            )}
+
+            {/* Days plan field */}
+            {form.planType === 'days' && (
+              <div className="space-y-2 p-4 rounded-lg border border-border bg-background/50">
+                <label className="block text-sm font-medium text-foreground">Interval (days) *</label>
+                <Input
+                  type="number"
+                  min="1"
+                  value={form.intervalDays}
+                  onChange={e => setForm({ ...form, intervalDays: e.target.value })}
+                  required
+                  placeholder="e.g. 10"
+                  className="w-36"
+                />
+                <p className="text-xs text-muted-foreground">
+                  Interest cycle repeats every {form.intervalDays || 'N'} day(s) — runs until balance is cleared. Works like monthly, but on your own day count (10, 15, 20, etc.).
+                </p>
               </div>
             )}
 
@@ -258,11 +298,12 @@ export default function PlansPage() {
                   <h3 className="font-semibold text-foreground">{plan.name}</h3>
                   <p className="text-sm text-muted-foreground mt-0.5">{plan.description}</p>
                 </div>
-                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${plan.planType === 'weekly'
-                    ? 'bg-muted text-blue-700'
-                    : 'bg-muted text-secondary-foreground'
-                  }`}>
-                  {plan.planType === 'weekly' ? '📆 Weekly' : '📅 Monthly'}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
+                  plan.planType === 'weekly' ? 'bg-muted text-blue-700' :
+                  plan.planType === 'days' ? 'bg-muted text-purple-700' :
+                  'bg-muted text-secondary-foreground'
+                }`}>
+                  {planLabel(plan)}
                 </span>
               </div>
 
@@ -277,6 +318,12 @@ export default function PlansPage() {
                   <div className="flex justify-between">
                     <span>Duration</span>
                     <span className="font-medium text-foreground">{plan.duration} week(s)</span>
+                  </div>
+                )}
+                {plan.planType === 'days' && (
+                  <div className="flex justify-between">
+                    <span>Cycle</span>
+                    <span className="font-medium text-foreground">every {plan.intervalDays ?? '?'} day(s)</span>
                   </div>
                 )}
               </div>

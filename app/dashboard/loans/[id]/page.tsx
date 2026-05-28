@@ -19,8 +19,9 @@ import { IndianRupee, TrendingUp, Wallet, Trash2 } from 'lucide-react';
 interface Plan {
   name: string;
   interestType: 'fixed' | 'percentage';
-  planType: 'weekly' | 'monthly';
+  planType: 'weekly' | 'monthly' | 'days';
   duration?: number;
+  intervalDays?: number;
 }
 
 interface Loan {
@@ -148,9 +149,17 @@ export default function LoanDetailPage() {
 
   const progress = Math.min(100, loan.totalAmount > 0 ? (loan.totalPaid / loan.totalAmount) * 100 : 0);
 
-  const durationDisplay = plan?.planType === 'weekly' && plan?.duration
-    ? `${plan.duration} week(s)`
-    : 'Monthly';
+  const durationDisplay = (() => {
+    if (plan?.planType === 'weekly' && plan?.duration) return `${plan.duration} week(s)`;
+    if (plan?.planType === 'days') return `Every ${plan.intervalDays ?? '?'} day(s)`;
+    return 'Monthly';
+  })();
+
+  const planTypeDisplay = plan?.planType === 'weekly'
+    ? 'Weekly'
+    : plan?.planType === 'days'
+      ? `Days · every ${plan.intervalDays ?? '?'}d`
+      : 'Monthly';
 
   const statusStyle = {
     active: 'bg-green-100 text-green-700',
@@ -237,7 +246,7 @@ export default function LoanDetailPage() {
             {[
               ['Plan', plan?.name],
               ['Client', loan.clientId.name],
-              ['Type', plan?.planType === 'weekly' ? 'Weekly' : 'Monthly'],
+              ['Type', planTypeDisplay],
               ['Duration', durationDisplay],
               ['Dispose', fmt(loan.disposeAmount)],
               ['Monthly Interest', fmt(loan.interestAmount)],

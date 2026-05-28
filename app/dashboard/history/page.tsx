@@ -13,8 +13,9 @@ interface HistoryRow {
     clientName: string;
     clientPhone: string;
     planName: string;
-    planType: 'weekly' | 'monthly';
+    planType: 'weekly' | 'monthly' | 'days';
     duration: number | null;
+    intervalDays: number | null;
     disposeAmount: number;
     initialInterest: number;
     totalAmount: number;
@@ -31,8 +32,14 @@ interface HistoryRow {
 interface Plan {
     _id: string;
     name: string;
-    planType: 'weekly' | 'monthly';
+    planType: 'weekly' | 'monthly' | 'days';
 }
+
+const planTypeLabel = (r: { planType: string; duration: number | null; intervalDays: number | null }) => {
+    if (r.planType === 'weekly') return `Weekly${r.duration ? ` (${r.duration}w)` : ''}`;
+    if (r.planType === 'days') return r.intervalDays ? `Every ${r.intervalDays}d` : 'Days';
+    return 'Monthly';
+};
 
 const fmt = (n: number) => `₹${(n ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 })}`;
 const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString('en-IN') : '—';
@@ -126,8 +133,12 @@ export default function HistoryPage() {
             ['Client Name', 'Phone', 'Plan', 'Duration', 'Dispose Amount', 'Init. Interest',
                 'Total Amount', 'Collected Interest', 'Total Given', 'Balance', 'Status', 'Start Date', 'End Date'],
             ...filteredRows.map(r => [
-                r.clientName, r.clientPhone, `${r.planName} (${r.planType === 'weekly' ? 'Weekly' : 'Monthly'})`,
-                r.duration ? `${r.duration} weeks` : 'N/A',
+                r.clientName, r.clientPhone, `${r.planName} (${planTypeLabel(r)})`,
+                r.planType === 'weekly' && r.duration
+                    ? `${r.duration} weeks`
+                    : r.planType === 'days' && r.intervalDays
+                        ? `Every ${r.intervalDays}d`
+                        : 'N/A',
                 r.disposeAmount, r.initialInterest, r.totalAmount,
                 r.collectedInterest, r.collectedGiven, r.balance,
                 r.status.toUpperCase(), fmtDate(r.startDate), fmtDate(r.endDate),
@@ -181,7 +192,7 @@ export default function HistoryPage() {
             ]],
             body: filteredRows.map(r => [
                 r.clientName,
-                `${r.planName}\n(${r.planType === 'weekly' ? 'Weekly' : 'Monthly'})`,
+                `${r.planName}\n(${planTypeLabel(r)})`,
                 fmtPDF(r.disposeAmount),
                 fmtPDF(r.initialInterest),
                 fmtPDF(r.totalAmount),
@@ -433,8 +444,12 @@ export default function HistoryPage() {
                                         <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">{r.clientName}</td>
                                         <td className="px-4 py-3 whitespace-nowrap">
                                             <p className="text-foreground font-medium mb-1">{r.planName}</p>
-                                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${r.planType === 'weekly' ? 'bg-muted text-blue-700' : 'bg-muted text-secondary-foreground'}`}>
-                                                {r.planType === 'weekly' ? `Weekly${r.duration ? ` (${r.duration}w)` : ''}` : 'Monthly'}
+                                            <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
+                                                r.planType === 'weekly' ? 'bg-muted text-blue-700' :
+                                                r.planType === 'days' ? 'bg-muted text-purple-700' :
+                                                'bg-muted text-secondary-foreground'
+                                            }`}>
+                                                {planTypeLabel(r)}
                                             </span>
                                         </td>
                                         <td className="px-4 py-3 text-foreground font-medium">{fmt(r.disposeAmount)}</td>
@@ -463,7 +478,7 @@ export default function HistoryPage() {
                                 <div className="flex items-start justify-between">
                                     <div>
                                         <p className="font-semibold text-foreground">{r.clientName}</p>
-                                        <p className="text-xs text-muted-foreground">{r.planName} · {r.planType === 'weekly' ? `Weekly${r.duration ? ` (${r.duration}w)` : ''}` : 'Monthly'}</p>
+                                        <p className="text-xs text-muted-foreground">{r.planName} · {planTypeLabel(r)}</p>
                                     </div>
                                     <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${statusStyle[r.status]}`}>
                                         {r.status.toUpperCase()}

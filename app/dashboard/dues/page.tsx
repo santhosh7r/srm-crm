@@ -10,6 +10,7 @@ import { motion } from 'framer-motion';
 export default function DuesPage() {
     const [weeklyPending, setWeeklyPending] = useState<any[]>([]);
     const [monthlyPending, setMonthlyPending] = useState<any[]>([]);
+    const [daysPending, setDaysPending] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
@@ -26,6 +27,7 @@ export default function DuesPage() {
             .then(json => {
                 setWeeklyPending(json.data?.weekly || []);
                 setMonthlyPending(json.data?.monthly || []);
+                setDaysPending(json.data?.days || []);
             })
             .catch(() => setError('Failed to load pending dues.'))
             .finally(() => setLoading(false));
@@ -157,6 +159,24 @@ export default function DuesPage() {
                         )}
                     </div>
                 </Card>
+                {daysPending.length > 0 && (
+                    <Card className="p-5 border-border flex items-center gap-4 sm:col-span-2">
+                        <div className="p-3 bg-muted rounded-xl shrink-0">
+                            <Clock className="w-6 h-6 text-primary" />
+                        </div>
+                        <div>
+                            <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide mb-0.5">Days Dues</p>
+                            <p className="text-2xl font-bold text-foreground">
+                                {daysPending.length}<span className="text-sm font-medium text-muted-foreground ml-1">clients</span>
+                            </p>
+                            {daysPending.length > 0 && (
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                    {daysPending.filter(p => p.unpaidCycles > 1).length} with multiple cycles pending
+                                </p>
+                            )}
+                        </div>
+                    </Card>
+                )}
             </motion.div>
 
             <motion.div
@@ -352,6 +372,104 @@ export default function DuesPage() {
                     )}
                 </Card>
             </motion.div>
+
+            {/* ── DAYS ── */}
+            {daysPending.length > 0 && (
+                <motion.div
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.15 }}
+                    className="mt-8"
+                >
+                    <Card className="p-6 border-border shadow-sm flex flex-col">
+                        <div className="flex items-center justify-between mb-5">
+                            <div className="flex items-center gap-2">
+                                <Clock className="w-5 h-5 text-primary" />
+                                <h2 className="text-lg font-bold text-foreground">Days Pending Dues</h2>
+                            </div>
+                            <span className="bg-muted text-primary px-3 py-1 rounded-full text-xs font-bold">
+                                {daysPending.length} Clients
+                            </span>
+                        </div>
+
+                        <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
+                            {daysPending.map((p, i) => {
+                                const cycleLabel = `${p.intervalDays}d`;
+                                return (
+                                    <motion.div
+                                        key={i}
+                                        initial={{ opacity: 0, y: 8 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        transition={{ delay: i * 0.04 }}
+                                        className={`flex flex-col gap-3 p-4 rounded-xl border transition-all hover:shadow-sm
+                                            ${(p.unpaidCycles ?? 0) > 1
+                                                ? 'bg-orange-50/40 border-orange-200/70 dark:bg-orange-950/20 dark:border-orange-800/40'
+                                                : 'bg-card border-border/60 hover:border-primary/35'
+                                            }`}
+                                    >
+                                        <div className="flex items-start justify-between gap-2">
+                                            <div className="flex-1 min-w-0">
+                                                <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                                                    <p className="font-bold text-foreground">{p.clientId?.name || '—'}</p>
+                                                    <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-muted text-primary border border-border shrink-0">
+                                                        Every {cycleLabel}
+                                                    </span>
+                                                    {(p.unpaidCycles ?? 0) > 1 && (
+                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 border border-orange-200 shrink-0">
+                                                            {p.unpaidCycles} cycles pending
+                                                        </span>
+                                                    )}
+                                                </div>
+                                                <div className="flex flex-col gap-0.5 text-xs">
+                                                    {p.hasInterest ? (
+                                                        <span className="flex items-center gap-1 text-foreground font-medium">
+                                                            <IndianRupee className="w-3 h-3 shrink-0" />
+                                                            {fmt(p.interestPerCycle)} / {cycleLabel}
+                                                            {p.unpaidCycles > 1 && ` × ${p.unpaidCycles} = ${fmt(p.dueAmount)} total`}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="flex items-center gap-1 text-foreground font-medium">
+                                                            <IndianRupee className="w-3 h-3 shrink-0" />
+                                                            Collect outstanding: {fmt(p.outstandingBalance)}
+                                                        </span>
+                                                    )}
+                                                    <span className="flex items-center gap-1 text-muted-foreground">
+                                                        <Clock className="w-3 h-3 shrink-0" />
+                                                        Due from: {fmtDate(p.dueDate)}
+                                                    </span>
+                                                    <span className="flex items-center gap-1 text-muted-foreground">
+                                                        <Calendar className="w-3 h-3 shrink-0" />
+                                                        Started: {fmtDate(p.startDate)} · Balance: {fmt(p.outstandingBalance)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <p className="text-base font-bold text-red-600 whitespace-nowrap shrink-0">
+                                                {p.hasInterest ? fmt(p.dueAmount) : fmt(p.outstandingBalance)}
+                                            </p>
+                                        </div>
+                                        <div className="flex gap-2 justify-end">
+                                            <Link href={`/dashboard/clients/${p.clientId?._id}`}>
+                                                <Button size="sm" variant="outline" className="h-8 border-border hover:bg-muted text-xs">View</Button>
+                                            </Link>
+                                            <Button
+                                                size="sm"
+                                                className="h-8 bg-primary hover:bg-primary/90 text-primary-foreground text-xs px-4"
+                                                onClick={() => {
+                                                    setPaymentLoan(p);
+                                                    setPaymentAmount(p.hasInterest ? Math.round(p.interestPerCycle).toString() : '');
+                                                    setPaymentType(p.hasInterest ? 'interest' : 'given');
+                                                }}
+                                            >
+                                                Collect
+                                            </Button>
+                                        </div>
+                                    </motion.div>
+                                );
+                            })}
+                        </div>
+                    </Card>
+                </motion.div>
+            )}
 
             {/* Payment Modal */}
             {paymentLoan && (

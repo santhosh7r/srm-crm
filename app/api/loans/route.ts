@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
 
     const loans = await Loan.find(query)
       .populate('clientId', 'name email phone')
-      .populate('planId', 'name planType interestType duration')
+      .populate('planId', 'name planType interestType duration intervalDays')
       .sort({ createdAt: -1 });
 
     return NextResponse.json({ success: true, data: loans }, { status: 200 });
@@ -74,9 +74,13 @@ export async function POST(req: NextRequest) {
 
     await loan.save();
 
-    // Record initial interest payment at allocation for both monthly and weekly plans
-    if (interest > 0 && (plan.planType === 'monthly' || plan.planType === 'weekly')) {
-      const label = plan.planType === 'monthly' ? 'monthly' : 'weekly';
+    // Record initial interest payment at allocation for all plan types
+    if (interest > 0) {
+      let label: string;
+      if (plan.planType === 'monthly') label = 'monthly';
+      else if (plan.planType === 'weekly') label = 'weekly';
+      else label = `${plan.intervalDays ?? '?'}-day`;
+
       const initialPayment = new Payment({
         userId,
         loanId: loan._id,
