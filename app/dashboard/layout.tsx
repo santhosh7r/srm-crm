@@ -81,6 +81,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     <div className="min-h-screen bg-background text-foreground flex flex-col">
       {/* ── Navbar ── */}
       <nav
+        style={{ paddingTop: 'env(safe-area-inset-top)' }}
         className={`sticky top-0 z-50 transition-all duration-300 ${scrolled
           ? 'bg-card/90 backdrop-blur-md shadow-sm border-b border-border/60'
           : 'bg-card border-b border-border'
@@ -173,7 +174,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Slide-in panel */}
         <div
-          className={`absolute top-14 left-0 right-0 bottom-0 bg-card flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-y-0' : '-translate-y-4'
+          style={{ top: 'calc(3.5rem + env(safe-area-inset-top))' }}
+          className={`absolute left-0 right-0 bottom-0 bg-card flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-y-0' : '-translate-y-4'
             }`}
         >
           {/* Nav links — takes up main space */}
@@ -234,7 +236,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </main>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-border mt-auto w-full bg-card/30">
+      <footer
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="border-t border-border mt-auto w-full bg-card/30"
+      >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="text-xs text-muted-foreground font-medium text-center md:text-left">
             © {new Date().getFullYear()} RIYA FINANCE LTD. All rights reserved.
