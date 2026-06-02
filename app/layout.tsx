@@ -1,6 +1,7 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Geist, Geist_Mono } from 'next/font/google'
 import { Analytics } from '@vercel/analytics/next'
+import { PWARegister } from '@/components/pwa-register'
 import './globals.css'
 
 const _geist = Geist({ subsets: ["latin"] });
@@ -10,6 +11,16 @@ export const metadata: Metadata = {
   title: 'RIYA FINANCE LTD',
   description: 'RIYA FINANCE LTD - Finance & Loan Management',
   generator: 'v0.app',
+  applicationName: 'RIYA FINANCE LTD',
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    title: 'RIYA FINANCE',
+    statusBarStyle: 'black-translucent',
+  },
+  formatDetection: {
+    telephone: false,
+  },
   icons: {
     icon: [
       {
@@ -25,8 +36,20 @@ export const metadata: Metadata = {
         type: 'image/svg+xml',
       },
     ],
-    apple: '/apple-icon.png',
+    apple: '/apple-touch-icon.png',
   },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#000000' },
+    { media: '(prefers-color-scheme: dark)', color: '#000000' },
+  ],
 }
 
 import { ThemeProvider } from '@/components/theme-provider'
@@ -47,6 +70,7 @@ export default function RootLayout({
         >
           {children}
         </ThemeProvider>
+        <PWARegister />
         <Analytics />
       </body>
     </html>
