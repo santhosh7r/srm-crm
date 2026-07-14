@@ -244,7 +244,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             © {new Date().getFullYear()} RIYA FINANCE LTD. All rights reserved.
           </p>
           <p className="text-xs text-muted-foreground/80 font-medium text-center md:text-right flex items-center justify-center md:justify-end gap-1">
-            Software by <a href="https://webzystudios.com" target="_blank" rel="noopener noreferrer" className="bg-primary/10 text-primary px-2 py-0.5 rounded-md font-bold hover:bg-primary hover:text-primary-foreground transition-all">webzystudios.com</a>
+            Software by <a href="https://webzyinc.com" target="_blank" rel="noopener noreferrer" className="bg-primary/10 text-primary px-2 py-0.5 rounded-md font-bold hover:bg-primary hover:text-primary-foreground transition-all">webzy</a>
           </p>
         </div>
       </footer>
