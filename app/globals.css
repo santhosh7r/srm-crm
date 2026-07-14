@@ -12,7 +12,7 @@
 */
 
 :root {
-  --background: #FFFFFF;
+  --background: #FAF6EB;
   --foreground: #0A0A0A;
   --card: #FFFFFF;
   --card-foreground: #0A0A0A;
@@ -45,7 +45,7 @@
 
   --radius: 0.625rem;
 
-  --sidebar: #FFFFFF;
+  --sidebar: #FAF6EB;
   --sidebar-foreground: #0A0A0A;
   --sidebar-primary: #0A0A0A;
   --sidebar-primary-foreground: #FFFFFF;
