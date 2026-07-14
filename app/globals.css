@@ -4,75 +4,97 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/*
+  RIYA FINANCE palette — monochrome base + a single gold accent family.
+  Light: white base, black primary, gold secondary.
+  Dark:  black base, white primary, gold secondary.
+  `gold-strong` is the mode-flipped, text-legible gold; `gold` is the fill/border gold.
+*/
+
 :root {
-  --background: #FAF6EB;
-  --foreground: #1A1A1A;
+  --background: #FFFFFF;
+  --foreground: #0A0A0A;
   --card: #FFFFFF;
-  --card-foreground: #1A1A1A;
+  --card-foreground: #0A0A0A;
   --popover: #FFFFFF;
-  --popover-foreground: #1A1A1A;
-  --primary: #843131;
+  --popover-foreground: #0A0A0A;
+  --primary: #0A0A0A;
   --primary-foreground: #FFFFFF;
-  --secondary: #F2E9D0;
-  --secondary-foreground: #6B6B6B;
-  --muted: #E8E0C8;
-  --muted-foreground: #6B6B6B;
-  --accent: #843131;
-  --accent-foreground: #FFFFFF;
-  --destructive: #EF4444;
+  --secondary: #C9A227;
+  --secondary-foreground: #0A0A0A;
+  --muted: #F6F5F1;
+  --muted-foreground: #6B6659;
+  --accent: #F9F2DC;
+  --accent-foreground: #0A0A0A;
+  --destructive: #8A5A1E;
   --destructive-foreground: #FFFFFF;
-  --border: #E5DED0;
-  --input: #E5DED0;
-  --ring: #843131;
-  --chart-1: #843131;
-  --chart-2: #6B6B6B;
-  --chart-3: #1A1A1A;
-  --chart-4: #E5DED0;
-  --chart-5: #E8E0C8;
+  --border: #E6E2D6;
+  --input: #E6E2D6;
+  --ring: #C9A227;
+
+  --gold: #C9A227;
+  --gold-foreground: #0A0A0A;
+  --gold-strong: #806413;
+  --gold-soft: #F9F2DC;
+
+  --chart-1: #C9A227;
+  --chart-2: #E0C566;
+  --chart-3: #806413;
+  --chart-4: #0A0A0A;
+  --chart-5: #B9B3A2;
+
   --radius: 0.625rem;
-  --sidebar: #FAF6EB;
-  --sidebar-foreground: #1A1A1A;
-  --sidebar-primary: #843131;
+
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #0A0A0A;
+  --sidebar-primary: #0A0A0A;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #E8E0C8;
-  --sidebar-accent-foreground: #1A1A1A;
-  --sidebar-border: #E5DED0;
-  --sidebar-ring: #843131;
+  --sidebar-accent: #F9F2DC;
+  --sidebar-accent-foreground: #0A0A0A;
+  --sidebar-border: #E6E2D6;
+  --sidebar-ring: #C9A227;
 }
 
 .dark {
   --background: #000000;
   --foreground: #FFFFFF;
-  --card: #111111;
+  --card: #0C0C0C;
   --card-foreground: #FFFFFF;
-  --popover: #111111;
+  --popover: #0C0C0C;
   --popover-foreground: #FFFFFF;
-  --primary: #843131;
-  --primary-foreground: #FFFFFF;
-  --secondary: #1A1A1A;
-  --secondary-foreground: #CFCFCF;
-  --muted: #1A1A1A;
-  --muted-foreground: #8A8A8A;
-  --accent: #843131;
+  --primary: #FFFFFF;
+  --primary-foreground: #000000;
+  --secondary: #D4AF37;
+  --secondary-foreground: #000000;
+  --muted: #161616;
+  --muted-foreground: #A3A097;
+  --accent: #1C1708;
   --accent-foreground: #FFFFFF;
-  --destructive: #EF4444;
-  --destructive-foreground: #FFFFFF;
-  --border: #222222;
-  --input: #222222;
-  --ring: #843131;
-  --chart-1: #843131;
-  --chart-2: #CFCFCF;
-  --chart-3: #FFFFFF;
-  --chart-4: #222222;
-  --chart-5: #1A1A1A;
+  --destructive: #D19A4E;
+  --destructive-foreground: #000000;
+  --border: #262626;
+  --input: #262626;
+  --ring: #D4AF37;
+
+  --gold: #D4AF37;
+  --gold-foreground: #000000;
+  --gold-strong: #E5C76B;
+  --gold-soft: #1C1708;
+
+  --chart-1: #D4AF37;
+  --chart-2: #E5C76B;
+  --chart-3: #A8842A;
+  --chart-4: #FFFFFF;
+  --chart-5: #6E6A5E;
+
   --sidebar: #000000;
   --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #843131;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #1A1A1A;
+  --sidebar-primary: #FFFFFF;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #1C1708;
   --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #222222;
-  --sidebar-ring: #843131;
+  --sidebar-border: #262626;
+  --sidebar-ring: #D4AF37;
 }
 
 @theme inline {
@@ -97,6 +119,10 @@
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-gold: var(--gold);
+  --color-gold-foreground: var(--gold-foreground);
+  --color-gold-strong: var(--gold-strong);
+  --color-gold-soft: var(--gold-soft);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
   --color-chart-3: var(--chart-3);
@@ -122,5 +148,25 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+@layer components {
+  /*
+    Status treatments. Colour alone no longer separates them (the palette has no
+    red/green), so each state also differs in fill weight: gold for positive,
+    plain muted for neutral/pending, solid inverted for urgent/overdue.
+  */
+  .status-positive {
+    @apply bg-gold/12 text-gold-strong border-gold/35;
+  }
+  .status-neutral {
+    @apply bg-muted text-muted-foreground border-border;
+  }
+  .status-negative {
+    @apply bg-destructive/12 text-destructive border-destructive/35;
+  }
+  .status-urgent {
+    @apply bg-foreground text-background border-foreground;
   }
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, Loader2, ArrowRight } from 'lucide-react';
+import { LogoLockup } from '@/components/Logo';
 
 const currentYear = new Date().getFullYear();
 
@@ -34,7 +35,7 @@ export default function LoginPage() {
   if (isChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        <Loader2 className="w-8 h-8 animate-spin text-gold" />
       </div>
     );
   }
@@ -66,11 +67,11 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground relative overflow-hidden selection:bg-primary/20 selection:text-primary">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-background text-foreground relative overflow-hidden selection:bg-gold/25 selection:text-gold-strong">
       {/* Decorative background elements */}
       <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="absolute bottom-[0%] right-[0%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[100px]" />
+        <div className="absolute -top-[20%] -left-[10%] w-[50%] h-[50%] rounded-full bg-gold/15 blur-[120px]" />
+        <div className="absolute bottom-[0%] right-[0%] w-[40%] h-[40%] rounded-full bg-gold/15 blur-[100px]" />
       </div>
 
       <motion.div
@@ -80,13 +81,13 @@ export default function LoginPage() {
         className="w-full max-w-md px-6 relative z-10"
       >
         <div className="mb-10 text-center">
-          <motion.div 
+          <motion.div
             initial={{ scale: 0.8, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.5 }}
-            className="w-12 h-12 bg-primary mx-auto rounded-2xl flex items-center justify-center shadow-lg shadow-primary/20 mb-6"
+            className="flex items-center justify-center mb-6"
           >
-            <span className="text-white text-xl font-bold tracking-tighter">RI</span>
+            <LogoLockup width={104} priority />
           </motion.div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">Welcome Back</h1>
           <p className="text-muted-foreground text-sm font-medium">Please enter your details to sign in.</p>
@@ -140,16 +141,16 @@ export default function LoginPage() {
               <motion.div 
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
-                className="p-3 bg-red-50 border border-red-100 rounded-xl"
+                className="p-3 bg-destructive/10 border border-destructive/20 rounded-xl"
               >
-                <p className="text-sm font-medium text-red-600 text-center">{error}</p>
+                <p className="text-sm font-medium text-destructive text-center">{error}</p>
               </motion.div>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="group relative w-full h-12 flex items-center justify-center gap-2 bg-primary text-white rounded-xl font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 disabled:opacity-70 disabled:cursor-not-allowed"
+              className="group relative w-full h-12 flex items-center justify-center gap-2 bg-primary text-primary-foreground rounded-xl font-medium overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-gold/25 disabled:opacity-70 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -157,7 +158,7 @@ export default function LoginPage() {
                 <>
                   <span className="relative z-10">Sign In</span>
                   <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
-                  <div className="absolute inset-0 bg-black/10 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
+                  <div className="absolute inset-0 bg-gold/25 translate-y-[100%] group-hover:translate-y-0 transition-transform duration-300 ease-in-out" />
                 </>
               )}
             </button>

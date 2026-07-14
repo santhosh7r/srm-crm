@@ -101,7 +101,7 @@ export default function ProfilePage() {
       <form onSubmit={handleUpdate} className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-card">
-            <CardHeader className="border-b border-slate-50 pb-4">
+            <CardHeader className="border-b border-background pb-4">
               <div className="flex items-center gap-2 text-foreground">
                 <User size={18} className="text-muted-foreground" />
                 <CardTitle className="text-lg">Account Info</CardTitle>
@@ -116,7 +116,7 @@ export default function ProfilePage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     required
-                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-foreground transition-all pl-10"
                   />
                   <User className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 </div>
@@ -129,7 +129,7 @@ export default function ProfilePage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
-                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-foreground transition-all pl-10"
                   />
                   <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 </div>
@@ -138,7 +138,7 @@ export default function ProfilePage() {
           </Card>
 
           <Card className="border-none shadow-sm rounded-2xl overflow-hidden bg-card">
-            <CardHeader className="border-b border-slate-50 pb-4">
+            <CardHeader className="border-b border-background pb-4">
               <div className="flex items-center gap-2 text-foreground">
                 <ShieldCheck size={18} className="text-muted-foreground" />
                 <CardTitle className="text-lg">Security</CardTitle>
@@ -154,7 +154,7 @@ export default function ProfilePage() {
                     value={currentPassword}
                     onChange={(e) => setCurrentPassword(e.target.value)}
                     placeholder="Verify it's you"
-                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 pr-10 hover:bg-card"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-foreground transition-all pl-10 pr-10 hover:bg-card"
                   />
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                   <button
@@ -175,7 +175,7 @@ export default function ProfilePage() {
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     placeholder="Min. 6 characters"
-                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 pr-10 hover:bg-card"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-foreground transition-all pl-10 pr-10 hover:bg-card"
                   />
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                   <button
@@ -196,7 +196,7 @@ export default function ProfilePage() {
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     placeholder="Repeat new password"
-                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-slate-900 transition-all pl-10 hover:bg-card"
+                    className="h-11 bg-background border-border rounded-xl focus:ring-0 focus:border-foreground transition-all pl-10 hover:bg-card"
                   />
                   <Lock className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground" size={16} />
                 </div>
@@ -212,7 +212,7 @@ export default function ProfilePage() {
           <Button
             type="submit"
             disabled={isSaving}
-            className="h-11 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-lg shadow-slate-900/10 transition-all active:scale-[0.98]"
+            className="h-11 px-8 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl shadow-lg shadow-foreground/10 transition-all active:scale-[0.98]"
           >
             {isSaving ? (
               <>

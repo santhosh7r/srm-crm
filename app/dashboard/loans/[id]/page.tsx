@@ -162,9 +162,9 @@ export default function LoanDetailPage() {
       : 'Monthly';
 
   const statusStyle = {
-    active: 'bg-green-100 text-green-700',
+    active: 'bg-gold/15 text-gold-strong',
     completed: 'bg-muted text-secondary-foreground',
-    overdue: 'bg-red-100 text-red-700',
+    overdue: 'bg-destructive/15 text-destructive',
   }[loan.status];
 
   const filteredPayments =
@@ -199,9 +199,9 @@ export default function LoanDetailPage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {[
           { label: 'Disbursed', value: fmt(loan.disposeAmount), color: 'text-foreground' },
-          { label: 'Total Given', value: fmt(totalGiven), color: 'text-green-700' },
-          { label: 'Interest Paid', value: fmt(totalInterest), color: 'text-blue-700' },
-          { label: 'Balance', value: fmt(loan.balance), color: loan.balance === 0 ? 'text-green-600' : 'text-red-600' },
+          { label: 'Total Given', value: fmt(totalGiven), color: 'text-gold-strong' },
+          { label: 'Interest Paid', value: fmt(totalInterest), color: 'text-foreground' },
+          { label: 'Balance', value: fmt(loan.balance), color: loan.balance === 0 ? 'text-gold-strong' : 'text-destructive' },
         ].map(s => (
           <Card key={s.label} className="p-3.5">
             <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">{s.label}</p>
@@ -218,12 +218,12 @@ export default function LoanDetailPage() {
         </div>
         <div className="w-full bg-muted rounded-full h-2.5">
           <div
-            className={`h-2.5 rounded-full transition-all duration-500 ${loan.balance === 0 ? 'bg-green-500' : 'bg-slate-800'}`}
+            className={`h-2.5 rounded-full transition-all duration-500 ${loan.balance === 0 ? 'bg-gold' : 'bg-muted'}`}
             style={{ width: `${progress}%` }}
           />
         </div>
         {loan.balance === 0 && (
-          <p className="text-xs text-green-600 font-medium mt-1.5">Fully paid — loan completed</p>
+          <p className="text-xs text-gold-strong font-medium mt-1.5">Fully paid — loan completed</p>
         )}
       </Card>
 
@@ -275,7 +275,7 @@ export default function LoanDetailPage() {
             <select
               value={paymentType}
               onChange={e => { setPaymentType(e.target.value as 'given' | 'interest'); setAmount(''); setError(''); }}
-              className="w-full border border-border rounded-lg px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-transparent"
+              className="w-full border border-border rounded-lg px-3 py-2.5 text-sm text-foreground bg-card focus:outline-none focus:ring-2 focus:ring-foreground focus:border-transparent"
             >
               <option value="given">Given Amount — reduces balance</option>
               <option value="interest">Interest Payment — no balance change</option>
@@ -313,7 +313,7 @@ export default function LoanDetailPage() {
               />
             </div>
             {error && (
-              <div className="bg-red-50 border border-red-100 text-red-700 p-3 rounded-lg text-sm">{error}</div>
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive p-3 rounded-lg text-sm">{error}</div>
             )}
             <Button
               type="submit" disabled={isSubmitting}
@@ -350,7 +350,7 @@ export default function LoanDetailPage() {
             {filteredPayments.map(p => (
               <div
                 key={p._id}
-                className={`flex items-center justify-between p-3 rounded-lg border text-sm ${p.type === 'interest' ? 'bg-blue-50 border-blue-100' : 'bg-background border-border/50'
+                className={`flex items-center justify-between p-3 rounded-lg border text-sm ${p.type === 'interest' ? 'bg-muted border-border' : 'bg-background border-border/50'
                   }`}
               >
                 <div>
@@ -368,7 +368,7 @@ export default function LoanDetailPage() {
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="text-red-600 hover:bg-red-50"
+                    className="text-destructive hover:bg-destructive/10"
                     onClick={() => setDeletePayment(p)}
                     aria-label="Delete payment"
                   >
@@ -394,7 +394,7 @@ export default function LoanDetailPage() {
             </AlertDialogDescription>
             <div className="flex justify-end gap-2 mt-4">
               <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeletePayment} className="bg-red-600 hover:bg-red-700">
+              <AlertDialogAction onClick={handleDeletePayment} className="bg-destructive hover:bg-destructive/90">
                 Delete
               </AlertDialogAction>
             </div>
@@ -410,15 +410,15 @@ export default function LoanDetailPage() {
             </div>
             <div>
               <p className="text-muted-foreground uppercase font-semibold mb-1 text-primary">Initial Int.</p>
-              <p className="font-bold text-amber-700 text-sm">{fmt(totalInitial)}</p>
+              <p className="font-bold text-gold-strong text-sm">{fmt(totalInitial)}</p>
             </div>
             <div>
               <p className="text-muted-foreground uppercase font-semibold mb-1 text-primary">Coll. Interest</p>
-              <p className="font-bold text-blue-800 text-sm">{fmt(totalCollected)}</p>
+              <p className="font-bold text-foreground text-sm">{fmt(totalCollected)}</p>
             </div>
             <div>
               <p className="text-muted-foreground uppercase font-semibold mb-1">Balance</p>
-              <p className={`font-bold text-sm ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>{fmt(loan.balance)}</p>
+              <p className={`font-bold text-sm ${loan.balance === 0 ? 'text-gold-strong' : 'text-destructive'}`}>{fmt(loan.balance)}</p>
             </div>
           </div>
         )}

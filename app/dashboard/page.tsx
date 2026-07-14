@@ -530,9 +530,9 @@ export default function DashboardPage() {
 
           {(stats.overdueLoans > 0) && (
             <a href="/dashboard/loans" className="group">
-              <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer ring-1 ring-rose-100">
+              <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer ring-1 ring-destructive/20">
                 <div className="flex items-center gap-3">
-                  <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-rose-600 group-hover:text-primary-foreground transition-colors animate-pulse">
+                  <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-destructive group-hover:text-primary-foreground transition-colors animate-pulse">
                     <AlertCircle className="w-4 h-4" />
                   </div>
                   <span className="font-semibold text-foreground">Overdue Alerts ({stats.overdueLoans})</span>
@@ -545,7 +545,7 @@ export default function DashboardPage() {
           <a href="/dashboard/dues" className="group">
             <Card className="p-4 border-border hover:border-primary/50 hover:bg-muted transition-all flex items-center justify-between shadow-sm cursor-pointer">
               <div className="flex items-center gap-3">
-                <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-amber-600 group-hover:text-primary-foreground transition-colors">
+                <div className="p-2 bg-muted text-primary rounded-lg group-hover:bg-gold group-hover:text-primary-foreground transition-colors">
                   <AlertCircle className="w-4 h-4" />
                 </div>
                 <span className="font-semibold text-foreground">All Pending Dues</span>
@@ -563,7 +563,7 @@ export default function DashboardPage() {
             <h3 className="text-xl font-bold mb-1 text-foreground">Add Payment</h3>
             <p className="text-muted-foreground text-sm mb-5">Recording collection for <span className="font-semibold text-foreground">{paymentLoan.clientId?.name}</span></p>
 
-            {submitError && <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-5 font-medium border border-red-100">{submitError}</div>}
+            {submitError && <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm mb-5 font-medium border border-destructive/20">{submitError}</div>}
 
             <div className="space-y-4 mb-6">
               <div>

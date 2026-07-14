@@ -90,7 +90,7 @@ export default function ClientsPage() {
           placeholder="Search clients by name, phone, or email..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full md:w-1/3 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500"
+          className="w-full md:w-1/3 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-foreground"
         />
       </div>
 
@@ -124,7 +124,7 @@ export default function ClientsPage() {
                   <p className="text-sm text-secondary-foreground">{client.email}</p>
                   <div className="flex gap-4 mt-2 text-sm text-secondary-foreground">
                     <span>{client.phone}</span>
-                    <span className={client.status === 'active' ? "text-green-600 font-medium" : "text-secondary-foreground font-medium"}>
+                    <span className={client.status === 'active' ? "text-gold-strong font-medium" : "text-secondary-foreground font-medium"}>
                       {client.status.charAt(0).toUpperCase() + client.status.slice(1)}
                     </span>
                   </div>
@@ -142,7 +142,7 @@ export default function ClientsPage() {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="border-red-200 text-red-600 hover:bg-red-50"
+                    className="border-destructive/30 text-destructive hover:bg-destructive/10"
                     onClick={() => setDeleteId(client._id)}
                   >
                     Delete
@@ -164,7 +164,7 @@ export default function ClientsPage() {
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleDelete}
-              className="bg-red-600 hover:bg-red-700"
+              className="bg-destructive hover:bg-destructive/90"
             >
               Delete
             </AlertDialogAction>

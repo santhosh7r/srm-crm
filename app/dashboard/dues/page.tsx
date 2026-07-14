@@ -81,8 +81,8 @@ export default function DuesPage() {
         return (
             <div className="w-full min-h-[500px] flex items-center justify-center">
                 <div className="text-center">
-                    <AlertCircle className="w-10 h-10 text-red-500 mx-auto mb-3" />
-                    <p className="text-red-600 font-medium mb-4">{error}</p>
+                    <AlertCircle className="w-10 h-10 text-destructive mx-auto mb-3" />
+                    <p className="text-destructive font-medium mb-4">{error}</p>
                     <Button onClick={() => window.location.reload()}>Retry</Button>
                 </div>
             </div>
@@ -113,10 +113,10 @@ export default function DuesPage() {
                 <motion.div
                     initial={{ opacity: 0, y: -8 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-red-50 border border-red-200 dark:bg-red-950/30 dark:border-red-800/50"
+                    className="mb-6 flex items-center gap-3 p-4 rounded-xl bg-destructive/10 border border-destructive/30 dark:bg-destructive/15 dark:border-destructive/30"
                 >
-                    <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
-                    <p className="text-sm font-semibold text-red-700 dark:text-red-400">
+                    <AlertTriangle className="w-5 h-5 text-destructive shrink-0" />
+                    <p className="text-sm font-semibold text-destructive dark:text-destructive">
                         {overdueWeekly.length} weekly loan{overdueWeekly.length > 1 ? 's' : ''} past duration — collect immediately
                     </p>
                 </motion.div>
@@ -139,7 +139,7 @@ export default function DuesPage() {
                             {weeklyPending.length}<span className="text-sm font-medium text-muted-foreground ml-1">clients</span>
                         </p>
                         {overdueWeekly.length > 0 && (
-                            <p className="text-xs font-bold text-red-600 mt-0.5">{overdueWeekly.length} past duration</p>
+                            <p className="text-xs font-bold text-destructive mt-0.5">{overdueWeekly.length} past duration</p>
                         )}
                     </div>
                 </Card>
@@ -194,7 +194,7 @@ export default function DuesPage() {
                         </div>
                         <div className="flex items-center gap-2">
                             {overdueWeekly.length > 0 && (
-                                <span className="bg-red-100 text-red-600 border border-red-200 px-2.5 py-1 rounded-full text-xs font-bold">
+                                <span className="bg-destructive/15 text-destructive border border-destructive/30 px-2.5 py-1 rounded-full text-xs font-bold">
                                     {overdueWeekly.length} overdue
                                 </span>
                             )}
@@ -216,7 +216,7 @@ export default function DuesPage() {
                                     transition={{ delay: i * 0.04 }}
                                     className={`flex flex-col gap-3 p-4 rounded-xl border transition-all hover:shadow-sm
                                         ${p.isPastDuration
-                                            ? 'bg-red-50/60 border-red-300 dark:bg-red-950/25 dark:border-red-800/50'
+                                            ? 'bg-destructive/10 border-destructive/40 dark:bg-destructive/15 dark:border-destructive/30'
                                             : 'bg-card border-border/60 hover:border-primary/35'
                                         }`}
                                 >
@@ -228,12 +228,12 @@ export default function DuesPage() {
                                                     Weekly
                                                 </span>
                                                 {p.isPastDuration && (
-                                                    <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-red-100 text-red-700 border border-red-300 shrink-0 flex items-center gap-1">
+                                                    <span className="text-[10px] uppercase font-bold px-1.5 py-0.5 rounded bg-destructive/15 text-destructive border border-destructive/40 shrink-0 flex items-center gap-1">
                                                         <AlertTriangle className="w-2.5 h-2.5" /> Past Duration
                                                     </span>
                                                 )}
                                                 {p.unpaidWeeks > 1 && (
-                                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 border border-orange-200 shrink-0">
+                                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-muted text-foreground border border-border shrink-0">
                                                         {p.unpaidWeeks} weeks unpaid
                                                     </span>
                                                 )}
@@ -256,7 +256,7 @@ export default function DuesPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <p className={`text-base font-bold whitespace-nowrap shrink-0 ${p.isPastDuration ? 'text-red-700' : 'text-red-600'}`}>
+                                        <p className={`text-base font-bold whitespace-nowrap shrink-0 ${p.isPastDuration ? 'text-destructive' : 'text-destructive'}`}>
                                             {fmt(p.dueAmount)}
                                         </p>
                                     </div>
@@ -266,7 +266,7 @@ export default function DuesPage() {
                                         </Link>
                                         <Button
                                             size="sm"
-                                            className={`h-8 text-xs px-4 ${p.isPastDuration ? 'bg-red-600 hover:bg-red-700' : 'bg-primary hover:bg-primary/90'} text-white`}
+                                            className={`h-8 text-xs px-4 ${p.isPastDuration ? 'bg-destructive hover:bg-destructive/90 text-destructive-foreground' : 'bg-primary hover:bg-primary/90 text-primary-foreground'}`}
                                             onClick={() => {
                                                 setPaymentLoan(p);
                                                 setPaymentAmount(Math.round(p.dueAmount).toString());
@@ -306,7 +306,7 @@ export default function DuesPage() {
                                     transition={{ delay: i * 0.04 }}
                                     className={`flex flex-col gap-3 p-4 rounded-xl border transition-all hover:shadow-sm
                                         ${p.unpaidMonths > 1
-                                            ? 'bg-orange-50/40 border-orange-200/70 dark:bg-orange-950/20 dark:border-orange-800/40'
+                                            ? 'bg-muted/60 border-border dark:bg-muted dark:border-border'
                                             : 'bg-card border-border/60 hover:border-primary/35'
                                         }`}
                                 >
@@ -318,7 +318,7 @@ export default function DuesPage() {
                                                     Monthly
                                                 </span>
                                                 {p.unpaidMonths > 1 && (
-                                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 border border-orange-200 shrink-0">
+                                                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-muted text-foreground border border-border shrink-0">
                                                         {p.unpaidMonths} months pending
                                                     </span>
                                                 )}
@@ -346,7 +346,7 @@ export default function DuesPage() {
                                                 </span>
                                             </div>
                                         </div>
-                                        <p className="text-base font-bold text-red-600 whitespace-nowrap shrink-0">
+                                        <p className="text-base font-bold text-destructive whitespace-nowrap shrink-0">
                                             {p.hasInterest ? fmt(p.dueAmount) : fmt(p.outstandingBalance)}
                                         </p>
                                     </div>
@@ -403,7 +403,7 @@ export default function DuesPage() {
                                         transition={{ delay: i * 0.04 }}
                                         className={`flex flex-col gap-3 p-4 rounded-xl border transition-all hover:shadow-sm
                                             ${(p.unpaidCycles ?? 0) > 1
-                                                ? 'bg-orange-50/40 border-orange-200/70 dark:bg-orange-950/20 dark:border-orange-800/40'
+                                                ? 'bg-muted/60 border-border dark:bg-muted dark:border-border'
                                                 : 'bg-card border-border/60 hover:border-primary/35'
                                             }`}
                                     >
@@ -415,7 +415,7 @@ export default function DuesPage() {
                                                         Every {cycleLabel}
                                                     </span>
                                                     {(p.unpaidCycles ?? 0) > 1 && (
-                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-orange-100 text-orange-700 border border-orange-200 shrink-0">
+                                                        <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-muted text-foreground border border-border shrink-0">
                                                             {p.unpaidCycles} cycles pending
                                                         </span>
                                                     )}
@@ -443,7 +443,7 @@ export default function DuesPage() {
                                                     </span>
                                                 </div>
                                             </div>
-                                            <p className="text-base font-bold text-red-600 whitespace-nowrap shrink-0">
+                                            <p className="text-base font-bold text-destructive whitespace-nowrap shrink-0">
                                                 {p.hasInterest ? fmt(p.dueAmount) : fmt(p.outstandingBalance)}
                                             </p>
                                         </div>
@@ -485,7 +485,7 @@ export default function DuesPage() {
                         </p>
 
                         {submitError && (
-                            <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm mb-4 border border-red-100">{submitError}</div>
+                            <div className="p-3 bg-destructive/10 text-destructive rounded-lg text-sm mb-4 border border-destructive/20">{submitError}</div>
                         )}
 
                         <div className="space-y-4 mb-6">

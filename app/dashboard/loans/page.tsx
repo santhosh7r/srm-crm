@@ -60,9 +60,9 @@ export default function LoansPage() {
   };
 
   const statusStyle = (status: string) => ({
-    active: 'bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/30 dark:text-blue-300 dark:border-blue-800/50',
-    completed: 'bg-green-50 text-green-700 border border-green-200 dark:bg-green-950/30 dark:text-green-300 dark:border-green-800/50',
-    overdue: 'bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/30 dark:text-red-300 dark:border-red-800/50',
+    active: 'bg-muted text-foreground border border-border dark:bg-muted dark:text-foreground dark:border-border',
+    completed: 'bg-gold/10 text-gold-strong border border-gold/30 dark:bg-gold/15 dark:text-gold-strong dark:border-gold/30',
+    overdue: 'bg-destructive/10 text-destructive border border-destructive/30 dark:bg-destructive/15 dark:text-destructive dark:border-destructive/30',
   }[status] || 'bg-muted text-foreground');
 
   const fmtDate = (d: string) =>
@@ -98,7 +98,7 @@ export default function LoansPage() {
             return (
               <Card
                 key={loan._id}
-                className={`p-5 hover:shadow-md transition-shadow border ${isOverdue ? 'border-red-200 dark:border-red-800/50' : 'border-border'}`}
+                className={`p-5 hover:shadow-md transition-shadow border ${isOverdue ? 'border-destructive/30 dark:border-destructive/30' : 'border-border'}`}
               >
                 <div className="flex items-start justify-between gap-4">
                   {/* Left */}
@@ -136,7 +136,7 @@ export default function LoansPage() {
                       {loan.planId?.planType === 'weekly' && loan.endDate && (
                         <div className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold border
                           ${new Date(loan.endDate) < new Date()
-                            ? 'bg-red-50 border-red-200 text-red-700 dark:bg-red-950/30 dark:border-red-800/50 dark:text-red-400'
+                            ? 'bg-destructive/10 border-destructive/30 text-destructive dark:bg-destructive/15 dark:border-destructive/30 dark:text-destructive'
                             : 'bg-muted border-border text-muted-foreground'
                           }`}
                         >
@@ -168,11 +168,11 @@ export default function LoansPage() {
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Paid</p>
-                        <p className="font-semibold text-green-700 dark:text-green-400">₹{(loan.totalPaid ?? 0).toLocaleString('en-IN')}</p>
+                        <p className="font-semibold text-gold-strong dark:text-gold-strong">₹{(loan.totalPaid ?? 0).toLocaleString('en-IN')}</p>
                       </div>
                       <div>
                         <p className="text-xs text-muted-foreground">Balance</p>
-                        <p className={`font-bold ${loan.balance === 0 ? 'text-green-600' : 'text-red-600'}`}>
+                        <p className={`font-bold ${loan.balance === 0 ? 'text-gold-strong' : 'text-destructive'}`}>
                           ₹{(loan.balance ?? 0).toLocaleString('en-IN')}
                         </p>
                       </div>
@@ -181,7 +181,7 @@ export default function LoansPage() {
                     {/* Progress bar */}
                     <div className="w-full bg-muted rounded-full h-1.5 max-w-sm">
                       <div
-                        className={`h-1.5 rounded-full transition-all ${progress === 100 ? 'bg-green-500' : 'bg-primary'}`}
+                        className={`h-1.5 rounded-full transition-all ${progress === 100 ? 'bg-gold' : 'bg-primary'}`}
                         style={{ width: `${progress}%` }}
                       />
                     </div>
@@ -198,7 +198,7 @@ export default function LoansPage() {
                     <Button
                       variant="outline"
                       size="sm"
-                      className="border-red-200 text-red-600 hover:bg-red-50 w-20"
+                      className="border-destructive/30 text-destructive hover:bg-destructive/10 w-20"
                       onClick={() => setDeleteId(loan._id)}
                     >
                       Delete
@@ -219,7 +219,7 @@ export default function LoansPage() {
           </AlertDialogDescription>
           <div className="flex gap-3 justify-end">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </div>

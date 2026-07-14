@@ -38,9 +38,9 @@ interface Loan {
 
 function statusBadge(status: string) {
   const map: Record<string, string> = {
-    active: 'bg-green-100 text-green-700 border border-green-200',
+    active: 'bg-gold/15 text-gold-strong border border-gold/30',
     completed: 'bg-muted text-secondary-foreground border border-border',
-    overdue: 'bg-red-100 text-red-700 border border-red-200',
+    overdue: 'bg-destructive/15 text-destructive border border-destructive/30',
   };
   return `px-2 py-0.5 rounded text-xs font-semibold ${map[status] || 'bg-muted text-secondary-foreground'}`;
 }
@@ -129,12 +129,12 @@ export default function ClientDetailPage() {
             </div>
             <div className="flex gap-4 text-xs text-muted-foreground mb-2">
               <span>Disbursed: <span className="font-medium text-foreground">₹{(loan.disposeAmount ?? 0).toFixed(2)}</span></span>
-              <span>Paid: <span className="font-medium text-green-700">₹{(loan.totalPaid ?? 0).toFixed(2)}</span></span>
-              <span>Balance: <span className="font-medium text-red-600">₹{(loan.balance ?? 0).toFixed(2)}</span></span>
+              <span>Paid: <span className="font-medium text-gold-strong">₹{(loan.totalPaid ?? 0).toFixed(2)}</span></span>
+              <span>Balance: <span className="font-medium text-destructive">₹{(loan.balance ?? 0).toFixed(2)}</span></span>
             </div>
             <div className="w-full bg-muted rounded-full h-1.5 max-w-sm">
               <div
-                className="bg-green-500 h-1.5 rounded-full"
+                className="bg-gold h-1.5 rounded-full"
                 style={{ width: `${progress}%` }}
               />
             </div>
@@ -221,7 +221,7 @@ export default function ClientDetailPage() {
           <Card className="p-6">
             <div className="flex items-center gap-2 mb-4">
               <h3 className="font-semibold text-foreground">Active Loans</h3>
-              <span className="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full font-medium">
+              <span className="text-xs bg-gold/15 text-gold-strong px-2 py-0.5 rounded-full font-medium">
                 {activeLoans.length}
               </span>
             </div>
@@ -268,7 +268,7 @@ export default function ClientDetailPage() {
               </div>
               <div className="flex justify-between">
                 <span className="text-secondary-foreground">Active</span>
-                <span className="font-semibold text-green-700">{activeLoans.length}</span>
+                <span className="font-semibold text-gold-strong">{activeLoans.length}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-secondary-foreground">Completed</span>
@@ -277,13 +277,13 @@ export default function ClientDetailPage() {
               <div className="border-t border-border/50 pt-3 mt-2 space-y-2">
                 <div className="flex justify-between">
                   <span className="text-secondary-foreground">Total Paid</span>
-                  <span className="font-semibold text-green-700">
+                  <span className="font-semibold text-gold-strong">
                     ₹{loans.reduce((s, l) => s + (l.totalPaid ?? 0), 0).toFixed(2)}
                   </span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-secondary-foreground">Total Balance</span>
-                  <span className="font-semibold text-red-600">
+                  <span className="font-semibold text-destructive">
                     ₹{loans.reduce((s, l) => s + (l.balance ?? 0), 0).toFixed(2)}
                   </span>
                 </div>

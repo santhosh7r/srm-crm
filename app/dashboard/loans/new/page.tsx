@@ -256,7 +256,7 @@ export default function NewLoanPage() {
               )}
 
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 p-3 rounded-md text-sm">{error}</div>
+                <div className="bg-destructive/10 border border-destructive/30 text-destructive p-3 rounded-md text-sm">{error}</div>
               )}
 
               <Button
@@ -282,8 +282,8 @@ export default function NewLoanPage() {
               <div>
                 <p className="text-xs text-muted-foreground uppercase tracking-wide">Type</p>
                 <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold mt-1 ${
-                  selectedPlan.planType === 'weekly' ? 'bg-muted text-blue-700' :
-                  selectedPlan.planType === 'days' ? 'bg-muted text-purple-700' :
+                  selectedPlan.planType === 'weekly' ? 'bg-muted text-foreground' :
+                  selectedPlan.planType === 'days' ? 'bg-muted text-muted-foreground' :
                   'bg-muted text-secondary-foreground'
                 }`}>
                   {selectedPlan.planType === 'weekly' ? '📆 Weekly' :

@@ -124,9 +124,9 @@ export default function LoanDetailView({ loanId, onClose }: Props) {
     const progress = Math.min(100, (loan.totalPaid / totalRepay) * 100);
 
     const statusColor = {
-        active: 'bg-green-100 text-green-700',
+        active: 'bg-gold/15 text-gold-strong',
         completed: 'bg-muted text-secondary-foreground',
-        overdue: 'bg-red-100 text-red-700',
+        overdue: 'bg-destructive/15 text-destructive',
     }[loan.status];
 
     return (
@@ -168,11 +168,11 @@ export default function LoanDetailView({ loanId, onClose }: Props) {
                     </div>
                     <div>
                         <p className="text-xs text-muted-foreground uppercase tracking-wide">Total Paid</p>
-                        <p className="text-xl font-bold text-green-700">₹{loan.totalPaid.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-gold-strong">₹{loan.totalPaid.toFixed(2)}</p>
                     </div>
                     <div>
                         <p className="text-xs text-muted-foreground uppercase tracking-wide">Balance</p>
-                        <p className="text-xl font-bold text-red-600">₹{loan.balance.toFixed(2)}</p>
+                        <p className="text-xl font-bold text-destructive">₹{loan.balance.toFixed(2)}</p>
                     </div>
                 </div>
 
@@ -184,7 +184,7 @@ export default function LoanDetailView({ loanId, onClose }: Props) {
                     </div>
                     <div className="w-full bg-muted rounded-full h-2">
                         <div
-                            className="bg-green-500 h-2 rounded-full transition-all"
+                            className="bg-gold h-2 rounded-full transition-all"
                             style={{ width: `${progress}%` }}
                         />
                     </div>
@@ -231,7 +231,7 @@ export default function LoanDetailView({ loanId, onClose }: Props) {
                                 />
                             </div>
                             {error && (
-                                <div className="bg-red-50 text-red-700 p-2 rounded text-xs">{error}</div>
+                                <div className="bg-destructive/10 text-destructive p-2 rounded text-xs">{error}</div>
                             )}
                             <Button
                                 type="submit"

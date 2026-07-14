@@ -265,7 +265,7 @@ export default function PlansPage() {
               />
             </div>
 
-            {error && <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm">{error}</div>}
+            {error && <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">{error}</div>}
 
             <div className="flex gap-3">
               <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
@@ -299,8 +299,8 @@ export default function PlansPage() {
                   <p className="text-sm text-muted-foreground mt-0.5">{plan.description}</p>
                 </div>
                 <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                  plan.planType === 'weekly' ? 'bg-muted text-blue-700' :
-                  plan.planType === 'days' ? 'bg-muted text-purple-700' :
+                  plan.planType === 'weekly' ? 'bg-muted text-foreground' :
+                  plan.planType === 'days' ? 'bg-muted text-muted-foreground' :
                   'bg-muted text-secondary-foreground'
                 }`}>
                   {planLabel(plan)}
@@ -336,7 +336,7 @@ export default function PlansPage() {
                   onClick={() => setDeleteId(plan._id)}
                   variant="outline"
                   size="sm"
-                  className="border-red-200 text-red-600 hover:bg-red-50"
+                  className="border-destructive/30 text-destructive hover:bg-destructive/10"
                 >
                   Delete
                 </Button>
@@ -354,7 +354,7 @@ export default function PlansPage() {
           </AlertDialogDescription>
           <div className="flex gap-3 justify-end">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-red-600 hover:bg-red-700">
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90">
               Delete
             </AlertDialogAction>
           </div>

@@ -123,7 +123,7 @@ export default function AccountsPage() {
 
             <Card className="p-4 hover:shadow-md transition-shadow">
               <p className="text-xs text-muted-foreground font-semibold mb-2 uppercase">Collection Amount</p>
-              <p className="text-2xl font-bold text-green-600">{fmt(data.totalGiven)}</p>
+              <p className="text-2xl font-bold text-gold-strong">{fmt(data.totalGiven)}</p>
               <p className="text-xs text-muted-foreground mt-2">Principal collected back</p>
             </Card>
 
@@ -132,27 +132,27 @@ export default function AccountsPage() {
           {/* Key Metrics - Available Balance & Account Balance */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Available Balance */}
-            <Card className="p-6 bg-linear-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200/50 dark:border-green-800/30">
+            <Card className="p-6 bg-linear-to-br from-gold/12 to-gold/5 dark:from-gold/12 dark:to-gold/5 border-gold/30 dark:border-gold/25">
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <p className="text-sm font-bold text-green-700 dark:text-green-300 mb-1">TOTAL AVAILABLE BALANCE</p>
-                  <p className="text-xs text-green-600 dark:text-green-400">Investment − Disposed + Collected</p>
+                  <p className="text-sm font-bold text-gold-strong dark:text-gold-strong mb-1">TOTAL AVAILABLE BALANCE</p>
+                  <p className="text-xs text-gold-strong dark:text-gold-strong">Investment − Disposed + Collected</p>
                 </div>
-                <TrendingUp className="w-5 h-5 text-green-600" />
+                <TrendingUp className="w-5 h-5 text-gold-strong" />
               </div>
-              <p className="text-4xl font-bold text-green-700 dark:text-green-300 mb-4">{fmtAbs(availableBalance)}</p>
-              <div className="bg-white dark:bg-black/30 rounded-lg p-3 text-xs space-y-2 border border-green-200/30 dark:border-green-800/30">
+              <p className="text-4xl font-bold text-gold-strong dark:text-gold-strong mb-4">{fmtAbs(availableBalance)}</p>
+              <div className="bg-card dark:bg-black/30 rounded-lg p-3 text-xs space-y-2 border border-gold/25">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Investment:</span>
                   <span className="font-semibold text-foreground">{fmt(investmentAmount)}</span>
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Disposed:</span>
-                  <span className="font-semibold text-orange-600">{fmt(data.totalDisposed)}</span>
+                  <span className="font-semibold text-destructive">{fmt(data.totalDisposed)}</span>
                 </div>
                 <div className="border-t border-border/50 pt-2 flex justify-between">
                   <span className="text-muted-foreground">Collected:</span>
-                  <span className="font-semibold text-green-600">{fmt(data.totalGiven)}</span>
+                  <span className="font-semibold text-gold-strong">{fmt(data.totalGiven)}</span>
                 </div>
               </div>
             </Card>
@@ -168,10 +168,10 @@ export default function AccountsPage() {
                   <IndianRupee className="w-5 h-5 text-primary" />
                 </div>
               </div>
-              <p className={`text-4xl font-bold mb-4 ${availableBalance >= 0 ? 'text-primary' : 'text-red-600'}`}>
+              <p className={`text-4xl font-bold mb-4 ${availableBalance >= 0 ? 'text-primary' : 'text-destructive'}`}>
                 {fmtAbs(availableBalance)}
               </p>
-              <div className="bg-white dark:bg-black/30 rounded-lg p-3 text-xs text-muted-foreground border border-primary/20 dark:border-primary/10">
+              <div className="bg-card dark:bg-black/30 rounded-lg p-3 text-xs text-muted-foreground border border-border">
                 {availableBalance >= 0
                   ? '✓ Positive balance - Operations healthy'
                   : '⚠ Negative balance - Review investments'}

@@ -239,7 +239,7 @@ export default function ClientForm({
         </div>
 
         {error && (
-          <div className="bg-red-50 text-red-700 p-3 rounded-md text-sm">
+          <div className="bg-destructive/10 text-destructive p-3 rounded-md text-sm">
             {error}
           </div>
         )}

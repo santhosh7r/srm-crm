@@ -45,9 +45,9 @@ const fmt = (n: number) => `₹${(n ?? 0).toLocaleString('en-IN', { minimumFract
 const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString('en-IN') : '—';
 
 const statusStyle: Record<string, string> = {
-    active: 'bg-green-100 text-green-700',
+    active: 'bg-gold/15 text-gold-strong',
     completed: 'bg-muted text-secondary-foreground',
-    overdue: 'bg-red-100 text-red-700',
+    overdue: 'bg-destructive/15 text-destructive',
 };
 
 export default function HistoryPage() {
@@ -287,7 +287,7 @@ export default function HistoryPage() {
                         onClick={downloadExcel}
                         disabled={rows.length === 0}
                         variant="outline"
-                        className="border-green-300 text-green-700 hover:bg-green-50 gap-2"
+                        className="border-gold/40 text-gold-strong hover:bg-gold/10 gap-2"
                     >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -298,7 +298,7 @@ export default function HistoryPage() {
                         onClick={downloadPDF}
                         disabled={rows.length === 0}
                         variant="outline"
-                        className="border-red-300 text-red-700 hover:bg-red-50 gap-2"
+                        className="border-destructive/40 text-destructive hover:bg-destructive/10 gap-2"
                     >
                         <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
@@ -340,7 +340,7 @@ export default function HistoryPage() {
                             <select
                                 value={planId}
                                 onChange={e => setPlanId(e.target.value)}
-                                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-slate-900"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-foreground"
                             >
                                 <option value="">All Plans</option>
                                 {plans.map(p => (
@@ -353,7 +353,7 @@ export default function HistoryPage() {
                             <select
                                 value={status}
                                 onChange={e => setStatus(e.target.value)}
-                                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-slate-900"
+                                className="w-full border border-border rounded-lg px-3 py-2 text-sm bg-card focus:outline-none focus:ring-2 focus:ring-foreground"
                             >
                                 <option value="">All Status</option>
                                 <option value="active">Active</option>
@@ -385,7 +385,7 @@ export default function HistoryPage() {
                             </Button>
                         </div>
 
-                        <span className="hidden md:inline-block text-xs text-slate-300 mx-2">|</span>
+                        <span className="hidden md:inline-block text-xs text-foreground mx-2">|</span>
 
                         <span className="text-xs text-muted-foreground self-center px-1">
                             {filteredRows.length} record{filteredRows.length !== 1 ? 's' : ''}
@@ -401,9 +401,9 @@ export default function HistoryPage() {
                         { label: 'Total Disposed', value: fmt(totals.dispose), color: 'text-foreground' },
                         { label: 'Init. Interest', value: fmt(totals.interest), color: 'text-foreground' },
                         { label: 'Total Loans', value: fmt(totals.total), color: 'text-foreground' },
-                        { label: 'Coll. Interest', value: fmt(totals.collectedInterest), color: 'text-blue-700' },
-                        { label: 'Total Given', value: fmt(totals.given), color: 'text-green-700' },
-                        { label: 'Total Balance', value: fmt(totals.balance), color: 'text-red-600' },
+                        { label: 'Coll. Interest', value: fmt(totals.collectedInterest), color: 'text-foreground' },
+                        { label: 'Total Given', value: fmt(totals.given), color: 'text-gold-strong' },
+                        { label: 'Total Balance', value: fmt(totals.balance), color: 'text-destructive' },
                     ].map(s => (
                         <Card key={s.label} className="p-3 text-center flex flex-col justify-center items-center overflow-hidden">
                             <p className="text-[10px] sm:text-xs text-muted-foreground mb-1 truncate w-full">{s.label}</p>
@@ -438,15 +438,15 @@ export default function HistoryPage() {
                                         ))}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-slate-100">
+                            <tbody className="divide-y divide-border">
                                 {paginatedRows.map((r, i) => (
                                     <tr key={r._id} className={`transition-colors ${i % 2 === 0 ? 'bg-card' : 'bg-muted/40'} hover:bg-muted/60`}>
                                         <td className="px-4 py-3 font-medium text-foreground whitespace-nowrap">{r.clientName}</td>
                                         <td className="px-4 py-3 whitespace-nowrap">
                                             <p className="text-foreground font-medium mb-1">{r.planName}</p>
                                             <span className={`px-2 py-0.5 rounded text-[10px] font-medium ${
-                                                r.planType === 'weekly' ? 'bg-muted text-blue-700' :
-                                                r.planType === 'days' ? 'bg-muted text-purple-700' :
+                                                r.planType === 'weekly' ? 'bg-muted text-foreground' :
+                                                r.planType === 'days' ? 'bg-muted text-muted-foreground' :
                                                 'bg-muted text-secondary-foreground'
                                             }`}>
                                                 {planTypeLabel(r)}
@@ -455,9 +455,9 @@ export default function HistoryPage() {
                                         <td className="px-4 py-3 text-foreground font-medium">{fmt(r.disposeAmount)}</td>
                                         <td className="px-4 py-3 text-foreground">{fmt(r.initialInterest)}</td>
                                         <td className="px-4 py-3 font-semibold text-foreground">{fmt(r.totalAmount)}</td>
-                                        <td className="px-4 py-3 text-blue-700 font-medium">{fmt(r.collectedInterest)}</td>
-                                        <td className="px-4 py-3 text-green-700 font-medium">{fmt(r.collectedGiven)}</td>
-                                        <td className="px-4 py-3 text-red-600 font-medium">{fmt(r.balance)}</td>
+                                        <td className="px-4 py-3 text-foreground font-medium">{fmt(r.collectedInterest)}</td>
+                                        <td className="px-4 py-3 text-gold-strong font-medium">{fmt(r.collectedGiven)}</td>
+                                        <td className="px-4 py-3 text-destructive font-medium">{fmt(r.balance)}</td>
                                         <td className="px-4 py-3">
                                             <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${statusStyle[r.status]}`}>
                                                 {r.status.toUpperCase()}
@@ -472,7 +472,7 @@ export default function HistoryPage() {
                     </div>
 
                     {/* Mobile cards */}
-                    <div className="md:hidden divide-y divide-slate-100">
+                    <div className="md:hidden divide-y divide-border">
                         {paginatedRows.map(r => (
                             <div key={r._id} className="p-4 space-y-2">
                                 <div className="flex items-start justify-between">
@@ -499,15 +499,15 @@ export default function HistoryPage() {
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground">Coll. Interest</p>
-                                        <p className="font-semibold text-blue-700">{fmt(r.collectedInterest)}</p>
+                                        <p className="font-semibold text-foreground">{fmt(r.collectedInterest)}</p>
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground">Given</p>
-                                        <p className="font-semibold text-green-700">{fmt(r.collectedGiven)}</p>
+                                        <p className="font-semibold text-gold-strong">{fmt(r.collectedGiven)}</p>
                                     </div>
                                     <div>
                                         <p className="text-muted-foreground">Balance</p>
-                                        <p className="font-semibold text-red-600">{fmt(r.balance)}</p>
+                                        <p className="font-semibold text-destructive">{fmt(r.balance)}</p>
                                     </div>
                                 </div>
                                 <p className="text-xs text-muted-foreground">{fmtDate(r.startDate)} → {fmtDate(r.endDate)}</p>

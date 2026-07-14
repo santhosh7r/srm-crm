@@ -4,6 +4,7 @@ import { useRouter, usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { LogoMark } from '@/components/Logo';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -51,7 +52,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="flex flex-col items-center gap-3">
-          <div className="h-10 w-10 rounded-xl bg-primary animate-pulse" />
+          <LogoMark size={44} className="animate-pulse" />
           <p className="text-sm text-muted-foreground font-medium">Loading...</p>
         </div>
       </div>
@@ -92,9 +93,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
             {/* Logo */}
             <Link href="/dashboard" className="flex items-center gap-2.5 shrink-0 group">
-              <div className="h-8 w-8 bg-primary rounded-lg flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200">
-                <span className="text-primary-foreground text-xs font-bold">RI</span>
-              </div>
+              <LogoMark size={30} priority className="group-hover:scale-105 transition-transform duration-200" />
               <span className="font-bold text-foreground text-sm hidden sm:inline tracking-tight">
                 RIYA FINANCE LTD
               </span>
@@ -218,7 +217,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center gap-2 text-sm font-semibold text-red-600 bg-red-50 hover:bg-red-100 px-4 py-2.5 rounded-xl transition-colors duration-200"
+                className="flex items-center gap-2 text-sm font-semibold text-destructive bg-destructive/10 hover:bg-destructive/15 px-4 py-2.5 rounded-xl transition-colors duration-200"
               >
                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
