@@ -12,6 +12,7 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { SearchInput } from '@/components/ui/search-input';
 
 interface Client {
   _id: string;
@@ -85,12 +86,11 @@ export default function ClientsPage() {
       </div>
 
       <div className="mb-6">
-        <input
-          type="text"
+        <SearchInput
+          className="md:w-96"
           placeholder="Search clients by name, phone, or email..."
           value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full md:w-1/3 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-foreground"
+          onValueChange={setSearchQuery}
         />
       </div>
 

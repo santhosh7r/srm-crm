@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/ui/search-input';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -314,17 +315,12 @@ export default function HistoryPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 mb-4">
                         <div className="sm:col-span-2 lg:col-span-2">
                             <label className="block text-xs font-medium text-secondary-foreground mb-1">Search Client</label>
-                            <div className="relative">
-                                <Input
-                                    placeholder="Search by name or phone..."
-                                    value={searchTerm}
-                                    onChange={e => { setSearchTerm(e.target.value); setCurrentPage(1); }}
-                                    className="pl-9"
-                                />
-                                <svg className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </div>
+                            <SearchInput
+                                placeholder="Search by name or phone..."
+                                value={searchTerm}
+                                onValueChange={v => { setSearchTerm(v); setCurrentPage(1); }}
+                                inputClassName="h-10"
+                            />
                         </div>
                         <div>
                             <label className="block text-xs font-medium text-secondary-foreground mb-1">From Date</label>

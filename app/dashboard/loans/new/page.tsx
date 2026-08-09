@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { SearchInput } from '@/components/ui/search-input';
 import {
   Select,
   SelectContent,
@@ -129,15 +130,12 @@ export default function NewLoanPage() {
                   </Link>
                 </div>
                 <div className="space-y-2">
-                  <div className="relative">
-                    <Input
-                      placeholder="Search for client..."
-                      value={clientSearch}
-                      onChange={(e) => setClientSearch(e.target.value)}
-                      className="pl-9 h-10 border-border focus:ring-primary"
-                    />
-                    <svg className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-                  </div>
+                  <SearchInput
+                    placeholder="Search for client..."
+                    value={clientSearch}
+                    onValueChange={setClientSearch}
+                    inputClassName="h-10"
+                  />
                   <Select value={clientId} onValueChange={setClientId} disabled={loading}>
                     <SelectTrigger className="h-11 border-border">
                       <SelectValue placeholder={clientSearch ? `Select from ${filteredClients.length} results` : "Or select from list"} />

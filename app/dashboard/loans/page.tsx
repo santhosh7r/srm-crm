@@ -12,6 +12,7 @@ import {
   AlertDialogDescription,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { SearchInput } from '@/components/ui/search-input';
 import { Calendar } from 'lucide-react';
 
 interface Loan {
@@ -37,6 +38,7 @@ export default function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => { fetchLoans(); }, []);
 
@@ -68,6 +70,15 @@ export default function LoansPage() {
   const fmtDate = (d: string) =>
     new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
+  const q = searchQuery.trim().toLowerCase();
+  const filteredLoans = q
+    ? loans.filter(l =>
+        (l.clientId?.name ?? '').toLowerCase().includes(q) ||
+        (l.planId?.name ?? '').toLowerCase().includes(q) ||
+        l.status.toLowerCase().includes(q)
+      )
+    : loans;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -80,6 +91,15 @@ export default function LoansPage() {
         </Link>
       </div>
 
+      <div className="mb-6">
+        <SearchInput
+          className="md:w-96"
+          placeholder="Search loans by client, plan, or status..."
+          value={searchQuery}
+          onValueChange={setSearchQuery}
+        />
+      </div>
+
       {loading ? (
         <Card className="p-8 text-center"><p className="text-muted-foreground">Loading loans...</p></Card>
       ) : loans.length === 0 ? (
@@ -89,9 +109,13 @@ export default function LoansPage() {
             <Button className="bg-primary hover:bg-primary/90 text-primary-foreground">Assign First Loan</Button>
           </Link>
         </Card>
+      ) : filteredLoans.length === 0 ? (
+        <Card className="p-8 text-center">
+          <p className="text-muted-foreground">No loans found matching &quot;{searchQuery}&quot;.</p>
+        </Card>
       ) : (
         <div className="grid grid-cols-1 gap-3">
-          {loans.map(loan => {
+          {filteredLoans.map(loan => {
             const progress = Math.min(100, (loan.totalPaid / (loan.totalAmount || 1)) * 100);
             const isOverdue = loan.status === 'overdue';
 
