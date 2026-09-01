@@ -53,6 +53,16 @@
   --sidebar-accent-foreground: #0A0A0A;
   --sidebar-border: #E6E2D6;
   --sidebar-ring: #C9A227;
+
+  /* ── Sheets scratchpad (app/dashboard/sheets) ── */
+  --sheet-bg: #FFFFFF;
+  --sheet-line: #DCD8CB;
+  --sheet-head: #F2EFE4;
+  --sheet-head-on: #E7DFC4;
+  --sheet-sel: rgba(201, 162, 39, 0.18);
+  --sheet-accent: #806413;
+  --sheet-err: #B42318;
+
 }
 
 .dark {
@@ -95,6 +105,16 @@
   --sidebar-accent-foreground: #FFFFFF;
   --sidebar-border: #262626;
   --sidebar-ring: #D4AF37;
+
+  /* ── Sheets scratchpad ── */
+  --sheet-bg: #080808;
+  --sheet-line: #2B2B2B;
+  --sheet-head: #151515;
+  --sheet-head-on: #2E2609;
+  --sheet-sel: rgba(212, 175, 55, 0.16);
+  --sheet-accent: #D4AF37;
+  --sheet-err: #F97066;
+
 }
 
 @theme inline {

@@ -9,6 +9,7 @@ import '@/models/Client';
 import '@/models/Plan';
 import '@/models/Loan';
 import '@/models/Payment';
+import '@/models/Sheetbook';
 
 let isConnected = false
 
