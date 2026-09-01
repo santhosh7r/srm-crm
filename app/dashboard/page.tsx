@@ -587,7 +587,7 @@ export default function DashboardPage() {
               <Button variant="outline" onClick={() => setPaymentLoan(null)} className="border-border">Cancel</Button>
               <Button onClick={handlePaymentSubmit} disabled={isSubmitting} className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[120px]">
                 {isSubmitting ? (
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin"></div>
                 ) : (
                   'Confirm Payment'
                 )}

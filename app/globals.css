@@ -5,115 +5,117 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  RIYA FINANCE palette — monochrome base + a single gold accent family.
-  Light: white base, black primary, gold secondary.
-  Dark:  black base, white primary, gold secondary.
-  `gold-strong` is the mode-flipped, text-legible gold; `gold` is the fill/border gold.
+  RIYA FINANCE palette — two colours only: bleach and maroon. No pure white and
+  no neutral grey; every surface is a bleach tone and everything drawn on it is a
+  maroon tone (inverted in dark mode, where bleach becomes the ink).
+  `gold-strong` is the mode-flipped, text-legible maroon; `gold` is the fill/border
+  maroon. The token names are kept so every existing `text-gold-strong` /
+  `bg-gold/12` in the app keeps working — only the values moved.
 */
 
 :root {
   --background: #FAF6EB;
-  --foreground: #0A0A0A;
-  --card: #FFFFFF;
-  --card-foreground: #0A0A0A;
-  --popover: #FFFFFF;
-  --popover-foreground: #0A0A0A;
-  --primary: #0A0A0A;
-  --primary-foreground: #FFFFFF;
-  --secondary: #C9A227;
-  --secondary-foreground: #0A0A0A;
-  --muted: #F6F5F1;
-  --muted-foreground: #6B6659;
-  --accent: #F9F2DC;
-  --accent-foreground: #0A0A0A;
-  --destructive: #8A5A1E;
-  --destructive-foreground: #FFFFFF;
-  --border: #E6E2D6;
-  --input: #E6E2D6;
-  --ring: #C9A227;
+  --foreground: #2E0A12;
+  --card: #FDFBF3;
+  --card-foreground: #2E0A12;
+  --popover: #FDFBF3;
+  --popover-foreground: #2E0A12;
+  --primary: #7B1E2B;
+  --primary-foreground: #FAF6EB;
+  --secondary: #7B1E2B;
+  --secondary-foreground: #2E0A12;
+  --muted: #F2EADB;
+  --muted-foreground: #6E4A52;
+  --accent: #F3E3E5;
+  --accent-foreground: #5E1420;
+  --destructive: #B3202E;
+  --destructive-foreground: #FAF6EB;
+  --border: #E4D5CE;
+  --input: #E4D5CE;
+  --ring: #7B1E2B;
 
-  --gold: #C9A227;
-  --gold-foreground: #0A0A0A;
-  --gold-strong: #806413;
-  --gold-soft: #F9F2DC;
+  --gold: #7B1E2B;
+  --gold-foreground: #FAF6EB;
+  --gold-strong: #5E1420;
+  --gold-soft: #F3E3E5;
 
-  --chart-1: #C9A227;
-  --chart-2: #E0C566;
-  --chart-3: #806413;
-  --chart-4: #0A0A0A;
-  --chart-5: #B9B3A2;
+  --chart-1: #7B1E2B;
+  --chart-2: #B0596A;
+  --chart-3: #4A0F1A;
+  --chart-4: #2E0A12;
+  --chart-5: #B79A9E;
 
   --radius: 0.625rem;
 
   --sidebar: #FAF6EB;
-  --sidebar-foreground: #0A0A0A;
-  --sidebar-primary: #0A0A0A;
-  --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #F9F2DC;
-  --sidebar-accent-foreground: #0A0A0A;
-  --sidebar-border: #E6E2D6;
-  --sidebar-ring: #C9A227;
+  --sidebar-foreground: #2E0A12;
+  --sidebar-primary: #7B1E2B;
+  --sidebar-primary-foreground: #FAF6EB;
+  --sidebar-accent: #F3E3E5;
+  --sidebar-accent-foreground: #5E1420;
+  --sidebar-border: #E4D5CE;
+  --sidebar-ring: #7B1E2B;
 
-  /* ── Sheets scratchpad (app/dashboard/sheets) ── */
-  --sheet-bg: #FFFFFF;
-  --sheet-line: #DCD8CB;
-  --sheet-head: #F2EFE4;
-  --sheet-head-on: #E7DFC4;
-  --sheet-sel: rgba(201, 162, 39, 0.18);
-  --sheet-accent: #806413;
-  --sheet-err: #B42318;
+  /* ── Notes scratchpad (app/dashboard/sheets) ── */
+  --sheet-bg: #FDFBF3;
+  --sheet-line: #E0D2CC;
+  --sheet-head: #F2E7E2;
+  --sheet-head-on: #EBD3D6;
+  --sheet-sel: rgba(123, 30, 43, 0.14);
+  --sheet-accent: #7B1E2B;
+  --sheet-err: #B3202E;
 
 }
 
 .dark {
-  --background: #000000;
-  --foreground: #FFFFFF;
-  --card: #0C0C0C;
-  --card-foreground: #FFFFFF;
-  --popover: #0C0C0C;
-  --popover-foreground: #FFFFFF;
-  --primary: #FFFFFF;
-  --primary-foreground: #000000;
-  --secondary: #D4AF37;
-  --secondary-foreground: #000000;
-  --muted: #161616;
-  --muted-foreground: #A3A097;
-  --accent: #1C1708;
-  --accent-foreground: #FFFFFF;
-  --destructive: #D19A4E;
-  --destructive-foreground: #000000;
-  --border: #262626;
-  --input: #262626;
-  --ring: #D4AF37;
+  --background: #120508;
+  --foreground: #F3E9E6;
+  --card: #1C0A0E;
+  --card-foreground: #F3E9E6;
+  --popover: #1C0A0E;
+  --popover-foreground: #F3E9E6;
+  --primary: #E0919C;
+  --primary-foreground: #2A0A10;
+  --secondary: #B03A4C;
+  --secondary-foreground: #F3E9E6;
+  --muted: #1E1013;
+  --muted-foreground: #B09A9E;
+  --accent: #260D12;
+  --accent-foreground: #F2C3CA;
+  --destructive: #E0576A;
+  --destructive-foreground: #2A0A10;
+  --border: #2E1A1E;
+  --input: #2E1A1E;
+  --ring: #B03A4C;
 
-  --gold: #D4AF37;
-  --gold-foreground: #000000;
-  --gold-strong: #E5C76B;
-  --gold-soft: #1C1708;
+  --gold: #B03A4C;
+  --gold-foreground: #F3E9E6;
+  --gold-strong: #E79AA6;
+  --gold-soft: #260D12;
 
-  --chart-1: #D4AF37;
-  --chart-2: #E5C76B;
-  --chart-3: #A8842A;
-  --chart-4: #FFFFFF;
-  --chart-5: #6E6A5E;
+  --chart-1: #B03A4C;
+  --chart-2: #E79AA6;
+  --chart-3: #7A1F2E;
+  --chart-4: #F3E9E6;
+  --chart-5: #6E5E61;
 
-  --sidebar: #000000;
-  --sidebar-foreground: #FFFFFF;
-  --sidebar-primary: #FFFFFF;
-  --sidebar-primary-foreground: #000000;
-  --sidebar-accent: #1C1708;
-  --sidebar-accent-foreground: #FFFFFF;
-  --sidebar-border: #262626;
-  --sidebar-ring: #D4AF37;
+  --sidebar: #120508;
+  --sidebar-foreground: #F3E9E6;
+  --sidebar-primary: #E0919C;
+  --sidebar-primary-foreground: #2A0A10;
+  --sidebar-accent: #260D12;
+  --sidebar-accent-foreground: #F2C3CA;
+  --sidebar-border: #2E1A1E;
+  --sidebar-ring: #B03A4C;
 
-  /* ── Sheets scratchpad ── */
-  --sheet-bg: #080808;
-  --sheet-line: #2B2B2B;
-  --sheet-head: #151515;
-  --sheet-head-on: #2E2609;
-  --sheet-sel: rgba(212, 175, 55, 0.16);
-  --sheet-accent: #D4AF37;
-  --sheet-err: #F97066;
+  /* ── Notes scratchpad ── */
+  --sheet-bg: #120508;
+  --sheet-line: #301D21;
+  --sheet-head: #1C0D10;
+  --sheet-head-on: #3A171D;
+  --sheet-sel: rgba(224, 145, 156, 0.16);
+  --sheet-accent: #D4667A;
+  --sheet-err: #E0576A;
 
 }
 
@@ -174,7 +176,7 @@
 @layer components {
   /*
     Status treatments. Colour alone no longer separates them (the palette has no
-    red/green), so each state also differs in fill weight: gold for positive,
+    green), so each state also differs in fill weight: maroon for positive,
     plain muted for neutral/pending, solid inverted for urgent/overdue.
   */
   .status-positive {

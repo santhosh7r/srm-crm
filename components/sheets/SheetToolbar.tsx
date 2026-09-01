@@ -2,9 +2,10 @@
 
 import { useRef } from 'react';
 import {
-  AlignCenter, AlignLeft, AlignRight, Baseline, Bold, Download, Eraser,
-  IndianRupee, Italic, Maximize2, Minimize2, PaintBucket, Percent, Plus,
-  Redo2, Strikethrough, Trash2, Underline, Undo2, Upload, WrapText,
+  AlignCenter, AlignLeft, AlignRight, Baseline, Bold, ClipboardPaste, Copy,
+  Download, Eraser, IndianRupee, Italic, Maximize2, Minimize2, PaintBucket,
+  Minus, Percent, Plus, Redo2, Scissors, Strikethrough, Trash2, Underline, Undo2,
+  UnfoldHorizontal, Upload, WrapText,
 } from 'lucide-react';
 import type { CellStyle, NumFmt } from '@/lib/sheets/engine';
 import { ColorPicker } from './ColorPicker';
@@ -39,6 +40,7 @@ function TBtn({
       aria-label={title}
       aria-pressed={active}
       disabled={disabled}
+      onMouseDown={(e) => e.preventDefault()}
       onClick={onClick}
       className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-md transition-colors disabled:opacity-40 disabled:hover:bg-transparent sm:h-8 sm:w-8 ${
         active ? 'bg-secondary/25 text-foreground ring-1 ring-secondary/50' : 'text-foreground hover:bg-muted'
@@ -57,6 +59,13 @@ export interface ToolbarProps {
   canRedo: boolean;
   onUndo: () => void;
   onRedo: () => void;
+  onCut: () => void;
+  onCopy: () => void;
+  onPaste: () => void;
+  onFitCol: () => void;
+  /** Width of the first selected column, in pixels. */
+  colWidth: number;
+  onColWidth: (w: number) => void;
   onInsertRow: () => void;
   onDeleteRow: () => void;
   onInsertCol: () => void;
@@ -82,12 +91,24 @@ export function SheetToolbar(p: ToolbarProps) {
 
       <Sep />
 
+      <TBtn title="Cut (Ctrl+X)" onClick={p.onCut}>
+        <Scissors className="h-4 w-4" />
+      </TBtn>
+      <TBtn title="Copy (Ctrl+C)" onClick={p.onCopy}>
+        <Copy className="h-4 w-4" />
+      </TBtn>
+      <TBtn title="Paste (Ctrl+V)" onClick={p.onPaste}>
+        <ClipboardPaste className="h-4 w-4" />
+      </TBtn>
+
+      <Sep />
+
       <select
         title="Font size"
         aria-label="Font size"
         value={s.size ?? 12}
         onChange={(e) => p.onStyle({ size: Number(e.target.value) })}
-        className="h-9 shrink-0 rounded-md border border-border bg-background px-1.5 text-xs font-medium outline-none focus:ring-2 focus:ring-ring/40 sm:h-8"
+        className="h-9 shrink-0 rounded-md border border-border bg-background px-1.5 text-[16px] font-medium outline-none focus:ring-2 focus:ring-ring/40 sm:h-8 sm:text-xs"
       >
         {FONT_SIZES.map((n) => (
           <option key={n} value={n}>{n}</option>
@@ -154,7 +175,7 @@ export function SheetToolbar(p: ToolbarProps) {
         aria-label="Number format"
         value={s.fmt ?? 'general'}
         onChange={(e) => p.onStyle({ fmt: e.target.value as NumFmt })}
-        className="h-9 shrink-0 rounded-md border border-border bg-background px-1.5 text-xs font-medium outline-none focus:ring-2 focus:ring-ring/40 sm:h-8"
+        className="h-9 shrink-0 rounded-md border border-border bg-background px-1.5 text-[16px] font-medium outline-none focus:ring-2 focus:ring-ring/40 sm:h-8 sm:text-xs"
       >
         {FORMATS.map((f) => (
           <option key={f.value} value={f.value}>{f.label}</option>
@@ -175,6 +196,31 @@ export function SheetToolbar(p: ToolbarProps) {
       <TBtn title="Delete column" onClick={p.onDeleteCol}>
         <span className="flex items-center"><Trash2 className="h-3 w-3" /><span className="text-[10px] font-bold">C</span></span>
       </TBtn>
+      {/* Column width — the same job as dragging the divider, but reachable on a phone. */}
+      <div className="flex shrink-0 items-center gap-0.5">
+        <TBtn title="Narrower column" onClick={() => p.onColWidth(Math.max(28, p.colWidth - 20))}>
+          <Minus className="h-4 w-4" />
+        </TBtn>
+        <input
+          type="number"
+          min={28}
+          max={640}
+          value={p.colWidth}
+          title="Column width in pixels"
+          aria-label="Column width in pixels"
+          onChange={(e) => {
+            const n = Number(e.target.value);
+            if (Number.isFinite(n)) p.onColWidth(Math.max(28, Math.min(640, Math.round(n))));
+          }}
+          className="h-9 w-14 shrink-0 rounded-md border border-border bg-background px-1 text-center text-[16px] font-medium outline-none focus:ring-2 focus:ring-ring/40 sm:h-8 sm:w-12 sm:text-xs"
+        />
+        <TBtn title="Wider column" onClick={() => p.onColWidth(Math.min(640, p.colWidth + 20))}>
+          <Plus className="h-4 w-4" />
+        </TBtn>
+        <TBtn title="Fit column width to contents" onClick={p.onFitCol}>
+          <UnfoldHorizontal className="h-4 w-4" />
+        </TBtn>
+      </div>
       <TBtn title="Clear formatting" onClick={p.onClearFormat}>
         <Eraser className="h-4 w-4" />
       </TBtn>

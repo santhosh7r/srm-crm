@@ -11,7 +11,14 @@ const HEAD_H = 26;
 const MIN_COL_W = 28;
 const MIN_ROW_H = 18;
 
+/** How close to the edge a drag must get before the grid starts scrolling itself. */
+const EDGE = 48;
+const EDGE_STEP = 16;
+/** A touch that moves further than this is a scroll, not a tap. */
+const TAP_SLOP = 10;
+
 type Box = { x: number; y: number; w: number; h: number };
+type Hit = { r: number | null; c: number | null };
 
 /* ─────────────────────────────── cell ────────────────────────────── */
 
@@ -92,8 +99,14 @@ export interface GridProps {
   onResizeRow: (r: number, h: number) => void;
   onFill: (target: Range) => void;
   onKeyDown: (e: React.KeyboardEvent) => void;
-  /** Coarse-pointer device: tap to select, tap again to edit, drag the handle to extend. */
+  /** Coarse-pointer device: tap to select, tap again to edit, drag the handles to extend or fill. */
   touch: boolean;
+  /**
+   * Filled in with a "fit this column to its contents" function. Only the grid can
+   * measure rendered text, but the toolbar needs to offer it — a double-click on a
+   * 22px divider is not something you can ask of a thumb.
+   */
+  fitColRef?: React.RefObject<((c: number) => void) | null>;
   /**
    * The offscreen textarea that holds focus. Chrome only fires copy/cut/paste at
    * an editable element, so keyboard and clipboard both live here rather than on
@@ -113,7 +126,7 @@ export function SheetGrid(props: GridProps) {
   const wrapRef = useRef<HTMLDivElement>(null);
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
-  // Live size while a divider is dragged — local so the page doesn't re-render per mousemove.
+  // Live size while a divider is dragged — local so the page doesn't re-render per pointermove.
   const [drag, setDrag] = useState<{ kind: 'col' | 'row'; index: number; size: number } | null>(null);
   const [fillTo, setFillTo] = useState<Range | null>(null);
 
@@ -122,6 +135,15 @@ export function SheetGrid(props: GridProps) {
   const resize = useRef<{ kind: 'col' | 'row'; index: number; from: number; size: number } | null>(null);
   const dragSize = useRef<{ kind: 'col' | 'row'; index: number; size: number } | null>(null);
   const fillRef = useRef<Range | null>(null);
+
+  /** A touch that has gone down but not yet been decided as a tap or a scroll. */
+  const tap = useRef<{ r: number; c: number; kind: 'cell' | 'col' | 'row'; x: number; y: number } | null>(null);
+  /** Last pointer position, so edge auto-scroll can keep extending without pointer movement. */
+  const point = useRef({ x: 0, y: 0 });
+  /** Where the current drag began, so a stationary press never triggers auto-scroll. */
+  const dragFrom = useRef({ x: 0, y: 0 });
+  const edgeDir = useRef({ dx: 0, dy: 0 });
+  const scroller = useRef<number | null>(null);
 
   const colW = (c: number) =>
     drag?.kind === 'col' && drag.index === c ? drag.size : (sheet.colW[c] ?? DEFAULT_COL_W);
@@ -201,65 +223,21 @@ export function SheetGrid(props: GridProps) {
     el.focus();
     if (cb.current.editing?.caretAtEnd) el.setSelectionRange(el.value.length, el.value.length);
     else el.select();
+    // The on-screen keyboard covers the lower half of a phone — make sure the
+    // cell being typed into is still somewhere the user can see it.
+    if (cb.current.touch) {
+      window.setTimeout(() => el.scrollIntoView({ block: 'nearest', inline: 'nearest' }), 250);
+    }
   }, [editKey]);
 
-  /* ── global drag handling ── */
-
-  useEffect(() => {
-    const move = (e: MouseEvent) => {
-      if (mode.current !== 'resize') return;
-      const rz = resize.current;
-      if (!rz) return;
-      const delta = (rz.kind === 'col' ? e.clientX : e.clientY) - rz.from;
-      const min = rz.kind === 'col' ? MIN_COL_W : MIN_ROW_H;
-      const next = { kind: rz.kind, index: rz.index, size: Math.max(min, Math.round(rz.size + delta)) };
-      dragSize.current = next;
-      setDrag(next);
-    };
-
-    const up = () => {
-      if (mode.current === 'resize') {
-        const d = dragSize.current;
-        if (d) {
-          if (d.kind === 'col') cb.current.onResizeCol(d.index, d.size);
-          else cb.current.onResizeRow(d.index, d.size);
-        }
-        dragSize.current = null;
-        resize.current = null;
-        setDrag(null);
-      } else if (mode.current === 'fill') {
-        const t = fillRef.current;
-        if (t) cb.current.onFill(normRange(t));
-        fillRef.current = null;
-        setFillTo(null);
-      }
-      mode.current = 'none';
-    };
-
-    const touchMove = (e: TouchEvent) => {
-      if (mode.current === 'none' || mode.current === 'resize') return;
-      const t = e.touches[0];
-      if (!t) return;
-      // Stop the grid from scrolling while a handle drag is in progress.
-      e.preventDefault();
-      const el = document.elementFromPoint(t.clientX, t.clientY);
-      const td = el?.closest<HTMLElement>('td[data-r]');
-      if (td) extendRef.current(Number(td.dataset.r), Number(td.dataset.c));
-    };
-
-    window.addEventListener('mousemove', move);
-    window.addEventListener('mouseup', up);
-    window.addEventListener('touchmove', touchMove, { passive: false });
-    window.addEventListener('touchend', up);
-    window.addEventListener('touchcancel', up);
-    return () => {
-      window.removeEventListener('mousemove', move);
-      window.removeEventListener('mouseup', up);
-      window.removeEventListener('touchmove', touchMove);
-      window.removeEventListener('touchend', up);
-      window.removeEventListener('touchcancel', up);
-    };
-  }, []);
+  /**
+   * Mouse only: stop the browser handing focus back to <body>, which would strip
+   * the grid of its keyboard and clipboard events. Done on mousedown rather than
+   * pointerdown so the compatibility click / dblclick events still fire.
+   */
+  const keepFocus = (e: React.MouseEvent) => {
+    e.preventDefault();
+  };
 
   const focusGrid = () => {
     // Focusing the hidden textarea pops the on-screen keyboard, so on touch we
@@ -268,9 +246,32 @@ export function SheetGrid(props: GridProps) {
     cb.current.containerRef.current?.focus();
   };
 
-  /** Extend the current drag to the cell under the pointer. */
-  const extendTo = (r: number, c: number) => {
+  /**
+   * Row / column under a viewport point — over body cells and over headers alike.
+   * Walks the whole hit stack rather than just the top element, because the drag
+   * handles sit directly over the cells a drag is trying to reach.
+   */
+  const hitAt = (x: number, y: number): Hit | null => {
+    const root = wrapRef.current;
+    if (!root) return null;
+    for (const el of document.elementsFromPoint(x, y)) {
+      const target = (el as HTMLElement).closest<HTMLElement>('[data-r],[data-c]');
+      if (target && root.contains(target)) {
+        return {
+          r: target.dataset.r !== undefined ? Number(target.dataset.r) : null,
+          c: target.dataset.c !== undefined ? Number(target.dataset.c) : null,
+        };
+      }
+    }
+    return null;
+  };
+
+  /** Extend the current drag to the given cell. */
+  const extendTo = (hit: Hit) => {
     const o = origin.current;
+    const r = hit.r ?? o.r;
+    const c = hit.c ?? o.c;
+
     if (mode.current === 'cell') {
       props.onSelect({ r1: o.r, c1: o.c, r2: r, c2: c }, o);
     } else if (mode.current === 'col') {
@@ -296,27 +297,140 @@ export function SheetGrid(props: GridProps) {
   const extendRef = useRef(extendTo);
   extendRef.current = extendTo;
 
-  /** One delegated handler for every cell in the body. */
-  const bodyPos = (e: React.MouseEvent): { r: number; c: number } | null => {
+  const hitRef = useRef(hitAt);
+  hitRef.current = hitAt;
+
+  /* ── edge auto-scroll while dragging ── */
+
+  const stopScroller = useCallback(() => {
+    if (scroller.current !== null) {
+      window.clearInterval(scroller.current);
+      scroller.current = null;
+    }
+    edgeDir.current = { dx: 0, dy: 0 };
+  }, []);
+
+  const updateEdgeScroll = useCallback(() => {
+    const box = scrollRef.current;
+    if (!box) return;
+    const rect = box.getBoundingClientRect();
+    const { x, y } = point.current;
+    const dx = x < rect.left + EDGE ? -EDGE_STEP : x > rect.right - EDGE ? EDGE_STEP : 0;
+    const dy = y < rect.top + EDGE ? -EDGE_STEP : y > rect.bottom - EDGE ? EDGE_STEP : 0;
+    edgeDir.current = { dx, dy };
+
+    if (!dx && !dy) {
+      if (scroller.current !== null) {
+        window.clearInterval(scroller.current);
+        scroller.current = null;
+      }
+      return;
+    }
+    if (scroller.current !== null) return;
+    scroller.current = window.setInterval(() => {
+      const b = scrollRef.current;
+      if (!b) return;
+      b.scrollLeft += edgeDir.current.dx;
+      b.scrollTop += edgeDir.current.dy;
+      const hit = hitRef.current(point.current.x, point.current.y);
+      if (hit) extendRef.current(hit);
+    }, 60);
+  }, []);
+
+  /* ── global drag handling (one path for mouse, touch and pen) ── */
+
+  useEffect(() => {
+    const move = (e: PointerEvent) => {
+      if (mode.current === 'none') return;
+
+      if (mode.current === 'resize') {
+        const rz = resize.current;
+        if (!rz) return;
+        const delta = (rz.kind === 'col' ? e.clientX : e.clientY) - rz.from;
+        const min = rz.kind === 'col' ? MIN_COL_W : MIN_ROW_H;
+        const next = { kind: rz.kind, index: rz.index, size: Math.max(min, Math.round(rz.size + delta)) };
+        dragSize.current = next;
+        setDrag(next);
+        return;
+      }
+
+      point.current = { x: e.clientX, y: e.clientY };
+      const hit = hitRef.current(e.clientX, e.clientY);
+      if (hit) extendRef.current(hit);
+      // A press that has not travelled yet must not drag the grid out from under it.
+      const moved =
+        Math.abs(e.clientX - dragFrom.current.x) + Math.abs(e.clientY - dragFrom.current.y) > 12;
+      if (moved) updateEdgeScroll();
+      else stopScroller();
+    };
+
+    const finish = (commit: boolean) => {
+      if (mode.current === 'resize') {
+        const d = dragSize.current;
+        if (commit && d) {
+          if (d.kind === 'col') cb.current.onResizeCol(d.index, d.size);
+          else cb.current.onResizeRow(d.index, d.size);
+        }
+        dragSize.current = null;
+        resize.current = null;
+        setDrag(null);
+      } else if (mode.current === 'fill') {
+        const t = fillRef.current;
+        if (commit && t) cb.current.onFill(normRange(t));
+        fillRef.current = null;
+        setFillTo(null);
+      }
+      mode.current = 'none';
+      stopScroller();
+    };
+
+    const up = (e: PointerEvent) => {
+      // A pending touch is only a tap if it never travelled far enough to be a scroll.
+      if (e.pointerType !== 'mouse') resolveTapRef.current(e.clientX, e.clientY);
+      finish(true);
+    };
+    const cancel = () => {
+      tap.current = null;
+      // A cancelled resize or fill should leave the sheet untouched.
+      finish(mode.current !== 'resize' && mode.current !== 'fill');
+    };
+
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    window.addEventListener('pointercancel', cancel);
+    return () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      window.removeEventListener('pointercancel', cancel);
+      stopScroller();
+    };
+  }, [stopScroller, updateEdgeScroll]);
+
+  /* ── body ── */
+
+  const bodyPos = (e: React.PointerEvent): { r: number; c: number } | null => {
     const td = (e.target as HTMLElement).closest<HTMLElement>('td[data-r]');
     if (!td) return null;
     return { r: Number(td.dataset.r), c: Number(td.dataset.c) };
   };
 
-  const onBodyMouseDown = (e: React.MouseEvent) => {
+  const onBodyPointerDown = (e: React.PointerEvent) => {
     const pos = bodyPos(e);
-    if (!pos || e.button !== 0) return;
-    // Without this the browser hands focus back to <body> after the handler runs,
-    // which would strip the grid of its keyboard and clipboard events.
-    e.preventDefault();
+    if (!pos) return;
+
+    if (e.pointerType !== 'mouse') {
+      // Let the browser own the gesture — it is a scroll until proven otherwise
+      // by a pointerup that has not moved far.
+      tap.current = { ...pos, kind: 'cell', x: e.clientX, y: e.clientY };
+      return;
+    }
+    if (e.button !== 0) return;
     focusGrid();
     if (editing) props.onCommitEdit('none');
+    point.current = { x: e.clientX, y: e.clientY };
+    dragFrom.current = { x: e.clientX, y: e.clientY };
     if (e.shiftKey) {
       props.onSelect({ r1: active.r, c1: active.c, r2: pos.r, c2: pos.c });
-    } else if (touch && pos.r === active.r && pos.c === active.c) {
-      // Second tap on the selected cell opens the editor — double-tap is unreliable.
-      props.onStartEdit(pos.r, pos.c);
-      return;
     } else {
       origin.current = pos;
       props.onSelect({ r1: pos.r, c1: pos.c, r2: pos.r, c2: pos.c }, pos);
@@ -324,20 +438,76 @@ export function SheetGrid(props: GridProps) {
     mode.current = 'cell';
   };
 
-  const onBodyMouseOver = (e: React.MouseEvent) => {
-    if (mode.current === 'none' || mode.current === 'resize') return;
-    const pos = bodyPos(e);
-    if (pos) extendTo(pos.r, pos.c);
-  };
-
   const onBodyDoubleClick = (e: React.MouseEvent) => {
-    const pos = bodyPos(e);
-    if (pos) props.onStartEdit(pos.r, pos.c);
+    const td = (e.target as HTMLElement).closest<HTMLElement>('td[data-r]');
+    if (td) props.onStartEdit(Number(td.dataset.r), Number(td.dataset.c));
   };
 
-  const startResize = (e: React.MouseEvent, kind: 'col' | 'row', index: number) => {
-    e.preventDefault();
+  /* ── headers ── */
+
+  const selectCol = (c: number, extend: boolean) => {
+    if (editing) props.onCommitEdit('none');
+    if (extend) props.onSelect({ r1: 0, c1: active.c, r2: sheet.rows - 1, c2: c });
+    else props.onSelect({ r1: 0, c1: c, r2: sheet.rows - 1, c2: c }, { r: 0, c });
+  };
+
+  const selectRow = (r: number, extend: boolean) => {
+    if (editing) props.onCommitEdit('none');
+    if (extend) props.onSelect({ r1: active.r, c1: 0, r2: r, c2: sheet.cols - 1 });
+    else props.onSelect({ r1: r, c1: 0, r2: r, c2: sheet.cols - 1 }, { r, c: 0 });
+  };
+
+  const onHeadPointerDown = (e: React.PointerEvent, kind: 'col' | 'row', index: number) => {
+    if (e.pointerType !== 'mouse') {
+      tap.current = { r: index, c: index, kind, x: e.clientX, y: e.clientY };
+      return;
+    }
+    if (e.button !== 0) return;
+    focusGrid();
+    point.current = { x: e.clientX, y: e.clientY };
+    dragFrom.current = { x: e.clientX, y: e.clientY };
+    origin.current = kind === 'col' ? { r: 0, c: index } : { r: index, c: 0 };
+    mode.current = kind;
+    if (kind === 'col') selectCol(index, e.shiftKey);
+    else selectRow(index, e.shiftKey);
+  };
+
+  /**
+   * Settle a touch that has been waiting to see whether it was a tap or a scroll.
+   * Lives on the window rather than on the cell so a finger that drifts onto one
+   * of the overlays before lifting still counts.
+   */
+  const resolveTap = (x: number, y: number) => {
+    const t = tap.current;
+    tap.current = null;
+    if (!t) return;
+    if (Math.abs(x - t.x) > TAP_SLOP || Math.abs(y - t.y) > TAP_SLOP) return;
+
+    if (t.kind === 'col') {
+      selectCol(t.c, false);
+      return;
+    }
+    if (t.kind === 'row') {
+      selectRow(t.r, false);
+      return;
+    }
+    if (editing) props.onCommitEdit('none');
+    if (t.r === active.r && t.c === active.c) {
+      // Second tap on the selected cell opens the editor — double-tap is unreliable.
+      props.onStartEdit(t.r, t.c);
+      return;
+    }
+    origin.current = { r: t.r, c: t.c };
+    props.onSelect({ r1: t.r, c1: t.c, r2: t.r, c2: t.c }, { r: t.r, c: t.c });
+  };
+
+  const resolveTapRef = useRef(resolveTap);
+  resolveTapRef.current = resolveTap;
+
+  const startResize = (e: React.PointerEvent, kind: 'col' | 'row', index: number) => {
+    if (e.pointerType !== 'mouse') e.preventDefault();
     e.stopPropagation();
+    tap.current = null;
     mode.current = 'resize';
     const size = kind === 'col' ? colW(index) : rowH(index);
     resize.current = { kind, index, from: kind === 'col' ? e.clientX : e.clientY, size };
@@ -345,8 +515,55 @@ export function SheetGrid(props: GridProps) {
     setDrag({ kind, index, size });
   };
 
+  /* ── selection handles ── */
+
+  const startHandle = (e: React.PointerEvent, kind: 'fill' | 'topLeft' | 'bottomRight') => {
+    if (e.pointerType !== 'mouse') e.preventDefault();
+    e.stopPropagation();
+    tap.current = null;
+    focusGrid();
+    point.current = { x: e.clientX, y: e.clientY };
+    dragFrom.current = { x: e.clientX, y: e.clientY };
+    if (kind === 'fill') {
+      mode.current = 'fill';
+      fillRef.current = null;
+      setFillTo(null);
+    } else {
+      mode.current = 'cell';
+      // Anchor on the opposite corner so the dragged corner is the one that moves.
+      origin.current = kind === 'topLeft' ? { r: n.r2, c: n.c2 } : { r: n.r1, c: n.c1 };
+    }
+  };
+
+  /**
+   * Widen a column to its longest entry. Measured with a Range over the rendered
+   * text, because the cell's own box is either clipped or stretched by spill and
+   * so says nothing about how wide the content really is.
+   */
+  const autoFitCol = (c: number) => {
+    const root = wrapRef.current;
+    if (!root) return;
+    const range = document.createRange();
+    let widest = 0;
+    root.querySelectorAll<HTMLElement>(`td[data-c="${c}"] > div`).forEach((el) => {
+      range.selectNodeContents(el);
+      widest = Math.max(widest, range.getBoundingClientRect().width);
+    });
+    // Nothing to fit — collapsing an empty column to 28px only makes it unusable.
+    props.onResizeCol(c, widest === 0 ? DEFAULT_COL_W : Math.max(MIN_COL_W, Math.min(480, Math.ceil(widest) + 14)));
+  };
+
+  if (props.fitColRef) props.fitColRef.current = autoFitCol;
+
   const cols = Array.from({ length: sheet.cols }, (_, i) => i);
   const totalW = HEAD_W + cols.reduce((sum, c) => sum + colW(c), 0);
+  // The neighbouring header paints over anything past the divider, so a grip has to
+  // reach back into its own header to stay hittable — especially with a finger.
+  // Columns can afford a wide strip; a row is only ~26px tall, and a fat grip there
+  // would swallow the tap that selects the row.
+  const colGrip = touch ? 24 : 13;
+  const rowGrip = touch ? 11 : 9;
+  const gripOut = touch ? 5 : 6;
 
   return (
     <div
@@ -358,8 +575,8 @@ export function SheetGrid(props: GridProps) {
         <table
           className="border-collapse text-[12px]"
           style={{ width: totalW, tableLayout: 'fixed' }}
-          onMouseDown={onBodyMouseDown}
-          onMouseOver={onBodyMouseOver}
+          onMouseDown={keepFocus}
+          onPointerDown={onBodyPointerDown}
           onDoubleClick={onBodyDoubleClick}
         >
           <colgroup>
@@ -372,8 +589,7 @@ export function SheetGrid(props: GridProps) {
           <thead>
             <tr style={{ height: HEAD_H }}>
               <th
-                onMouseDown={(e) => {
-                  e.preventDefault();
+                onClick={() => {
                   focusGrid();
                   props.onSelect({ r1: 0, c1: 0, r2: sheet.rows - 1, c2: sheet.cols - 1 }, { r: 0, c: 0 });
                 }}
@@ -385,37 +601,36 @@ export function SheetGrid(props: GridProps) {
                 return (
                   <th
                     key={c}
-                    onMouseDown={(e) => {
-                      if (e.button !== 0) return;
-                      e.preventDefault();
-                      focusGrid();
-                      if (editing) props.onCommitEdit('none');
-                      origin.current = { r: 0, c };
-                      mode.current = 'col';
-                      if (e.shiftKey) props.onSelect({ r1: 0, c1: active.c, r2: sheet.rows - 1, c2: c });
-                      else props.onSelect({ r1: 0, c1: c, r2: sheet.rows - 1, c2: c }, { r: 0, c });
-                    }}
-                    onMouseOver={() => {
-                      if (mode.current === 'col') extendTo(0, c);
-                    }}
+                    data-c={c}
+                    onPointerDown={(e) => onHeadPointerDown(e, 'col', c)}
                     className={`sticky top-0 z-20 border-r border-b border-[var(--sheet-line)] p-0 text-[11px] font-semibold ${
                       on
                         ? 'bg-[var(--sheet-head-on)] text-foreground'
                         : 'bg-[var(--sheet-head)] text-muted-foreground'
                     }`}
                   >
-                    <div className="relative flex h-full cursor-pointer items-center justify-center">
+                    <div className="flex h-full cursor-pointer items-center justify-center">
                       {colName(c)}
-                      <span
-                        onMouseDown={(e) => startResize(e, 'col', c)}
-                        onDoubleClick={(e) => {
-                          e.stopPropagation();
-                          props.onResizeCol(c, DEFAULT_COL_W);
-                        }}
-                        title="Drag to resize · double-click to reset"
-                        className="absolute top-0 -right-[3px] z-10 h-full w-[6px] cursor-col-resize hover:bg-[var(--sheet-accent)]"
-                      />
                     </div>
+                    <span
+                      onMouseDown={keepFocus}
+                      onPointerDown={(e) => startResize(e, 'col', c)}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        autoFitCol(c);
+                      }}
+                      title="Drag to resize · double-click to fit the contents"
+                      style={{ width: colGrip, right: -gripOut, touchAction: 'none' }}
+                      className="group/grip absolute top-0 bottom-0 z-10 flex cursor-col-resize justify-center"
+                    >
+                      <span
+                        className={`h-full w-[3px] rounded-full transition-colors ${
+                          drag?.kind === 'col' && drag.index === c
+                            ? 'bg-[var(--sheet-accent)]'
+                            : 'bg-transparent group-hover/grip:bg-[var(--sheet-accent)]'
+                        }`}
+                      />
+                    </span>
                   </th>
                 );
               })}
@@ -428,37 +643,28 @@ export function SheetGrid(props: GridProps) {
               return (
                 <tr key={r} style={{ height: rowH(r) }}>
                   <th
-                    onMouseDown={(e) => {
-                      if (e.button !== 0) return;
-                      e.preventDefault();
-                      focusGrid();
-                      if (editing) props.onCommitEdit('none');
-                      origin.current = { r, c: 0 };
-                      mode.current = 'row';
-                      if (e.shiftKey) props.onSelect({ r1: active.r, c1: 0, r2: r, c2: sheet.cols - 1 });
-                      else props.onSelect({ r1: r, c1: 0, r2: r, c2: sheet.cols - 1 }, { r, c: 0 });
-                    }}
-                    onMouseOver={() => {
-                      if (mode.current === 'row') extendTo(r, 0);
-                    }}
+                    data-r={r}
+                    onPointerDown={(e) => onHeadPointerDown(e, 'row', r)}
                     className={`sticky left-0 z-10 border-r border-b border-[var(--sheet-line)] p-0 text-[11px] font-semibold ${
                       on
                         ? 'bg-[var(--sheet-head-on)] text-foreground'
                         : 'bg-[var(--sheet-head)] text-muted-foreground'
                     }`}
                   >
-                    <div className="relative flex h-full cursor-pointer items-center justify-center">
+                    <div className="flex h-full cursor-pointer items-center justify-center">
                       {r + 1}
-                      <span
-                        onMouseDown={(e) => startResize(e, 'row', r)}
-                        onDoubleClick={(e) => {
-                          e.stopPropagation();
-                          props.onResizeRow(r, DEFAULT_ROW_H);
-                        }}
-                        title="Drag to resize · double-click to reset"
-                        className="absolute -bottom-[3px] left-0 z-10 h-[6px] w-full cursor-row-resize hover:bg-[var(--sheet-accent)]"
-                      />
                     </div>
+                    <span
+                      onMouseDown={keepFocus}
+                      onPointerDown={(e) => startResize(e, 'row', r)}
+                      onDoubleClick={(e) => {
+                        e.stopPropagation();
+                        props.onResizeRow(r, DEFAULT_ROW_H);
+                      }}
+                      title="Drag to resize · double-click to reset"
+                      style={{ height: rowGrip, bottom: -gripOut, touchAction: 'none' }}
+                      className="absolute right-0 left-0 z-10 cursor-row-resize hover:bg-[var(--sheet-accent)]"
+                    />
                   </th>
 
                   {cols.map((c) => {
@@ -525,29 +731,53 @@ export function SheetGrid(props: GridProps) {
                 style={{ left: rects.fill.x, top: rects.fill.y, width: rects.fill.w, height: rects.fill.h }}
               />
             )}
+
             {!editing && (
-              <div
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  mode.current = 'fill';
-                }}
-                onTouchStart={(e) => {
-                  e.stopPropagation();
-                  // On touch the handle extends the selection rather than filling —
-                  // that is what makes formatting a range possible without a keyboard.
-                  origin.current = { r: n.r1, c: n.c1 };
-                  mode.current = 'cell';
-                }}
-                title={touch ? 'Drag to select more cells' : 'Drag to fill'}
-                className={`absolute z-[7] cursor-crosshair border-2 border-white bg-[var(--sheet-accent)] dark:border-black ${
-                  touch ? 'h-[18px] w-[18px] rounded-full' : 'h-[8px] w-[8px] rounded-[1px]'
-                }`}
-                style={{
-                  left: rects.sel.x + rects.sel.w - (touch ? 9 : 4),
-                  top: rects.sel.y + rects.sel.h - (touch ? 9 : 4),
-                }}
-              />
+              <>
+                {/* Touch: round grips on opposite corners grow the selection. */}
+                {touch && (
+                  <>
+                    <div
+                      onMouseDown={keepFocus}
+                      onPointerDown={(e) => startHandle(e, 'topLeft')}
+                      aria-label="Extend selection"
+                      style={{
+                        left: rects.sel.x - 10,
+                        top: rects.sel.y - 10,
+                        touchAction: 'none',
+                      }}
+                      className="absolute z-[7] h-[20px] w-[20px] rounded-full border-2 border-[var(--sheet-bg)] bg-[var(--sheet-accent)] shadow-sm"
+                    />
+                    <div
+                      onMouseDown={keepFocus}
+                      onPointerDown={(e) => startHandle(e, 'bottomRight')}
+                      aria-label="Extend selection"
+                      style={{
+                        left: rects.sel.x + rects.sel.w - 10,
+                        top: rects.sel.y + rects.sel.h - 10,
+                        touchAction: 'none',
+                      }}
+                      className="absolute z-[7] h-[20px] w-[20px] rounded-full border-2 border-[var(--sheet-bg)] bg-[var(--sheet-accent)] shadow-sm"
+                    />
+                  </>
+                )}
+
+                {/* Fill handle — square, and on touch offset clear of the round grip. */}
+                <div
+                  onMouseDown={keepFocus}
+                  onPointerDown={(e) => startHandle(e, 'fill')}
+                  title="Drag to copy the contents"
+                  aria-label="Drag to copy the contents"
+                  style={{
+                    left: rects.sel.x + rects.sel.w + (touch ? 10 : -4),
+                    top: rects.sel.y + rects.sel.h + (touch ? 10 : -4),
+                    touchAction: 'none',
+                  }}
+                  className={`absolute z-[7] cursor-crosshair border-2 border-[var(--sheet-bg)] bg-[var(--sheet-accent)] ${
+                    touch ? 'h-[18px] w-[18px] rounded-[4px] shadow-sm' : 'h-[8px] w-[8px] rounded-[1px]'
+                  }`}
+                />
+              </>
             )}
           </>
         )}
@@ -569,7 +799,7 @@ export function SheetGrid(props: GridProps) {
           tabIndex={0}
           aria-label="Spreadsheet"
           spellCheck={false}
-          className="absolute z-[8] h-px w-px resize-none border-0 bg-transparent p-0 opacity-0 outline-none"
+          className="pointer-events-none absolute z-[8] h-px w-px resize-none border-0 bg-transparent p-0 opacity-0 outline-none"
           style={{ left: rects?.active.x ?? 0, top: rects?.active.y ?? 0 }}
         />
 
@@ -578,7 +808,7 @@ export function SheetGrid(props: GridProps) {
             ref={editorRef}
             value={editing.value}
             onChange={(e) => props.onEditValue(e.target.value)}
-            onMouseDown={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
             onDoubleClick={(e) => e.stopPropagation()}
             onBlur={() => props.onCommitEdit('none')}
             onKeyDown={(e) => {
@@ -606,6 +836,8 @@ export function SheetGrid(props: GridProps) {
               top: rects.active.y,
               minWidth: rects.active.w,
               minHeight: rects.active.h,
+              // iOS Safari zooms the whole page in on any field under 16px.
+              fontSize: touch ? 16 : undefined,
             }}
             className="absolute z-40 resize-none overflow-hidden border-2 border-[var(--sheet-accent)] bg-card px-[4px] py-[3px] text-[12px] leading-tight shadow-md outline-none"
             rows={1}

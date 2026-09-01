@@ -32,6 +32,46 @@ type Clip = {
   origin: { r: number; c: number };
 } | null;
 
+/**
+ * Put text on the system clipboard. `navigator.clipboard` needs a secure context
+ * and is missing on a few older mobile browsers, so fall back to the old
+ * execCommand trick before giving up.
+ */
+async function writeClipboard(text: string): Promise<boolean> {
+  try {
+    if (navigator.clipboard?.writeText) {
+      await navigator.clipboard.writeText(text);
+      return true;
+    }
+  } catch {
+    /* denied or unavailable — try the fallback */
+  }
+  try {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.readOnly = true;
+    ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+    document.body.appendChild(ta);
+    ta.select();
+    ta.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    document.body.removeChild(ta);
+    return ok;
+  } catch {
+    return false;
+  }
+}
+
+/** Read the system clipboard; null when the browser will not let us. */
+async function readClipboard(): Promise<string | null> {
+  try {
+    if (navigator.clipboard?.readText) return await navigator.clipboard.readText();
+  } catch {
+    /* the user dismissed the permission prompt, or we are not on https */
+  }
+  return null;
+}
+
 const uid = () =>
   typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : `s${Date.now()}${Math.random()}`;
 
@@ -149,7 +189,7 @@ function deleteLine(sheet: Sheet, at: number, axis: 'row' | 'col'): Sheet {
 
 /* ──────────────────────────────  page  ───────────────────────────── */
 
-export default function SheetsPage() {
+export default function NotesPage() {
   const [doc, setDoc] = useState<Doc | null>(null);
   const [sel, setSel] = useState<Range>({ r1: 0, c1: 0, r2: 0, c2: 0 });
   const [active, setActive] = useState({ r: 0, c: 0 });
@@ -164,6 +204,8 @@ export default function SheetsPage() {
   const [histVersion, setHistVersion] = useState(0);
 
   const gridRef = useRef<HTMLTextAreaElement>(null);
+  /** Set by the grid — only it can measure how wide a column's contents render. */
+  const fitColRef = useRef<((c: number) => void) | null>(null);
   const undoStack = useRef<Doc[]>([]);
   const redoStack = useRef<Doc[]>([]);
   const clipboard = useRef<Clip>(null);
@@ -380,6 +422,12 @@ export default function SheetsPage() {
     setNameBox(rangeLabel(sel));
   }, [sel]);
 
+  /** Returning focus to the grid pops the on-screen keyboard on a phone — skip it there. */
+  const focusGrid = useCallback(() => {
+    if (isTouch) return;
+    gridRef.current?.focus();
+  }, [isTouch]);
+
   const select = useCallback((next: Range, nextActive?: { r: number; c: number }) => {
     setSel(next);
     if (nextActive) setActive(nextActive);
@@ -423,15 +471,15 @@ export default function SheetsPage() {
       setEditing(null);
       const delta = { down: [1, 0], up: [-1, 0], right: [0, 1], left: [0, -1], none: [0, 0] }[move];
       moveTo(editing.r + delta[0], editing.c + delta[1]);
-      gridRef.current?.focus();
+      focusGrid();
     },
-    [editing, sheet, editSheet, moveTo],
+    [editing, sheet, editSheet, moveTo, focusGrid],
   );
 
   const cancelEdit = useCallback(() => {
     setEditing(null);
-    gridRef.current?.focus();
-  }, []);
+    focusGrid();
+  }, [focusGrid]);
 
   /* ── formatting ── */
 
@@ -445,9 +493,9 @@ export default function SheetsPage() {
         edits.push([key, { v: prev?.v ?? '', s: { ...(prev?.s ?? {}), ...patch } }]);
       });
       editSheet((s) => writeCells(s, edits));
-      gridRef.current?.focus();
+      focusGrid();
     },
-    [sheet, sel, editSheet],
+    [sheet, sel, editSheet, focusGrid],
   );
 
   const clearFormat = useCallback(() => {
@@ -459,8 +507,8 @@ export default function SheetsPage() {
       if (prev) edits.push([key, { v: prev.v ?? '' }]);
     });
     editSheet((s) => writeCells(s, edits));
-    gridRef.current?.focus();
-  }, [sheet, sel, editSheet]);
+    focusGrid();
+  }, [sheet, sel, editSheet, focusGrid]);
 
   const clearContents = useCallback(() => {
     if (!sheet) return;
@@ -590,6 +638,39 @@ export default function SheetsPage() {
     };
   }, [gridMounted]);
 
+  /*
+   * Toolbar clipboard actions. A phone has no Ctrl+C, and mobile browsers never
+   * deliver copy/cut/paste events to a grid that is not a text field — so these
+   * drive the async Clipboard API directly. The in-app copy is kept alongside
+   * so styles and formulas survive a round trip even when the system clipboard
+   * is off limits.
+   */
+
+  const copySelection = useCallback(async () => {
+    const clip = readSelection();
+    if (!clip) return null;
+    clipboard.current = clip;
+    await writeClipboard(clip.text);
+    focusGrid();
+    return clip;
+  }, [readSelection, focusGrid]);
+
+  const cutSelection = useCallback(async () => {
+    const clip = await copySelection();
+    if (clip) clearContents();
+  }, [copySelection, clearContents]);
+
+  const pasteClipboard = useCallback(async () => {
+    const own = clipboard.current;
+    const text = await readClipboard();
+    const { r, c } = active;
+    // Nothing new on the system clipboard (or no access to it) — use our own copy,
+    // which carries the styles and formulas that plain text cannot.
+    if (own && (text === null || text === own.text)) pasteAt(r, c, own);
+    else if (text) pasteAt(r, c, null, fromTSV(text));
+    focusGrid();
+  }, [active, pasteAt, focusGrid]);
+
   /* ── fill handle ── */
 
   const fill = useCallback(
@@ -638,6 +719,27 @@ export default function SheetsPage() {
       for (let i = range.c2; i >= range.c1; i--) out = deleteLine(out, i, 'col');
       return out;
     });
+
+  /** Set an explicit width on every column in the selection. */
+  const setColWidth = useCallback(
+    (w: number) => {
+      editSheetQuiet((s) => {
+        const colW = { ...s.colW };
+        for (let c = range.c1; c <= range.c2; c++) colW[c] = w;
+        return { ...s, colW };
+      });
+      focusGrid();
+    },
+    [range.c1, range.c2, editSheetQuiet, focusGrid],
+  );
+
+  /** Widen every column in the selection to fit what is in it. */
+  const fitCols = useCallback(() => {
+    const fit = fitColRef.current;
+    if (!fit) return;
+    for (let c = range.c1; c <= range.c2; c++) fit(c);
+    focusGrid();
+  }, [range.c1, range.c2, focusGrid]);
 
   const growIfNeeded = useCallback(
     (r: number, c: number) => {
@@ -740,7 +842,7 @@ export default function SheetsPage() {
       ws['!cols'] = Array.from({ length: maxC + 1 }, (_, c) => ({ wpx: s.colW[c] ?? DEFAULT_COL_W }));
       XLSX.utils.book_append_sheet(wb, ws, s.name.slice(0, 31));
     }
-    XLSX.writeFile(wb, `Sheets_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    XLSX.writeFile(wb, `Notes_${new Date().toISOString().slice(0, 10)}.xlsx`);
   }, [doc]);
 
   const importFile = useCallback(
@@ -821,7 +923,7 @@ export default function SheetsPage() {
       c2: Math.min((b ?? a).c, sheet.cols - 1),
     };
     select(target, { r: target.r1, c: target.c1 });
-    gridRef.current?.focus();
+    focusGrid();
   };
 
   /* ── status bar numbers ── */
@@ -853,7 +955,7 @@ export default function SheetsPage() {
       <div className="flex h-[60vh] items-center justify-center">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <FileSpreadsheet className="h-4 w-4 animate-pulse" />
-          Loading sheet…
+          Loading notes…
         </div>
       </div>
     );
@@ -875,6 +977,12 @@ export default function SheetsPage() {
         canRedo={canRedo}
         onUndo={undo}
         onRedo={redo}
+        onCut={() => void cutSelection()}
+        onCopy={() => void copySelection()}
+        onPaste={() => void pasteClipboard()}
+        onFitCol={fitCols}
+        colWidth={sheet.colW[range.c1] ?? DEFAULT_COL_W}
+        onColWidth={setColWidth}
         onInsertRow={insertRow}
         onDeleteRow={removeRow}
         onInsertCol={insertCol}
@@ -896,7 +1004,7 @@ export default function SheetsPage() {
           }}
           onBlur={() => setNameBox(rangeLabel(sel))}
           aria-label="Cell reference"
-          className="h-8 w-[74px] shrink-0 rounded-md border border-border bg-background px-1.5 text-center text-xs font-semibold outline-none focus:ring-2 focus:ring-ring/40 sm:h-7 sm:w-[92px] sm:px-2"
+          className="h-9 w-[80px] shrink-0 rounded-md border border-border bg-background px-1.5 text-center text-[16px] font-semibold outline-none focus:ring-2 focus:ring-ring/40 sm:h-7 sm:w-[92px] sm:px-2 sm:text-xs"
         />
         <span className="hidden w-6 shrink-0 items-center justify-center font-serif text-sm text-muted-foreground italic sm:flex">
           fx
@@ -918,7 +1026,7 @@ export default function SheetsPage() {
           }}
           placeholder="Value, or = for a formula"
           aria-label="Formula bar"
-          className="h-8 min-w-0 flex-1 rounded-md border border-border bg-background px-2 font-mono text-xs outline-none focus:ring-2 focus:ring-ring/40 sm:h-7"
+          className="h-9 min-w-0 flex-1 rounded-md border border-border bg-background px-2 font-mono text-[16px] outline-none focus:ring-2 focus:ring-ring/40 sm:h-7 sm:text-xs"
         />
       </div>
 
@@ -938,6 +1046,7 @@ export default function SheetsPage() {
         onFill={fill}
         onKeyDown={onKeyDown}
         touch={isTouch}
+        fitColRef={fitColRef}
         containerRef={gridRef}
       />
 
@@ -957,7 +1066,7 @@ export default function SheetsPage() {
                   if (e.key === 'Enter') commitRename();
                   if (e.key === 'Escape') setRenaming(null);
                 }}
-                className="h-7 w-28 shrink-0 rounded-md border border-border bg-background px-2 text-xs font-semibold outline-none focus:ring-2 focus:ring-ring/40"
+                className="h-8 w-28 shrink-0 rounded-md border border-border bg-background px-2 text-[16px] font-semibold outline-none focus:ring-2 focus:ring-ring/40 sm:h-7 sm:text-xs"
               />
             );
           }
@@ -1048,7 +1157,7 @@ export default function SheetsPage() {
           <div className="min-w-0">
             <h1 className="flex items-center gap-2 text-xl font-bold tracking-tight sm:text-2xl">
               <FileSpreadsheet className="h-5 w-5 text-secondary sm:h-6 sm:w-6" />
-              Sheets
+              Notes
             </h1>
             <p className="mt-1 hidden text-sm text-muted-foreground sm:block">
               A free-form scratchpad for notes and quick sums. Saved to your account — it is not
@@ -1059,7 +1168,8 @@ export default function SheetsPage() {
             Double-click a cell to edit · start with <span className="font-mono font-semibold">=</span> for a formula
           </p>
           <p className="text-xs text-muted-foreground sm:hidden">
-            Tap to select, tap again to edit
+            Tap to select · tap again to edit · drag the round grips to select a range and the
+            square one to copy across
           </p>
         </div>
       )}

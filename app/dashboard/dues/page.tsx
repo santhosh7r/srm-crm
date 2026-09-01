@@ -530,7 +530,7 @@ export default function DuesPage() {
                                 disabled={isSubmitting}
                                 className="bg-primary hover:bg-primary/90 text-primary-foreground min-w-[130px]"
                             >
-                                {isSubmitting ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : 'Confirm Payment'}
+                                {isSubmitting ? <div className="w-4 h-4 border-2 border-background/30 border-t-background rounded-full animate-spin" /> : 'Confirm Payment'}
                             </Button>
                         </div>
                     </motion.div>
