@@ -5,93 +5,95 @@
 @custom-variant dark (&:is(.dark *));
 
 /*
-  RIYA FINANCE palette — two colours only: bleach and maroon. No pure white and
-  no neutral grey; every surface is a bleach tone and everything drawn on it is a
-  maroon tone (inverted in dark mode, where bleach becomes the ink).
+  RIYA FINANCE palette — two colours only: bleach and maroon, both run dark.
+  The bleach is an aged/toasted parchment (never near-white) and the maroon is a
+  deep oxblood; every surface is a bleach tone and everything drawn on it is a
+  maroon tone (inverted in dark mode, where bleach becomes the ink and the
+  ground goes near-black maroon).
   `gold-strong` is the mode-flipped, text-legible maroon; `gold` is the fill/border
   maroon. The token names are kept so every existing `text-gold-strong` /
   `bg-gold/12` in the app keeps working — only the values moved.
 */
 
 :root {
-  --background: #FAF6EB;
-  --foreground: #2E0A12;
-  --card: #FDFBF3;
-  --card-foreground: #2E0A12;
-  --popover: #FDFBF3;
-  --popover-foreground: #2E0A12;
-  --primary: #7B1E2B;
-  --primary-foreground: #FAF6EB;
-  --secondary: #7B1E2B;
-  --secondary-foreground: #2E0A12;
-  --muted: #F2EADB;
-  --muted-foreground: #6E4A52;
-  --accent: #F3E3E5;
-  --accent-foreground: #5E1420;
-  --destructive: #B3202E;
-  --destructive-foreground: #FAF6EB;
-  --border: #E4D5CE;
-  --input: #E4D5CE;
-  --ring: #7B1E2B;
+  --background: #EDE3CE;
+  --foreground: #210509;
+  --card: #F4EBD9;
+  --card-foreground: #210509;
+  --popover: #F4EBD9;
+  --popover-foreground: #210509;
+  --primary: #5C1420;
+  --primary-foreground: #EDE3CE;
+  --secondary: #5C1420;
+  --secondary-foreground: #210509;
+  --muted: #E2D5BB;
+  --muted-foreground: #573139;
+  --accent: #E7D2CF;
+  --accent-foreground: #400A13;
+  --destructive: #8E1622;
+  --destructive-foreground: #EDE3CE;
+  --border: #CDB9AC;
+  --input: #CDB9AC;
+  --ring: #5C1420;
 
-  --gold: #7B1E2B;
-  --gold-foreground: #FAF6EB;
-  --gold-strong: #5E1420;
-  --gold-soft: #F3E3E5;
+  --gold: #5C1420;
+  --gold-foreground: #EDE3CE;
+  --gold-strong: #400A13;
+  --gold-soft: #E7D2CF;
 
-  --chart-1: #7B1E2B;
-  --chart-2: #B0596A;
-  --chart-3: #4A0F1A;
-  --chart-4: #2E0A12;
-  --chart-5: #B79A9E;
+  --chart-1: #5C1420;
+  --chart-2: #8E3B49;
+  --chart-3: #340810;
+  --chart-4: #210509;
+  --chart-5: #8C7176;
 
   --radius: 0.625rem;
 
-  --sidebar: #FAF6EB;
-  --sidebar-foreground: #2E0A12;
-  --sidebar-primary: #7B1E2B;
-  --sidebar-primary-foreground: #FAF6EB;
-  --sidebar-accent: #F3E3E5;
-  --sidebar-accent-foreground: #5E1420;
-  --sidebar-border: #E4D5CE;
-  --sidebar-ring: #7B1E2B;
+  --sidebar: #EDE3CE;
+  --sidebar-foreground: #210509;
+  --sidebar-primary: #5C1420;
+  --sidebar-primary-foreground: #EDE3CE;
+  --sidebar-accent: #E7D2CF;
+  --sidebar-accent-foreground: #400A13;
+  --sidebar-border: #CDB9AC;
+  --sidebar-ring: #5C1420;
 
   /* ── Notes scratchpad (app/dashboard/sheets) ── */
-  --sheet-bg: #FDFBF3;
-  --sheet-line: #E0D2CC;
-  --sheet-head: #F2E7E2;
-  --sheet-head-on: #EBD3D6;
-  --sheet-sel: rgba(123, 30, 43, 0.14);
-  --sheet-accent: #7B1E2B;
-  --sheet-err: #B3202E;
+  --sheet-bg: #F4EBD9;
+  --sheet-line: #C9B4A6;
+  --sheet-head: #E4D3C9;
+  --sheet-head-on: #D8BDBC;
+  --sheet-sel: rgba(92, 20, 32, 0.18);
+  --sheet-accent: #5C1420;
+  --sheet-err: #8E1622;
 
 }
 
 .dark {
-  --background: #120508;
+  --background: #0A0204;
   --foreground: #F3E9E6;
-  --card: #1C0A0E;
+  --card: #150609;
   --card-foreground: #F3E9E6;
-  --popover: #1C0A0E;
+  --popover: #150609;
   --popover-foreground: #F3E9E6;
   --primary: #E0919C;
-  --primary-foreground: #2A0A10;
+  --primary-foreground: #1A0407;
   --secondary: #B03A4C;
   --secondary-foreground: #F3E9E6;
-  --muted: #1E1013;
+  --muted: #170A0D;
   --muted-foreground: #B09A9E;
-  --accent: #260D12;
+  --accent: #1F080D;
   --accent-foreground: #F2C3CA;
   --destructive: #E0576A;
-  --destructive-foreground: #2A0A10;
-  --border: #2E1A1E;
-  --input: #2E1A1E;
+  --destructive-foreground: #1A0407;
+  --border: #2A1418;
+  --input: #2A1418;
   --ring: #B03A4C;
 
   --gold: #B03A4C;
   --gold-foreground: #F3E9E6;
   --gold-strong: #E79AA6;
-  --gold-soft: #260D12;
+  --gold-soft: #1F080D;
 
   --chart-1: #B03A4C;
   --chart-2: #E79AA6;
@@ -99,20 +101,20 @@
   --chart-4: #F3E9E6;
   --chart-5: #6E5E61;
 
-  --sidebar: #120508;
+  --sidebar: #0A0204;
   --sidebar-foreground: #F3E9E6;
   --sidebar-primary: #E0919C;
-  --sidebar-primary-foreground: #2A0A10;
-  --sidebar-accent: #260D12;
+  --sidebar-primary-foreground: #1A0407;
+  --sidebar-accent: #1F080D;
   --sidebar-accent-foreground: #F2C3CA;
-  --sidebar-border: #2E1A1E;
+  --sidebar-border: #2A1418;
   --sidebar-ring: #B03A4C;
 
   /* ── Notes scratchpad ── */
-  --sheet-bg: #120508;
-  --sheet-line: #301D21;
-  --sheet-head: #1C0D10;
-  --sheet-head-on: #3A171D;
+  --sheet-bg: #0A0204;
+  --sheet-line: #26161A;
+  --sheet-head: #150809;
+  --sheet-head-on: #2F1116;
   --sheet-sel: rgba(224, 145, 156, 0.16);
   --sheet-accent: #D4667A;
   --sheet-err: #E0576A;

@@ -13,7 +13,18 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { SearchInput } from '@/components/ui/search-input';
-import { Calendar } from 'lucide-react';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Calendar, LayoutGrid, Table as TableIcon } from 'lucide-react';
+
+type ViewMode = 'cards' | 'table';
+const VIEW_KEY = 'loans.view';
 
 interface Loan {
   _id: string;
@@ -39,8 +50,20 @@ export default function LoansPage() {
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [view, setView] = useState<ViewMode>('cards');
 
   useEffect(() => { fetchLoans(); }, []);
+
+  // Restore the last-used view. Read after mount so server and client markup match.
+  useEffect(() => {
+    const stored = window.localStorage.getItem(VIEW_KEY);
+    if (stored === 'cards' || stored === 'table') setView(stored);
+  }, []);
+
+  const changeView = (next: ViewMode) => {
+    setView(next);
+    window.localStorage.setItem(VIEW_KEY, next);
+  };
 
   const fetchLoans = async () => {
     try {
@@ -91,13 +114,43 @@ export default function LoansPage() {
         </Link>
       </div>
 
-      <div className="mb-6">
+      <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
         <SearchInput
           className="md:w-96"
           placeholder="Search loans by client, plan, or status..."
           value={searchQuery}
           onValueChange={setSearchQuery}
         />
+
+        {/* Cards / table switch — the choice is remembered per browser */}
+        <div className="inline-flex rounded-lg border border-border bg-muted p-0.5 self-start sm:ml-auto">
+          <button
+            type="button"
+            onClick={() => changeView('cards')}
+            aria-pressed={view === 'cards'}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${
+              view === 'cards'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <LayoutGrid className="w-4 h-4" />
+            Cards
+          </button>
+          <button
+            type="button"
+            onClick={() => changeView('table')}
+            aria-pressed={view === 'table'}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-semibold transition-colors ${
+              view === 'table'
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <TableIcon className="w-4 h-4" />
+            Table
+          </button>
+        </div>
       </div>
 
       {loading ? (
@@ -113,7 +166,7 @@ export default function LoansPage() {
         <Card className="p-8 text-center">
           <p className="text-muted-foreground">No loans found matching &quot;{searchQuery}&quot;.</p>
         </Card>
-      ) : (
+      ) : view === 'cards' ? (
         <div className="grid grid-cols-1 gap-3">
           {filteredLoans.map(loan => {
             const progress = Math.min(100, (loan.totalPaid / (loan.totalAmount || 1)) * 100);
@@ -233,6 +286,109 @@ export default function LoansPage() {
             );
           })}
         </div>
+      ) : (
+        <Card className="p-0 overflow-hidden border border-border">
+          <Table>
+            <TableHeader>
+              <TableRow className="bg-muted/60 hover:bg-muted/60">
+                <TableHead className="pl-4">Client</TableHead>
+                <TableHead>Plan</TableHead>
+                <TableHead>Started</TableHead>
+                <TableHead>Ends</TableHead>
+                <TableHead className="text-right">Disposed</TableHead>
+                <TableHead className="text-right">Interest</TableHead>
+                <TableHead className="text-right">Paid</TableHead>
+                <TableHead className="text-right">Balance</TableHead>
+                <TableHead>Progress</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right pr-4">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredLoans.map(loan => {
+                const progress = Math.min(100, (loan.totalPaid / (loan.totalAmount || 1)) * 100);
+                const endPassed = !!loan.endDate && new Date(loan.endDate) < new Date();
+
+                return (
+                  <TableRow
+                    key={loan._id}
+                    className={loan.status === 'overdue' ? 'bg-destructive/5' : undefined}
+                  >
+                    <TableCell className="pl-4">
+                      <Link
+                        href={`/dashboard/loans/${loan._id}`}
+                        className="font-semibold text-foreground hover:underline"
+                      >
+                        {loan.clientId?.name ?? '—'}
+                      </Link>
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {loan.planId?.name ?? '—'}
+                      <span className="ml-1.5 text-xs">
+                        {loan.planId?.planType === 'weekly'
+                          ? `(Weekly${loan.planId.duration ? ` ${loan.planId.duration}w` : ''})`
+                          : loan.planId?.planType === 'days'
+                            ? `(Every ${loan.planId.intervalDays ?? '?'}d)`
+                            : '(Monthly)'}
+                      </span>
+                    </TableCell>
+                    <TableCell className="font-medium text-primary">{fmtDate(loan.startDate)}</TableCell>
+                    <TableCell className={endPassed ? 'font-medium text-destructive' : 'text-muted-foreground'}>
+                      {loan.endDate ? `${fmtDate(loan.endDate)}${endPassed ? ' ⚠' : ''}` : '—'}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold text-foreground">
+                      ₹{(loan.disposeAmount ?? 0).toLocaleString('en-IN')}
+                    </TableCell>
+                    <TableCell className="text-right text-foreground">
+                      ₹{(loan.interestAmount ?? 0).toLocaleString('en-IN')}
+                      {loan.planId?.planType === 'monthly' && loan.interestAmount > 0 && '/mo'}
+                      {loan.planId?.planType === 'days' && loan.interestAmount > 0 && `/${loan.planId.intervalDays}d`}
+                    </TableCell>
+                    <TableCell className="text-right font-semibold text-gold-strong">
+                      ₹{(loan.totalPaid ?? 0).toLocaleString('en-IN')}
+                    </TableCell>
+                    <TableCell
+                      className={`text-right font-bold ${loan.balance === 0 ? 'text-gold-strong' : 'text-destructive'}`}
+                    >
+                      ₹{(loan.balance ?? 0).toLocaleString('en-IN')}
+                    </TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-2">
+                        <div className="w-20 bg-muted rounded-full h-1.5 shrink-0">
+                          <div
+                            className={`h-1.5 rounded-full ${progress === 100 ? 'bg-gold' : 'bg-primary'}`}
+                            style={{ width: `${progress}%` }}
+                          />
+                        </div>
+                        <span className="text-xs text-muted-foreground">{progress.toFixed(0)}%</span>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${statusStyle(loan.status)}`}>
+                        {loan.status}
+                      </span>
+                    </TableCell>
+                    <TableCell className="text-right pr-4">
+                      <div className="flex gap-2 justify-end">
+                        <Link href={`/dashboard/loans/${loan._id}`}>
+                          <Button variant="outline" size="sm" className="border-border">View</Button>
+                        </Link>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="border-destructive/30 text-destructive hover:bg-destructive/10"
+                          onClick={() => setDeleteId(loan._id)}
+                        >
+                          Delete
+                        </Button>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </Card>
       )}
 
       <AlertDialog open={!!deleteId} onOpenChange={open => !open && setDeleteId(null)}>
