@@ -13,13 +13,6 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { SearchInput } from '@/components/ui/search-input';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { Calendar, X } from 'lucide-react';
 
 const ALL = 'all';
@@ -44,6 +37,11 @@ interface Loan {
   endDate?: string;
 }
 
+interface Plan {
+  _id: string;
+  name: string;
+}
+
 /** Day of the month a loan is collected on — monthly dues recur on the start date's day. */
 const startDay = (loan: Loan) => {
   const d = new Date(loan.startDate);
@@ -52,17 +50,23 @@ const startDay = (loan: Loan) => {
 
 export default function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([]);
+  const [plans, setPlans] = useState<Plan[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [planFilter, setPlanFilter] = useState<string>(ALL);
 
-  useEffect(() => { fetchLoans(); }, []);
+  useEffect(() => { fetchData(); }, []);
 
-  const fetchLoans = async () => {
+  const fetchData = async () => {
     try {
-      const res = await fetch('/api/loans');
-      if (res.ok) setLoans((await res.json()).data || []);
+      // Plans drive the filter buttons, so they are loaded alongside the loans.
+      const [loanRes, planRes] = await Promise.all([
+        fetch('/api/loans'),
+        fetch('/api/plans'),
+      ]);
+      if (loanRes.ok) setLoans((await loanRes.json()).data || []);
+      if (planRes.ok) setPlans((await planRes.json()).data || []);
     } catch (e) {
       console.error('Failed to fetch loans:', e);
     } finally {
@@ -87,12 +91,29 @@ export default function LoansPage() {
   const fmtDate = (d: string) =>
     new Date(d).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 
-  // Only offer plans that some loan actually uses, so the dropdown never lists dead options.
+  const fmtMonthYear = (d: string) =>
+    new Date(d).toLocaleDateString('en-IN', { month: 'short', year: 'numeric' });
+
+  // One button per plan that currently exists — a plan added today shows up with a count of 0,
+  // and a deleted plan drops out on the next load. Counts come from the loans.
   const planOptions = useMemo(() => {
-    const byId = new Map<string, string>();
-    loans.forEach(l => { if (l.planId?._id) byId.set(l.planId._id, l.planId.name ?? '—'); });
-    return [...byId].map(([id, name]) => ({ id, name })).sort((a, b) => a.name.localeCompare(b.name));
-  }, [loans]);
+    const counts = new Map<string, number>();
+    loans.forEach(l => {
+      const id = l.planId?._id;
+      if (id) counts.set(id, (counts.get(id) ?? 0) + 1);
+    });
+    return plans
+      .map(p => ({ id: p._id, name: p.name ?? '—', count: counts.get(p._id) ?? 0 }))
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [loans, plans]);
+
+  // If the plan being filtered on is deleted elsewhere, fall back to showing everything
+  // rather than leaving the page stuck on an empty list.
+  useEffect(() => {
+    if (planFilter !== ALL && plans.length > 0 && !plans.some(p => p._id === planFilter)) {
+      setPlanFilter(ALL);
+    }
+  }, [plans, planFilter]);
 
   const visibleLoans = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -123,6 +144,13 @@ export default function LoansPage() {
     setSearchQuery('');
   };
 
+  const planChipClass = (active: boolean) =>
+    `px-3.5 py-1.5 rounded-full border text-sm font-semibold transition-colors ${
+      active
+        ? 'bg-primary text-primary-foreground border-primary'
+        : 'bg-card text-foreground border-border hover:border-primary/40 hover:bg-muted'
+    }`;
+
   return (
     <div>
       <div className="flex justify-between items-center mb-8">
@@ -136,35 +164,52 @@ export default function LoansPage() {
       </div>
 
       {/* Filters */}
-      <div className="mb-6 flex flex-col sm:flex-row sm:items-center gap-3">
-        <SearchInput
-          className="md:w-96"
-          placeholder="Search loans by client, plan, or status..."
-          value={searchQuery}
-          onValueChange={setSearchQuery}
-        />
+      <div className="mb-6 space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+          <SearchInput
+            className="md:w-96"
+            placeholder="Search loans by client, plan, or status..."
+            value={searchQuery}
+            onValueChange={setSearchQuery}
+          />
 
-        <Select value={planFilter} onValueChange={setPlanFilter}>
-          <SelectTrigger className="h-11 w-full sm:w-64 rounded-xl bg-card border-border shadow-sm">
-            <SelectValue placeholder="All plans" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value={ALL}>All plans</SelectItem>
+          {filtersActive && (
+            <Button
+              variant="outline"
+              className="h-11 rounded-xl border-border self-start sm:ml-auto"
+              onClick={clearFilters}
+            >
+              <X className="w-4 h-4 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Plan filter — one button per plan in use */}
+        {planOptions.length > 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setPlanFilter(ALL)}
+              aria-pressed={planFilter === ALL}
+              className={planChipClass(planFilter === ALL)}
+            >
+              All plans
+              <span className="ml-1.5 opacity-70 font-normal">{loans.length}</span>
+            </button>
             {planOptions.map(p => (
-              <SelectItem key={p.id} value={p.id}>{p.name}</SelectItem>
+              <button
+                key={p.id}
+                type="button"
+                onClick={() => setPlanFilter(p.id)}
+                aria-pressed={planFilter === p.id}
+                className={planChipClass(planFilter === p.id)}
+              >
+                {p.name}
+                <span className="ml-1.5 opacity-70 font-normal">{p.count}</span>
+              </button>
             ))}
-          </SelectContent>
-        </Select>
-
-        {filtersActive && (
-          <Button
-            variant="outline"
-            className="h-11 rounded-xl border-border self-start sm:ml-auto"
-            onClick={clearFilters}
-          >
-            <X className="w-4 h-4 mr-1" />
-            Clear
-          </Button>
+          </div>
         )}
       </div>
 
@@ -219,10 +264,18 @@ export default function LoansPage() {
                             : '📅 Monthly'}
                       </p>
 
-                      {/* ── PROMINENT START DATE ── */}
-                      <div className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-primary/10 border border-primary/20 text-primary">
-                        <Calendar className="w-3.5 h-3.5 shrink-0" />
-                        <span className="text-xs font-bold">Started {fmtDate(loan.startDate)}</span>
+                      {/* ── PROMINENT START DATE — the day number is the sort key, so it leads ── */}
+                      <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl bg-primary/10 border border-primary/20 text-primary">
+                        <Calendar className="w-4 h-4 shrink-0" />
+                        <span className="text-3xl font-extrabold leading-none tabular-nums">
+                          {startDay(loan) ?? '—'}
+                        </span>
+                        <span className="flex flex-col leading-tight">
+                          <span className="text-[10px] font-semibold uppercase tracking-wide opacity-70">
+                            Started
+                          </span>
+                          <span className="text-sm font-bold">{fmtMonthYear(loan.startDate)}</span>
+                        </span>
                       </div>
 
                       {/* End date for weekly */}
