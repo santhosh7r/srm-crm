@@ -1,5 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // The floating Next.js badge covers the first tab of the mobile bottom bar while developing.
+  devIndicators: false,
   typescript: {
     ignoreBuildErrors: true,
   },

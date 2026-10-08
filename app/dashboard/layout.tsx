@@ -1,17 +1,18 @@
 'use client';
 
 import { useRouter, usePathname } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { ThemeToggle } from '@/components/ThemeToggle';
 import { LogoMark } from '@/components/Logo';
+import { BookOpen, CalendarClock, ClipboardList, HandCoins, History, LayoutDashboard, LogOut, User, Users } from 'lucide-react';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
   const [useName, setUseName] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [mobileOpen, setMobileOpen] = useState(false);
+  const mobileNav = useRef<HTMLDivElement>(null);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -39,14 +40,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return () => window.removeEventListener('scroll', onScroll);
   }, []);
 
-  // Close on route change
-  useEffect(() => { setMobileOpen(false); }, [pathname]);
-
-  // Prevent body scroll when menu open
+  // Keep the current section visible in the scrolling mobile bottom bar
   useEffect(() => {
-    document.body.style.overflow = mobileOpen ? 'hidden' : '';
-    return () => { document.body.style.overflow = ''; };
-  }, [mobileOpen]);
+    mobileNav.current
+      ?.querySelector<HTMLElement>('[aria-current="page"]')
+      ?.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }, [pathname, isLoading]);
 
   if (isLoading) {
     return (
@@ -65,14 +64,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   };
 
   const navLinks = [
-    { href: '/dashboard', label: 'Dashboard' },
-    { href: '/dashboard/clients', label: 'Clients' },
-    { href: '/dashboard/plans', label: 'Plans' },
-    { href: '/dashboard/loans', label: 'Loans' },
-    { href: '/dashboard/accounts', label: 'Accounts' },
-    { href: '/dashboard/dues', label: 'Dues' },
-    { href: '/dashboard/history', label: 'History' },
-    { href: '/dashboard/profile', label: 'Profile' },
+    { href: '/dashboard', label: 'Dashboard', short: 'Home', icon: LayoutDashboard },
+    { href: '/dashboard/clients', label: 'Clients', icon: Users },
+    { href: '/dashboard/plans', label: 'Plans', icon: ClipboardList },
+    { href: '/dashboard/loans', label: 'Loans', icon: HandCoins },
+    { href: '/dashboard/accounts', label: 'Accounts', icon: BookOpen },
+    { href: '/dashboard/dues', label: 'Dues', icon: CalendarClock },
+    { href: '/dashboard/history', label: 'History', icon: History },
+    { href: '/dashboard/profile', label: 'Profile', icon: User },
   ];
 
   const isActive = (href: string) =>
@@ -141,94 +140,52 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               </button>
             </div>
 
-            {/* Hamburger — mobile */}
+            {/* Right — mobile (navigation lives in the bottom bar) */}
             <div className="sm:hidden flex items-center gap-2">
               <ThemeToggle />
               <button
-                onClick={() => setMobileOpen(!mobileOpen)}
-                className="relative h-9 w-9 flex items-center justify-center rounded-xl bg-muted hover:bg-muted/80 transition-colors duration-200"
-                aria-label="Toggle menu"
+                onClick={handleLogout}
+                className="h-9 w-9 flex items-center justify-center rounded-xl bg-muted text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors duration-200"
+                aria-label="Logout"
+                title="Logout"
               >
-                <div className="flex flex-col gap-1.5 w-4">
-                  <span className={`block h-0.5 bg-foreground rounded-full transition-all duration-300 origin-center ${mobileOpen ? 'rotate-45 translate-y-2' : ''}`} />
-                  <span className={`block h-0.5 bg-foreground rounded-full transition-all duration-200 ${mobileOpen ? 'opacity-0 scale-x-0' : ''}`} />
-                  <span className={`block h-0.5 bg-foreground rounded-full transition-all duration-300 origin-center ${mobileOpen ? '-rotate-45 -translate-y-2' : ''}`} />
-                </div>
+                <LogOut className="h-4 w-4" />
               </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* ── Full-page mobile menu overlay ── */}
-      <div
-        className={`fixed inset-0 z-40 sm:hidden transition-all duration-300 ${mobileOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-          }`}
+      {/* ── Mobile bottom bar: every section, scrolls sideways ── */}
+      <nav
+        aria-label="Sections"
+        style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
+        className="sm:hidden fixed inset-x-0 bottom-0 z-40 bg-card border-t border-border"
       >
-        {/* Backdrop */}
         <div
-          className="absolute inset-0 bg-black/30 backdrop-blur-sm"
-          onClick={() => setMobileOpen(false)}
-        />
-
-        {/* Slide-in panel */}
-        <div
-          style={{ top: 'calc(3.5rem + env(safe-area-inset-top))' }}
-          className={`absolute left-0 right-0 bottom-0 bg-card flex flex-col transition-transform duration-300 ease-out ${mobileOpen ? 'translate-y-0' : '-translate-y-4'
-            }`}
+          ref={mobileNav}
+          className="flex overflow-x-auto overscroll-x-contain snap-x [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {/* Nav links — takes up main space */}
-          <div className="flex-1 flex flex-col justify-center px-8 gap-2">
-            {navLinks.map((item, i) => {
-              const active = isActive(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  style={{ transitionDelay: mobileOpen ? `${60 + i * 50}ms` : '0ms' }}
-                  className={`flex items-center justify-between px-5 py-4 rounded-2xl text-xl font-semibold transition-all duration-300 ${mobileOpen ? 'translate-x-0 opacity-100' : '-translate-x-4 opacity-0'
-                    } ${active
-                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20'
-                      : 'text-foreground bg-muted hover:bg-muted/80'
-                    }`}
-                >
-                  {item.label}
-                  {active && (
-                    <svg className="h-5 w-5 opacity-60" fill="currentColor" viewBox="0 0 20 20">
-                      <circle cx="10" cy="10" r="4" />
-                    </svg>
-                  )}
-                </Link>
-              );
-            })}
-          </div>
-
-          {/* Bottom user section */}
-          <div className="px-8 pb-10 pt-4 border-t border-border">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 bg-primary rounded-full flex items-center justify-center text-base text-primary-foreground font-bold shadow">
-                  {useName.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-foreground">{useName}</p>
-                  <p className="text-xs text-muted-foreground">Signed in</p>
-                </div>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 text-sm font-semibold text-destructive bg-destructive/10 hover:bg-destructive/15 px-4 py-2.5 rounded-xl transition-colors duration-200"
+          {navLinks.map(item => {
+            const active = isActive(item.href);
+            const Icon = item.icon;
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                className={`relative flex h-[60px] w-[22%] min-w-[4.75rem] shrink-0 snap-start flex-col items-center justify-center gap-1 whitespace-nowrap text-[11px] font-medium transition-colors duration-200 ${active ? 'text-primary' : 'text-muted-foreground'}`}
               >
-                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5}
-                    d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Logout
-              </button>
-            </div>
-          </div>
+                {active && <span className="absolute top-0 h-0.5 w-8 rounded-full bg-primary" />}
+                <Icon className="h-[22px] w-[22px]" strokeWidth={active ? 2.2 : 1.8} />
+                {item.short || item.label}
+              </Link>
+            );
+          })}
         </div>
-      </div>
+        {/* A soft edge hints that there is more to the right */}
+        <span className="pointer-events-none absolute inset-y-0 right-0 w-6 bg-gradient-to-l from-card to-transparent" />
+      </nav>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-1 w-full">
         {children}
@@ -237,7 +194,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* ── Footer ── */}
       <footer
         style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
-        className="border-t border-border mt-auto w-full bg-card/30"
+        className="border-t border-border mt-auto w-full bg-card/30 mb-[60px] sm:mb-0"
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row items-center justify-between gap-2">
           <p className="text-xs text-muted-foreground font-medium text-center md:text-left">
