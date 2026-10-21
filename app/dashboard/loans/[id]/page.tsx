@@ -96,7 +96,7 @@ export default function LoanDetailPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ loanId: id, amount: amt, type: paymentType, date: new Date(date), notes }),
       });
-      if (!res.ok) throw new Error((await res.json()).error || 'Failed');
+      if (!res.ok) throw new Error((await res.json().catch(() => null))?.error || 'Failed');
       setAmount(''); setNotes('');
       await fetchData();
     } catch (err) {
@@ -111,7 +111,9 @@ export default function LoanDetailPage() {
     try {
       const res = await fetch(`/api/payments/${deletePayment._id}`, { method: 'DELETE' });
       if (!res.ok) {
-        const body = await res.json();
+        // A non-JSON reply (e.g. an HTML error page) makes Safari throw
+        // "The string did not match the expected pattern" — show our message instead.
+        const body = await res.json().catch(() => null);
         throw new Error(body?.error || 'Failed to delete payment');
       }
       setDeletePayment(null);
