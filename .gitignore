@@ -9,3 +9,5 @@ node_modules/
 .env*.local
 .env
 .DS_Store
+# Standalone Sheets app — its own repo (github.com/santhosh7r/srm-sheets)
+/sheets-app/
