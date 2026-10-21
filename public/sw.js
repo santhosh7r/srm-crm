@@ -1,5 +1,5 @@
 // Service worker for RIYA FINANCE LTD PWA
-const CACHE_VERSION = 'riya-finance-v2'
+const CACHE_VERSION = 'riya-finance-v3'
 const PRECACHE_URLS = ['/']
 
 self.addEventListener('install', (event) => {

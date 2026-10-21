@@ -1,11 +1,15 @@
 import Image from 'next/image';
 
 /**
- * Brand mark (crown + R) and full lockup (mark + FINANCE wordmark).
- * Both are transparent PNGs cut from public/riya-finance-logo.png, so the gold
- * reads on the white (light) and black (dark) surfaces without a backing tile.
+ * Logo 2.0: the "Riya" wordmark, and the full lockup (wordmark + FINANCE).
+ * Both are transparent PNGs cut from public/logo2.0.png, so the gold reads on
+ * the light and dark surfaces without a backing tile.
  */
 
+const MARK = { src: '/riya-logo2-mark.png', w: 759, h: 360 };
+const FULL = { src: '/riya-logo2-full.png', w: 900, h: 527 };
+
+/** The wordmark is wide, so `size` sets its height; the width follows. */
 export function LogoMark({
   size = 32,
   className = '',
@@ -17,13 +21,13 @@ export function LogoMark({
 }) {
   return (
     <Image
-      src="/riya-logo-mark.png"
+      src={MARK.src}
       alt="RIYA FINANCE"
-      width={size}
+      width={Math.round((size * MARK.w) / MARK.h)}
       height={size}
       priority={priority}
       className={`object-contain ${className}`}
-      style={{ width: size, height: 'auto' }}
+      style={{ height: size, width: 'auto' }}
     />
   );
 }
@@ -39,10 +43,10 @@ export function LogoLockup({
 }) {
   return (
     <Image
-      src="/riya-logo-full.png"
+      src={FULL.src}
       alt="RIYA FINANCE LTD"
       width={width}
-      height={Math.round((width * 868) / 559)}
+      height={Math.round((width * FULL.h) / FULL.w)}
       priority={priority}
       className={`object-contain ${className}`}
       style={{ width, height: 'auto' }}

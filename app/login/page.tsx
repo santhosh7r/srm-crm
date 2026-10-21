@@ -87,7 +87,7 @@ export default function LoginPage() {
             transition={{ delay: 0.2, duration: 0.5 }}
             className="flex items-center justify-center mb-6"
           >
-            <LogoLockup width={104} priority />
+            <LogoLockup width={190} priority />
           </motion.div>
           <h1 className="text-3xl font-bold tracking-tight text-foreground mb-2">Welcome Back</h1>
           <p className="text-muted-foreground text-sm font-medium">Please enter your details to sign in.</p>
